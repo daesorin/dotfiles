@@ -1,0 +1,220 @@
+#!/usr/bin/env bash
+
+# ==============================================================================
+#  ADBX - The Arch-Droid Monolith
+#  Unified tool for ADB, Fastboot, APK Engineering, and Device Management.
+# ==============================================================================
+
+# --- COLORS ---
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+# --- LOGGING HELPERS ---
+log_info()    { echo -e "${BLUE}[INFO]${NC} $1"; }
+log_success() { echo -e "${GREEN}[OK]${NC} $1"; }
+log_warn()    { echo -e "${YELLOW}[WARN]${NC} $1"; }
+log_err()     { echo -e "${RED}[ERR]${NC} $1"; }
+
+# --- DEPENDENCY CHECK ---
+check_deps() {
+    local tools=(adb fastboot apktool uber-apk-signer fzf)
+    local missing=0
+    for tool in "${tools[@]}"; do
+        if ! command -v "$tool" &> /dev/null; then
+            echo -e "${RED}✗ $tool MISSING${NC}"
+            missing=1
+        fi
+    done
+    if [ $missing -eq 1 ]; then
+        log_warn "Some tools are missing. Install them via pacman/yay for full functionality."
+    fi
+}
+
+# ==============================================================================
+#  MODULE 1: DEVICE MANAGEMENT
+# ==============================================================================
+
+cmd_check() {
+    echo -e "${CYAN}=== Environment Check ===${NC}"
+    check_deps
+    echo -e "${GREEN}✓ Environment looks good.${NC}"
+}
+
+cmd_list() {
+    echo -e "${CYAN}=== ADB Devices ===${NC}"
+    adb devices -l
+    echo ""
+    echo -e "${CYAN}=== Fastboot Devices ===${NC}"
+    fastboot devices
+}
+
+cmd_info() {
+    echo -e "${CYAN}=== Device Information ===${NC}"
+    echo "Model:   $(adb shell getprop ro.product.model)"
+    echo "Android: $(adb shell getprop ro.build.version.release)"
+    echo "Serial:  $(adb shell getprop ro.serialno)"
+    
+    # Battery Logic
+    local bat_level=$(adb shell dumpsys battery | grep level | cut -d: -f2 | tr -d ' ')
+    local bat_stat=$(adb shell dumpsys battery | grep 'AC powered' | cut -d: -f2 | tr -d ' ')
+    [[ "$bat_stat" == "true" ]] && status="Charging" || status="Discharging"
+    
+    if [ "$bat_level" -lt 20 ]; then
+        echo -e "Battery: ${RED}${bat_level}%${NC} ($status)"
+    else
+        echo -e "Battery: ${GREEN}${bat_level}%${NC} ($status)"
+    fi
+
+    # Root Check
+    if adb shell su -c "echo 'rooted'" &>/dev/null; then
+        echo -e "Root:    ${GREEN}YES${NC}"
+    else
+        echo -e "Root:    ${RED}NO${NC}"
+    fi
+}
+
+cmd_wifi() {
+    local port=${1:-5555}
+    local ip=$(adb shell ip addr show wlan0 | grep 'inet ' | awk '{print $2}' | cut -d/ -f1)
+    
+    if [ -z "$ip" ]; then
+        log_err "Could not detect WiFi IP. Is WiFi enabled on the phone?"
+        return 1
+    fi
+    
+    log_info "Targeting $ip:$port..."
+    adb tcpip $port
+    sleep 2
+    adb connect "$ip:$port"
+    log_success "Connected to $ip:$port"
+}
+
+# ==============================================================================
+#  MODULE 2: PACKAGE MANAGEMENT (DEBLOAT)
+# ==============================================================================
+
+cmd_nuke() {
+    # Interactive Nuke using FZF
+    local pkg=$(adb shell pm list packages | cut -d: -f2 | fzf --prompt="🔥 NUKE > " --height=40% --layout=reverse --border --preview "adb shell dumpsys package {} | grep -E 'versionName|firstInstallTime'")
+    
+    if [ -n "$pkg" ]; then
+        echo -n "Really NUKE $pkg? (y/N): "
+        read -r confirm
+        if [[ "$confirm" =~ ^[Yy]$ ]]; then
+            adb shell pm uninstall -k --user 0 "$pkg"
+            log_success "$pkg nuked."
+        else
+            log_warn "Aborted."
+        fi
+    fi
+}
+
+cmd_freeze() {
+    local pkg=$(adb shell pm list packages -e | cut -d: -f2 | fzf --prompt="❄️ FREEZE > " --height=40% --layout=reverse)
+    [ -n "$pkg" ] && adb shell pm disable-user --user 0 "$pkg" && log_success "$pkg frozen."
+}
+
+cmd_melt() {
+    local pkg=$(adb shell pm list packages -d | cut -d: -f2 | fzf --prompt="💧 UNFREEZE > " --height=40% --layout=reverse)
+    [ -n "$pkg" ] && adb shell pm enable "$pkg" && log_success "$pkg restored."
+}
+
+# ==============================================================================
+#  MODULE 3: FILE & APK ENGINEERING
+# ==============================================================================
+
+cmd_pull() {
+    # Pull installed APK
+    local pkg_filter="$1"
+    
+    if [ -z "$pkg_filter" ]; then
+        # If no argument, use FZF to pick package
+        local pkg=$(adb shell pm list packages | cut -d: -f2 | fzf --prompt="📦 Extract APK > " --height=40% --layout=reverse)
+        [ -z "$pkg" ] && return
+    else
+        local pkg="$pkg_filter"
+    fi
+
+    local path=$(adb shell pm path "$pkg" | head -n 1 | cut -d: -f2 | tr -d '\r')
+    if [ -z "$path" ]; then
+        log_err "Package $pkg not found."
+        return 1
+    fi
+
+    log_info "Pulling $pkg..."
+    adb pull "$path" "./$pkg.apk"
+    log_success "Saved to ./$pkg.apk"
+}
+
+cmd_sign() {
+    local apk="$1"
+    [ -z "$apk" ] && { log_err "Usage: adbx sign <file.apk>"; return 1; }
+    
+    if command -v uber-apk-signer &> /dev/null; then
+        uber-apk-signer --apks "$apk"
+    else
+        log_warn "Uber-signer missing. Falling back to apksigner..."
+        apksigner sign --ks ~/.android/debug.keystore --ks-pass pass:android --key-pass pass:android "$apk"
+    fi
+}
+
+cmd_scrot() {
+    local file="scrot_$(date +%Y%m%d_%H%M%S).png"
+    log_info "Taking screenshot..."
+    adb shell screencap -p /sdcard/temp.png
+    adb pull /sdcard/temp.png "./$file" > /dev/null
+    adb shell rm /sdcard/temp.png
+    log_success "Saved: $file"
+}
+
+# ==============================================================================
+#  MAIN ROUTER
+# ==============================================================================
+
+usage() {
+    echo -e "${CYAN}Arch-Droid Tool (adbx)${NC}"
+    echo "Usage: adbx <command> [args]"
+    echo ""
+    echo -e "${YELLOW}Device:${NC}"
+    echo "  check       - Check environment tools"
+    echo "  list        - List ADB and Fastboot devices"
+    echo "  info        - Show battery, model, and root status"
+    echo "  wifi        - Connect via TCP/IP (Wireless ADB)"
+    echo "  reboot      - Reboot device"
+    echo ""
+    echo -e "${YELLOW}Packages:${NC}"
+    echo "  nuke        - Interactive uninstall (Debloat)"
+    echo "  freeze      - Interactive freeze app"
+    echo "  melt        - Interactive unfreeze app"
+    echo ""
+    echo -e "${YELLOW}Files & APKs:${NC}"
+    echo "  pull [pkg]  - Extract installed APK from phone"
+    echo "  push <loc>  - Push file to /sdcard/"
+    echo "  sign <apk>  - Sign an APK (Uber/Apksigner)"
+    echo "  scrot       - Take a screenshot and pull it to PC"
+    echo ""
+    exit 1
+}
+
+case "$1" in
+    check)      cmd_check ;;
+    list)       cmd_list ;;
+    info)       cmd_info ;;
+    wifi)       cmd_wifi "$2" ;;
+    reboot)     adb reboot ;;
+    
+    nuke)       cmd_nuke ;;
+    freeze)     cmd_freeze ;;
+    melt)       cmd_melt ;;
+    
+    pull)       cmd_pull "$2" ;;
+    push)       adb push "$2" /sdcard/ ;;
+    sign)       cmd_sign "$2" ;;
+    scrot)      cmd_scrot ;;
+    
+    *)          usage ;;
+esac

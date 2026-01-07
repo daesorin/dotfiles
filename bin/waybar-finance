@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Path to your journal
+JOURNAL="$HOME/Documents/finance/2026.journal"
+
+# 1. Ask hledger for today's expense total
+# -p today: limit to today
+# expenses: only look at expense accounts (ignore assets/equity)
+# --depth 1: collapse subcategories (food:street becomes just expenses)
+# | tail -1: Grab the total line at the bottom
+TOTAL=$(hledger -f "$JOURNAL" balance expenses -p today | tail -1)
+
+# 2. Clean the output
+# This extracts just the numbers and currency, removing tree structure formatting
+# If TOTAL is empty (no spending yet), default to 0
+if [ -z "$TOTAL" ]; then
+    echo "🛡️ 0 NGN"
+else
+    # Formatting: "💸 4,500 NGN"
+    # Using awk to clean up whitespace
+    CLEAN_TOTAL=$(echo "$TOTAL" | awk '{print $1, $2}') 
+    echo "💸 $CLEAN_TOTAL"
+fi

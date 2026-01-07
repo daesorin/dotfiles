@@ -1,0 +1,13 @@
+{
+  "mpd": {
+    "format": "{artist} - {title}",
+    "format-disconnected": "",
+    "format-stopped": "",
+    "max-length": 30,
+    "interval": 2,
+  },
+  "tray": {
+    "icon-size": 14,
+    "spacing": 10,
+  },
+}

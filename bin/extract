@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+# ==============================================================================
+#  EXTRACT - The Universal Unpacker
+#  Automatically detects archive types and extracts them.
+# ==============================================================================
+
+# --- COLORS ---
+RED='\033[1;31m'
+GREEN='\033[1;32m'
+BLUE='\033[1;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+# --- VALIDATION ---
+if [ -z "$1" ]; then
+    echo -e "${BLUE}Usage:${NC} extract <file>"
+    echo "Supported: tar.gz, tar.xz, zip, rar, 7z, bz2, and more."
+    exit 1
+fi
+
+if [ ! -f "$1" ]; then
+    echo -e "${RED}Error: File '$1' not found.${NC}"
+    exit 1
+fi
+
+FILE="$1"
+echo -e "${BLUE}📦 Extracting: ${YELLOW}$FILE${NC}..."
+
+# --- EXTRACTION LOGIC ---
+case "$FILE" in
+    *.tar.bz2)   tar xjf "$FILE"    ;;
+    *.tar.gz)    tar xzf "$FILE"    ;;
+    *.tar.xz)    tar xJf "$FILE"    ;;
+    *.lzma)      unlzma "$FILE"     ;;
+    *.bz2)       bunzip2 "$FILE"    ;;
+    *.rar)       unrar x "$FILE"    ;;
+    *.gz)        gunzip "$FILE"     ;;
+    *.tar)       tar xf "$FILE"     ;;
+    *.tbz2)      tar xjf "$FILE"    ;;
+    *.tgz)       tar xzf "$FILE"    ;;
+    *.zip)       unzip "$FILE"      ;;
+    *.Z)         uncompress "$FILE" ;;
+    *.7z)        7z x "$FILE"       ;;
+    *.xz)        unxz "$FILE"       ;;
+    *.exe)       cabextract "$FILE" ;; # Often useful for Windows installers
+    *)
+        echo -e "${RED}❌ Error: '$FILE' format not recognized.${NC}"
+        echo "Supported extensions: .tar.gz, .zip, .rar, .7z, etc."
+        exit 1
+        ;;
+esac
+
+# --- RESULT ---
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}✅ Extraction complete.${NC}"
+else
+    echo -e "${RED}⚠️  Extraction failed.${NC}"
+fi

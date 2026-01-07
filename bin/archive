@@ -1,0 +1,158 @@
+#!/usr/bin/env bash
+
+# ==============================================================================
+#  ARCHIVE v2.0 - Intelligent Media Downloader
+#  Auto-sorting, History tracking, and 5-Tier Quality Control.
+# ==============================================================================
+
+# --- LOCATIONS ---
+DIR_VIDEO="$HOME/Videos"
+DIR_MUSIC="$HOME/Music"
+HIST_VIDEO="$HOME/.config/archive_history_video.txt"
+HIST_MUSIC="$HOME/.config/archive_history_music.txt"
+
+# --- COLORS ---
+GREEN='\033[1;32m'
+BLUE='\033[1;34m'
+YELLOW='\033[1;33m'
+RED='\033[1;31m'
+NC='\033[0m'
+
+# --- COMMON FLAGS (The "Stealth" Engine) ---
+# --download-archive: Records IDs to text file to prevent duplicates
+# --quiet --progress: Shows only the bar, no junk
+BASE_ARGS=(
+  "--quiet" "--progress"
+  "--no-warnings"
+  "--ignore-errors"
+  "--add-metadata"
+  "--embed-thumbnail"
+  "--embed-subs"
+  "--sub-langs" "all,-live_chat"
+  "--embed-chapters"
+)
+
+# --- DEPENDENCY CHECK ---
+check_deps() {
+  for cmd in yt-dlp ffmpeg fzf; do
+    if ! command -v "$cmd" &>/dev/null; then
+      echo -e "${RED}Error: '$cmd' is missing.${NC}"
+      exit 1
+    fi
+  done
+  # Create history files if missing
+  touch "$HIST_VIDEO" "$HIST_MUSIC"
+}
+
+# --- QUALITY MODES (1 = Best, 5 = Worst) ---
+
+dl_video() {
+  local url="$1"
+  local quality="$2"
+
+  cd "$DIR_VIDEO" || exit
+  echo -e "${BLUE}📂 Target: $DIR_VIDEO${NC}"
+
+  case "$quality" in
+  1 | ultra)
+    echo -e "${BLUE}⬇️  Mode 1: ULTRA (Best Available)${NC}"
+    F_STR="bv+ba/b"
+    ;;
+  2 | high)
+    echo -e "${BLUE}⬇️  Mode 2: HIGH (1080p limit)${NC}"
+    F_STR="bv[height<=1080]+ba/b[height<=1080]"
+    ;;
+  3 | medium)
+    echo -e "${BLUE}⬇️  Mode 3: MEDIUM (720p limit)${NC}"
+    F_STR="bv[height<=720]+ba/b[height<=720]"
+    ;;
+  4 | saver)
+    echo -e "${BLUE}⬇️  Mode 4: SAVER (480p limit)${NC}"
+    F_STR="bv[height<=480]+ba/b[height<=480]"
+    ;;
+  5 | worst)
+    echo -e "${BLUE}⬇️  Mode 5: POTATO (360p limit)${NC}"
+    F_STR="bv[height<=360]+ba/b[height<=360]"
+    ;;
+  *)
+    echo "Invalid Mode. Defaulting to Ultra."
+    F_STR="bv+ba/b"
+    ;;
+  esac
+
+  yt-dlp "${BASE_ARGS[@]}" \
+    --download-archive "$HIST_VIDEO" \
+    --merge-output-format mkv \
+    -f "$F_STR" \
+    -o "%(title)s [%(id)s].%(ext)s" \
+    "$url"
+}
+
+dl_audio() {
+  local url="$1"
+  cd "$DIR_MUSIC" || exit
+  echo -e "${BLUE}📂 Target: $DIR_MUSIC${NC}"
+  echo -e "${BLUE}🎵 Mode: AUDIO (MP3)${NC}"
+
+  yt-dlp "${BASE_ARGS[@]}" \
+    --download-archive "$HIST_MUSIC" \
+    --extract-audio \
+    --audio-format mp3 \
+    --audio-quality 0 \
+    -o "%(title)s.%(ext)s" \
+    "$url"
+}
+
+# --- INTERACTIVE MENU ---
+interactive_menu() {
+  local url="$1"
+  if [[ -z "$url" ]]; then
+    echo -e "${RED}Missing URL.${NC}"
+    exit 1
+  fi
+
+  echo -e "${BLUE}Select Quality Tier:${NC}"
+  # Use FZF to pick the mode
+  local choice=$(echo -e "1. Ultra (Best)\n2. High (1080p)\n3. Medium (720p)\n4. Saver (480p)\n5. Potato (360p)\nAudio Only (MP3)" |
+    fzf --height=30% --layout=reverse --prompt="🎚️  Quality > ")
+
+  case "$choice" in
+  1*) dl_video "$url" 1 ;;
+  2*) dl_video "$url" 2 ;;
+  3*) dl_video "$url" 3 ;;
+  4*) dl_video "$url" 4 ;;
+  5*) dl_video "$url" 5 ;;
+  Audio*) dl_audio "$url" ;;
+  *)
+    echo "Cancelled."
+    exit 0
+    ;;
+  esac
+}
+
+# --- MAIN ROUTER ---
+check_deps
+
+if [[ -z "$1" ]]; then
+  echo -e "${BLUE}Usage:${NC} archive <URL> [flags]"
+  echo "  <URL>         Interactive Menu (Recommended)"
+  echo "  -a <URL>      Quick Audio (MP3)"
+  echo "  -best <URL>   Quick Best Quality"
+  echo "  -worst <URL>  Quick Worst Quality"
+  exit 1
+fi
+
+# Flag Handling
+case "$1" in
+-a | --audio) dl_audio "$2" ;;
+-1 | --ultra) dl_video "$2" 1 ;;
+-2 | --high) dl_video "$2" 2 ;;
+-3 | --medium) dl_video "$2" 3 ;;
+-4 | --saver) dl_video "$2" 4 ;;
+-5 | --worst) dl_video "$2" 5 ;;
+http*) interactive_menu "$1" ;; # If just URL, show menu
+*)
+  echo "Unknown option."
+  exit 1
+  ;;
+esac

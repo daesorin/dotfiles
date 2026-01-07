@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+# ==============================================================================
+#  COMPRESS - The Universal Packer
+#  Auto-detects format from filename. Defaults to .tar.gz if no output specified.
+# ==============================================================================
+
+# --- COLORS ---
+RED='\033[1;31m'
+GREEN='\033[1;32m'
+BLUE='\033[1;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+# --- VALIDATION ---
+if [ -z "$1" ]; then
+    echo -e "${BLUE}Usage:${NC} compress <source> [output_filename]"
+    echo "Examples:"
+    echo "  compress myfolder            -> Creates myfolder.tar.gz"
+    echo "  compress myfolder data.zip   -> Creates data.zip"
+    exit 1
+fi
+
+SOURCE="${1%/}" # Strip trailing slash for cleaner naming
+if [ ! -e "$SOURCE" ]; then
+    echo -e "${RED}Error: Source '$SOURCE' not found.${NC}"
+    exit 1
+fi
+
+# --- SMART OUTPUT DETECTION ---
+# If user provided a 2nd argument, use it. Otherwise, default to source.tar.gz
+if [ -n "$2" ]; then
+    OUTPUT="$2"
+else
+    OUTPUT="${SOURCE}.tar.gz"
+fi
+
+echo -e "${BLUE}📦 Compressing ${YELLOW}$SOURCE${NC} into ${YELLOW}$OUTPUT${NC}..."
+
+# --- COMPRESSION LOGIC ---
+case "$OUTPUT" in
+    *.tar.gz)   tar -czf "$OUTPUT" "$SOURCE" ;;
+    *.tgz)      tar -czf "$OUTPUT" "$SOURCE" ;;
+    *.tar.xz)   tar -cJf "$OUTPUT" "$SOURCE" ;;
+    *.zip)      zip -r "$OUTPUT" "$SOURCE"   ;;
+    *.7z)       7z a "$OUTPUT" "$SOURCE"     ;;
+    *.tar.bz2)  tar -cjf "$OUTPUT" "$SOURCE" ;;
+    *.rar)      rar a "$OUTPUT" "$SOURCE"    ;; # Requires 'rar' package
+    *.tar)      tar -cf "$OUTPUT" "$SOURCE"  ;;
+    *)
+        echo -e "${RED}❌ Error: Format not recognized from extension.${NC}"
+        echo "Please end your filename with .zip, .tar.gz, .7z, etc."
+        exit 1
+        ;;
+esac
+
+# --- RESULT ---
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}✅ Compression complete.${NC}"
+    # Show the size of the new file
+    du -h "$OUTPUT" | awk '{print $1 "  " $2}'
+else
+    echo -e "${RED}⚠️  Compression failed.${NC}"
+fi

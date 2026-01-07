@@ -1,0 +1,6 @@
+set selection-clipboard clipboard
+set recolor "true"
+set completion-bg "#1e1e2e"
+set completion-fg "#cdd6f4"
+set statusbar-bg "#1e1e2e"
+set statusbar-fg "#cdd6f4"

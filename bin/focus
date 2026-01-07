@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+# FOCUS MODE
+# Toggles between "Deep Work" and "Normal" states.
+# Uses a lockfile to track state: /tmp/focus_active
+
+LOCKFILE="/tmp/focus_active"
+
+if [ -f "$LOCKFILE" ]; then
+    # --- DEACTIVATE FOCUS MODE ---
+    echo "Deactivating Focus Mode..."
+    
+    # 1. Bring back the Status Bar
+    waybar &
+    
+    # 2. Reset Hyprland Colors (Reloads your config defaults)
+    hyprctl reload
+    
+    # 3. Notify
+    notify-send "Focus Mode: OFF" "Welcome back to reality."
+    
+    # 4. Remove Lockfile
+    rm "$LOCKFILE"
+
+else
+    # --- ACTIVATE FOCUS MODE ---
+    echo "Activating Focus Mode..."
+    
+    # 1. Kill the Status Bar (No clock, no distractions)
+    killall waybar
+    
+    # 2. Silence Music (Pause MPD)
+    mpc pause
+    
+    # 3. Set "Combat Mode" Borders (Red = Work)
+    #    0xff + Hex Color. Example: Red = ff0000
+    hyprctl keyword general:col.active_border "0xffff0000"
+    hyprctl keyword general:col.inactive_border "0xff220000"
+    
+    # 4. Disable Animations (Snap performance)
+    hyprctl keyword animations:enabled 0
+    
+    # 5. Notify
+    notify-send -u critical "Focus Mode: ON" "Distractions killed. Build something."
+    
+    # 6. Create Lockfile
+    touch "$LOCKFILE"
+fi

@@ -1,0 +1,47 @@
+/* --- THE NOIR THEME: LINE RUNNER --- */
+
+configuration {
+    font: "JetBrains Mono Medium 11";
+    show-icons: false;
+}
+
+window {
+    height:           44px;
+    width:            500px;
+    location:         center;
+    anchor:           center;
+    
+    /* Structure */
+    border-radius:    0px; /* Flat */
+    border:           1px;
+    border-color:     #4a4a4a; /* Muted gray border */
+    background-color: #1a1a1a; /* Dark gray background */
+    padding:          0px;
+    
+    children:         [ inputbar ];
+}
+
+inputbar {
+    background-color: transparent;
+    text-color:       #c0c0c0;
+    children:         [ prompt, entry ];
+    spacing:          10px;
+    padding:          10px;
+}
+
+prompt {
+    /* The "Label" */
+    background-color: transparent; 
+    text-color:       #4a4a4a; /* Muted label */
+    padding:          0px 5px 0px 5px;
+    margin:           0px;
+    content:          ">"; /* Minimal prompt symbol */
+}
+
+entry {
+    background-color: transparent;
+    text-color:       #c0c0c0; /* Bright input text */
+    placeholder:      "Execute...";
+    placeholder-color:#4a4a4a;
+    vertical-align:   0.5;
+}
