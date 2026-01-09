@@ -10,24 +10,27 @@ BRANCH="main"
 mkdir -p "$(dirname "$LOG")"
 
 log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >>"$LOG"
 }
 
 # 1. Pre-Flight Check (Internet)
-if ! ping -c 1 codeberg.org &> /dev/null; then
-    log "Offline. Skipping sync."
-    exit 0
+if ! ping -c 1 codeberg.org &>/dev/null; then
+  log "Offline. Skipping sync."
+  exit 0
 fi
 
-cd "$DIR" || { log "Critical: Finance directory not found."; exit 1; }
+cd "$DIR" || {
+  log "Critical: Finance directory not found."
+  exit 1
+}
 
 # 2. Dirty Check (Only commit if there are changes)
 if [[ -n $(git status -s) ]]; then
-    git add .
-    git commit -m "Fortress: Auto-sync $(date '+%Y-%m-%d %H:%M')"
-    log "Local changes committed."
+  git add .
+  git commit -m "Fortress: Auto-sync $(date '+%Y-%m-%d %H:%M')"
+  log "Local changes committed."
 else
-    log "No local changes to commit."
+  log "No local changes to commit."
 fi
 
 # 3. The Sync (Pull --rebase -> Push)
@@ -35,17 +38,17 @@ log "Attempting sync..."
 OUTPUT=$(git pull --rebase "$REMOTE" "$BRANCH" 2>&1)
 
 if [ $? -eq 0 ]; then
-    # Pull successful, now push
-    git push "$REMOTE" "$BRANCH" >> "$LOG" 2>&1
-    if [ $? -eq 0 ]; then
-        log "✅ Sync Complete."
-        # Optional: notify-send -u low "Fortress" "Secured."
-    else
-        log "❌ Push failed."
-        notify-send -u critical "Fortress" "Push Failed! Check logs."
-    fi
+  # Pull successful, now push
+  git push "$REMOTE" "$BRANCH" >>"$LOG" 2>&1
+  if [ $? -eq 0 ]; then
+    log "✅ Sync Complete."
+    # Optional: notify-send -u low "Fortress" "Secured."
+  else
+    log "❌ Push failed."
+    notify-send -u critical "Fortress" "Push Failed! Check logs."
+  fi
 else
-    log "❌ Pull failed. Conflict likely."
-    echo "$OUTPUT" >> "$LOG"
-    notify-send -u critical "Fortress" "Sync Conflict! Manual intervention required."
+  log "❌ Pull failed. Conflict likely."
+  echo "$OUTPUT" >>"$LOG"
+  notify-send -u critical "Fortress" "Sync Conflict! Manual intervention required."
 fi
