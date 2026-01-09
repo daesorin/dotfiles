@@ -45,7 +45,6 @@ path=(
   /bin
 )
 
-[[ -d "$HOME/bin" ]] && path=("$HOME/bin" $path)
 [[ -d "$HOME/scripts" ]] && path=("$HOME/scripts" $path)
 [[ -d "$HOME/.local/bin" ]] && path=("$HOME/.local/bin" $path)
 
