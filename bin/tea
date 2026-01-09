@@ -7,7 +7,7 @@
 
 # Hardcoded path to avoid recursion since this script is also named 'tea'
 REAL_TEA="/usr/bin/tea"
-MY_USER="osaigbovo"
+MY_USER="daesorin"
 
 # Colors
 RED='\033[0;31m'
