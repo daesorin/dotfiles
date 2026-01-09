@@ -65,7 +65,7 @@ Workspace for public portfolio projects mirrored to GitHub.
 
 ```bash
 # 1. Clone the repository
-git clone git@codeberg.org:osaigbovo/dotfiles.git ~/dotfiles
+git clone git@codeberg.org:daesorin/dotfiles.git ~/dotfiles
 
 # 2. Link configurations (Using Stow or manual linking)
 # The 'bin' folder is designed to be symlinked to ~/.local/bin
