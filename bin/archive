@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # ==============================================================================
-#  ARCHIVE v2.0 - Intelligent Media Downloader
-#  Auto-sorting, History tracking, and 5-Tier Quality Control.
+#  ARCHIVE v2.1 - Intelligent Media Downloader
+#  Real-time format scanning, Resume persistence, and History tracking.
 # ==============================================================================
 
 # --- LOCATIONS ---
@@ -14,15 +14,18 @@ HIST_MUSIC="$HOME/.config/archive_history_music.txt"
 # --- COLORS ---
 GREEN='\033[1;32m'
 BLUE='\033[1;34m'
+CYAN='\033[1;36m'
 YELLOW='\033[1;33m'
 RED='\033[1;31m'
+GREY='\033[0;90m'
 NC='\033[0m'
 
-# --- COMMON FLAGS (The "Stealth" Engine) ---
-# --download-archive: Records IDs to text file to prevent duplicates
-# --quiet --progress: Shows only the bar, no junk
+# --- CONFIGURATION ---
+# -c: Force resume of partially downloaded files
+# --no-mtime: Don't set file modification time (helps with sorting by download date)
 BASE_ARGS=(
   "--quiet" "--progress"
+  "-c"
   "--no-warnings"
   "--ignore-errors"
   "--add-metadata"
@@ -30,64 +33,81 @@ BASE_ARGS=(
   "--embed-subs"
   "--sub-langs" "all,-live_chat"
   "--embed-chapters"
+  "--no-mtime"
 )
 
 # --- DEPENDENCY CHECK ---
 check_deps() {
-  for cmd in yt-dlp ffmpeg fzf; do
+  for cmd in yt-dlp ffmpeg fzf awk; do
     if ! command -v "$cmd" &>/dev/null; then
       echo -e "${RED}Error: '$cmd' is missing.${NC}"
       exit 1
     fi
   done
   # Create history files if missing
+  mkdir -p "$(dirname "$HIST_VIDEO")"
   touch "$HIST_VIDEO" "$HIST_MUSIC"
 }
 
-# --- QUALITY MODES (1 = Best, 5 = Worst) ---
+# --- FUNCTIONS ---
 
-dl_video() {
+# 1. Scan URL for specific formats
+scan_and_select() {
   local url="$1"
-  local quality="$2"
+
+  echo -e "${CYAN}🔍 Scanning available formats...${NC}"
+
+  # Fetch formats, remove header lines, and pipe to FZF
+  # We capture the raw output first to handle errors
+  if ! raw_formats=$(yt-dlp -F "$url" 2>/dev/null); then
+    echo -e "${RED}Failed to fetch formats. URL might be invalid.${NC}"
+    exit 1
+  fi
+
+  # Present the menu
+  # We assume the user wants the best at the bottom, so we use --tac (reverse)
+  # We extract the first column (Format ID) using awk
+  selected_line=$(echo "$raw_formats" | grep -v "format code" | grep -v "\[info\]" |
+    fzf --height=60% --layout=reverse --border --prompt="🎥 Select Quality > " \
+      --header="ID  EXT  RES  FPS  SIZE  BITRATE  CODECS" \
+      --color="header:blue,info:yellow,pointer:cyan")
+
+  if [[ -z "$selected_line" ]]; then
+    echo -e "${YELLOW}Selection cancelled.${NC}"
+    exit 0
+  fi
+
+  # Extract the ID (first column)
+  local f_id
+  f_id=$(echo "$selected_line" | awk '{print $1}')
+
+  # Check if it's "audio only" (often ID 140, 251, etc) or video
+  # If the line contains "audio only", treat differently?
+  # Actually, yt-dlp handles merging automatically if we use the right flag structure.
+
+  echo -e "${GREEN}✅ Selected ID: $f_id${NC}"
+  dl_specific "$url" "$f_id"
+}
+
+# 2. Download Specific Format (With Audio Merge fallback)
+dl_specific() {
+  local url="$1"
+  local f_id="$2"
 
   cd "$DIR_VIDEO" || exit
   echo -e "${BLUE}📂 Target: $DIR_VIDEO${NC}"
 
-  case "$quality" in
-  1 | ultra)
-    echo -e "${BLUE}⬇️  Mode 1: ULTRA (Best Available)${NC}"
-    F_STR="bv+ba/b"
-    ;;
-  2 | high)
-    echo -e "${BLUE}⬇️  Mode 2: HIGH (1080p limit)${NC}"
-    F_STR="bv[height<=1080]+ba/b[height<=1080]"
-    ;;
-  3 | medium)
-    echo -e "${BLUE}⬇️  Mode 3: MEDIUM (720p limit)${NC}"
-    F_STR="bv[height<=720]+ba/b[height<=720]"
-    ;;
-  4 | saver)
-    echo -e "${BLUE}⬇️  Mode 4: SAVER (480p limit)${NC}"
-    F_STR="bv[height<=480]+ba/b[height<=480]"
-    ;;
-  5 | worst)
-    echo -e "${BLUE}⬇️  Mode 5: POTATO (360p limit)${NC}"
-    F_STR="bv[height<=360]+ba/b[height<=360]"
-    ;;
-  *)
-    echo "Invalid Mode. Defaulting to Ultra."
-    F_STR="bv+ba/b"
-    ;;
-  esac
-
+  # Logic: Download the Selected ID + Best Audio.
+  # If the Selected ID already has audio (e.g. standard mp4), the /b fallback handles it.
   yt-dlp "${BASE_ARGS[@]}" \
     --download-archive "$HIST_VIDEO" \
     --merge-output-format mkv \
-    -f "$F_STR" \
+    -f "${f_id}+ba/b" \
     -o "%(title)s [%(id)s].%(ext)s" \
     "$url"
 }
 
+# 3. Audio Only Mode (MP3)
 dl_audio() {
   local url="$1"
   cd "$DIR_MUSIC" || exit
@@ -103,31 +123,19 @@ dl_audio() {
     "$url"
 }
 
-# --- INTERACTIVE MENU ---
-interactive_menu() {
+# 4. Fallback: Quick Best (Old Behavior)
+dl_best() {
   local url="$1"
-  if [[ -z "$url" ]]; then
-    echo -e "${RED}Missing URL.${NC}"
-    exit 1
-  fi
+  cd "$DIR_VIDEO" || exit
+  echo -e "${BLUE}📂 Target: $DIR_VIDEO${NC}"
+  echo -e "${BLUE}🚀 Mode: AUTO BEST${NC}"
 
-  echo -e "${BLUE}Select Quality Tier:${NC}"
-  # Use FZF to pick the mode
-  local choice=$(echo -e "1. Ultra (Best)\n2. High (1080p)\n3. Medium (720p)\n4. Saver (480p)\n5. Potato (360p)\nAudio Only (MP3)" |
-    fzf --height=30% --layout=reverse --prompt="🎚️  Quality > ")
-
-  case "$choice" in
-  1*) dl_video "$url" 1 ;;
-  2*) dl_video "$url" 2 ;;
-  3*) dl_video "$url" 3 ;;
-  4*) dl_video "$url" 4 ;;
-  5*) dl_video "$url" 5 ;;
-  Audio*) dl_audio "$url" ;;
-  *)
-    echo "Cancelled."
-    exit 0
-    ;;
-  esac
+  yt-dlp "${BASE_ARGS[@]}" \
+    --download-archive "$HIST_VIDEO" \
+    --merge-output-format mkv \
+    -f "bv+ba/b" \
+    -o "%(title)s [%(id)s].%(ext)s" \
+    "$url"
 }
 
 # --- MAIN ROUTER ---
@@ -135,24 +143,31 @@ check_deps
 
 if [[ -z "$1" ]]; then
   echo -e "${BLUE}Usage:${NC} archive <URL> [flags]"
-  echo "  <URL>         Interactive Menu (Recommended)"
+  echo "  <URL>         Scan & Select Quality (Interactive)"
   echo "  -a <URL>      Quick Audio (MP3)"
-  echo "  -best <URL>   Quick Best Quality"
-  echo "  -worst <URL>  Quick Worst Quality"
+  echo "  -b <URL>      Quick Best (Skip Menu)"
   exit 1
 fi
 
 # Flag Handling
 case "$1" in
--a | --audio) dl_audio "$2" ;;
--1 | --ultra) dl_video "$2" 1 ;;
--2 | --high) dl_video "$2" 2 ;;
--3 | --medium) dl_video "$2" 3 ;;
--4 | --saver) dl_video "$2" 4 ;;
--5 | --worst) dl_video "$2" 5 ;;
-http*) interactive_menu "$1" ;; # If just URL, show menu
+-a | --audio)
+  dl_audio "$2"
+  ;;
+-b | --best)
+  dl_best "$2"
+  ;;
+http* | www*)
+  # If it looks like a URL, go straight to scan mode
+  scan_and_select "$1"
+  ;;
 *)
-  echo "Unknown option."
-  exit 1
+  # Handle case where user puts flag after URL or messes up
+  if [[ "$2" =~ ^http ]]; then
+    scan_and_select "$2"
+  else
+    echo "Invalid usage."
+    exit 1
+  fi
   ;;
 esac
