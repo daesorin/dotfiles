@@ -51,3 +51,6 @@ iclaunch() {
 icip() {
     incus list "$1" -c 4 --format csv | cut -d' ' -f1
 }
+
+# Add to modules/incus.zsh
+alias torbrowser='incus exec librewolf-tor -- su - user -c "XDG_RUNTIME_DIR=/run/user/1000 WAYLAND_DISPLAY=wayland-1 MOZ_ENABLE_WAYLAND=1 librewolf"'

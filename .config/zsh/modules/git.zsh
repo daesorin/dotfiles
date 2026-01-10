@@ -13,7 +13,7 @@ alias gap='git add -p'
 alias gau='git add -u'
 
 # --- COMMITTING ---
-alias gc='git commit -v'
+alias gc='git commit'
 alias gca='git commit --amend --no-edit'
 
 # --- BRANCHING ---

@@ -12,25 +12,32 @@ alias ports='sudo ss -tulpn'
 alias myip='curl -s https://ifconfig.me && echo'
 
 # --- DNS ---
-# Flush DNS Cache (Systemd-resolved)
+# Smart DNS Flush
 flush() {
-    sudo systemd-resolve --flush-caches 2>/dev/null || sudo resolvectl flush-caches
-    echo "✅ DNS cache flushed"
+    if systemctl is-active --quiet dnscrypt-proxy; then
+        sudo systemctl restart dnscrypt-proxy
+        echo "✅ DNSCrypt-proxy restarted (Cache Flushed)"
+    elif systemctl is-active --quiet systemd-resolved; then
+        sudo resolvectl flush-caches
+        echo "✅ DNS cache flushed (systemd-resolved)"
+    elif systemctl is-active --quiet NetworkManager; then
+        sudo systemctl reload NetworkManager
+        echo "✅ NetworkManager reloaded"
+    else
+        echo "⚠️  No known DNS cacher found (checked dnscrypt, resolved, NM)."
+    fi
 }
 
 # --- VPN & PRIVACY ---
 
-# WireGuard (Proton Manual Config)
 alias vpnup='sudo wg-quick up proton'
 alias vpndown='sudo wg-quick down proton'
 
-# ProtonVPN CLI (Official App)
 alias vpn='protonvpn'
 alias vpn-on='protonvpn connect'      # Establish connection
 alias vpn-off='protonvpn disconnect'  # Kill the connection
 alias vpn-stat='protonvpn info'       # Check status
 
-# Tor Service
 alias torup='sudo systemctl start tor && echo "🧅 Tor Service Started [On]"'
 alias tordown='sudo systemctl stop tor && echo "🚫 Tor Service Stopped [Off]"'
 
