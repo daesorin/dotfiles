@@ -1,0 +1,26 @@
+{
+  "network": {
+    "format-wifi": "  {signalStrength}%",
+    "format-ethernet": "  Eth",
+    "format-disconnected": "",
+    "tooltip-format": "{essid} ({ipaddr})",
+    "on-click": "kitty -e nmtui",
+  },
+  "bluetooth": {
+    "format": "",
+    "format-disabled": "",
+    "format-connected": "",
+    "tooltip-format": "{controller_alias}\t{controller_address}",
+    "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+    "on-click": "blueman-manager",
+  },
+  "battery": {
+    "states": { "warning": 30, "critical": 15 },
+    "format": "{icon}  {capacity}%",
+    "format-charging": "  {capacity}%",
+    "format-plugged": "  {capacity}%",
+    "format-icons": ["", "", "", "", ""],
+    "tooltip-format": "{time} remaining",
+  },
+}

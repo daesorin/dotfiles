@@ -1,0 +1,25 @@
+{
+  // Load module definitions from external files
+  "include": [
+    "~/.config/waybar/modules/hyprland.jsonc",
+    "~/.config/waybar/modules/hardware.jsonc",
+    "~/.config/waybar/modules/media.jsonc",
+    "~/.config/waybar/modules/finance.jsonc",
+  ],
+
+  "layer": "top",
+  "position": "top",
+  "height": 27,
+  "spacing": 0,
+
+  // The Layout: Only module names go here
+  "modules-left": ["hyprland/workspaces"],
+  "modules-center": ["hyprland/window"],
+  "modules-right": [
+    "custom/finance",
+    "network",
+    "bluetooth",
+    "battery",
+    "tray",
+  ],
+}
