@@ -16,7 +16,7 @@ These files are meant to be _read_, _modified_, and _stolen from_.
 - Tmux with sane defaults and theming
 - Lightweight, scriptable status bars and notifications
 
-No installers. No magic bootstrap scripts. No assumptions about your distro beyond “it’s Linux and you know what you’re doing.”
+No installers. No magic bootstrap scripts. You are using Arch Linux and you know what you’re doing.
 
 ---
 
@@ -51,11 +51,6 @@ No installers. No magic bootstrap scripts. No assumptions about your distro beyo
 - TPM-based plugin management
 - Catppuccin theme
 - Sensible defaults with minimal custom glue
-
-### Waybar
-
-- JSONC configs with comments
-- Styling separated cleanly into CSS
 
 ---
 
