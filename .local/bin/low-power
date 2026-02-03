@@ -1,0 +1,10 @@
+#!/bin/bash
+# 1. Drop brightness to 10%
+brightnessctl set 10%
+
+# 2. Kill non-essential background hogs
+pkill -f filen-cli  # Pause the sync to save CPU/Wifi
+pkill -f newsboat   # Close news
+
+# 3. Notify the Fortress
+notify-send "⚡ Power Alert" "Switching to Survival Mode. Sync paused."

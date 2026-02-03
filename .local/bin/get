@@ -1,0 +1,147 @@
+#!/usr/bin/env python3
+
+"""
+GET - The Universal Downloader (Aria2c Wrapper)
+Ported to Python for cleaner logic and string handling.
+"""
+
+import sys
+import os
+import subprocess
+import argparse
+from urllib.parse import quote, unquote
+
+# --- CONFIGURATION ---
+SESSION_FILE = os.path.expanduser("~/.aria2_session")
+
+# --- COLORS ---
+class Color:
+    GREEN = '\033[1;32m'
+    BLUE = '\033[1;34m'
+    YELLOW = '\033[1;33m'
+    RED = '\033[1;31m'
+    NC = '\033[0m'
+
+def log(message, color=Color.NC):
+    """Prints a colored log message."""
+    print(f"{color}{message}{Color.NC}")
+
+def sanitize_url(url):
+    return quote(unquote(url), safe=':/?=&')
+
+def run_aria2c(args):
+    """Executes the aria2c process with the given arguments."""
+    base_cmd = [
+        "aria2c",
+        "--continue=true",
+        "--max-connection-per-server=16",
+        "--split=16",
+        "--min-split-size=1M",
+        "--user-agent=Mozilla/5.0",
+        f"--save-session={SESSION_FILE}",
+        "--save-session-interval=60",
+        "--seed-time=0"
+    ]
+    
+    # Combine base configuration with specific mode arguments
+    full_cmd = base_cmd + args
+    
+    try:
+        subprocess.run(full_cmd, check=True)
+    except subprocess.CalledProcessError as e:
+        log(f"Error: Aria2c exited with code {e.returncode}", Color.RED)
+        sys.exit(e.returncode)
+    except FileNotFoundError:
+        log("Error: aria2c not found. Install it with 'pacman -S aria2'.", Color.RED)
+        sys.exit(1)
+
+def mode_single(raw_url):
+    """Handles single URL downloads."""
+    url = sanitize_url(raw_url)
+    log(f">>> [get] Target: {url}", Color.BLUE)
+    run_aria2c([url])
+
+def mode_batch(filepath):
+    """Handles batch downloads from a file."""
+    if not os.path.exists(filepath):
+        log(f"Error: File '{filepath}' not found.", Color.RED)
+        sys.exit(1)
+
+    log(f">>> [get] Processing batch file: {filepath}", Color.BLUE)
+    
+    # Pre-process the list to sanitize URLs
+    clean_list_path = "/tmp/aria2_batch_clean.txt"
+    valid_count = 0
+    
+    try:
+        with open(filepath, 'r') as infile, open(clean_list_path, 'w') as outfile:
+            for line in infile:
+                line = line.strip()
+                if not line or line.startswith('#'):
+                    continue
+                sanitized = sanitize_url(line)
+                outfile.write(sanitized + '\n')
+                valid_count += 1
+        
+        log(f">>> Found {valid_count} valid links.", Color.GREEN)
+        
+        # Run aria2c pointing to the clean list
+        run_aria2c([
+            f"--input-file={clean_list_path}",
+            "--max-concurrent-downloads=4"
+        ])
+        
+    finally:
+        # Cleanup the temp file
+        if os.path.exists(clean_list_path):
+            os.remove(clean_list_path)
+
+def mode_resume():
+    """Resumes the previous session."""
+    if not os.path.exists(SESSION_FILE):
+        log(f"Error: No session file found at {SESSION_FILE}", Color.RED)
+        sys.exit(1)
+
+    log(">>> [get] Resuming previous session...", Color.YELLOW)
+    run_aria2c([f"--input-file={SESSION_FILE}"])
+
+def main():
+    parser = argparse.ArgumentParser(description="Aria2c Wrapper for Humans.")
+    
+    # We use a custom logic for the first argument to replicate the "smart detection"
+    # standard argparse makes "optional positional arguments" tricky.
+    
+    if len(sys.argv) < 2:
+        parser.print_help()
+        sys.exit(1)
+
+    target = sys.argv[1]
+
+    # 1. Smart Detection: Resume Flag
+    if target in ['-r', '--resume']:
+        mode_resume()
+        sys.exit(0)
+
+    # 2. Smart Detection: Is it a local file?
+    if os.path.isfile(target):
+        log(">>> [get] Detected local file. Switching to Batch Mode.", Color.GREEN)
+        mode_batch(target)
+        sys.exit(0)
+
+    # 3. Smart Detection: Explicit Batch Flag
+    if target in ['-b', '--batch']:
+        if len(sys.argv) < 3:
+            log("Error: Missing file argument for batch mode.", Color.RED)
+            sys.exit(1)
+        mode_batch(sys.argv[2])
+        sys.exit(0)
+
+    # 4. Default: It is a URL
+    mode_single(target)
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        log("\n>>> [get] Interrupted by user.", Color.RED)
+        sys.exit(130)

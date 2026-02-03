@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+
+# -----------------------------------------------------------------------------
+# MONOLITH WRAPPER FOR GITHUB CLI (gh)
+# Wraps /usr/bin/gh to add "smart" functionality for repo creation and issues.
+# -----------------------------------------------------------------------------
+
+# Hardcoded path to avoid recursion
+REAL_GH="/usr/bin/gh"
+MY_USER="daesorin" # Updated to your new handle
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+function show_help() {
+  echo -e "${BLUE}GitHub Monolith Wrapper${NC}"
+  echo "Custom Commands:"
+  echo "  new [name]   -> Init git, create PRIVATE repo on GitHub, push."
+  echo "  pub [name]   -> Same as new, but PUBLIC."
+  echo "  nuke [name]  -> Delete a repository remotely (Force)."
+  echo "  web          -> Open the current repo in browser."
+  echo ""
+  echo "Native Commands:"
+  $REAL_GH --help | grep "CORE COMMANDS" -A 10
+}
+
+function create_repo() {
+  local privacy_flag="$1" # --private or --public
+  local name="${2:-$(basename "$PWD")}"
+
+  echo -e "${BLUE}:: Setting up '$name' on GitHub ($privacy_flag)...${NC}"
+
+  # 1. Ensure Git is ready
+  if [ ! -d ".git" ]; then
+    git init
+    echo -e "${GREEN}:: Initialized empty Git repository.${NC}"
+  fi
+
+  # 2. Check if remote exists
+  if git remote | grep -q "origin"; then
+    echo -e "${RED}:: Error: Remote 'origin' already exists.${NC}"
+    return 1
+  fi
+
+  # 3. Create on GitHub
+  # gh repo create doesn't need --name flag, just the argument
+  if $REAL_GH repo create "$name" $privacy_flag; then
+    echo -e "${GREEN}:: Repository created successfully.${NC}"
+  else
+    echo -e "${RED}:: Failed to create repository.${NC}"
+    return 1
+  fi
+
+  # 4. Link and Push
+  # Note: gh repo create can do this automatically with flags, but we do it manually
+  # to match your logic and ensure SSH usage.
+  if ! git remote | grep -q "origin"; then
+    git remote add origin "git@github.com:$MY_USER/$name.git"
+  fi
+
+  # SMART COMMIT LOGIC
+  # Check if there is a valid HEAD (any commits at all?)
+  if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
+    echo -e "${BLUE}:: No commits found. Checking for files...${NC}"
+
+    # If the directory is NOT empty (has untracked files)
+    if [ -n "$(git status --porcelain)" ]; then
+      echo ":: Found untracked files. Staging everything..."
+      git add .
+      git commit -m "init: import existing files"
+    else
+      # Directory is truly empty
+      echo ":: Directory empty. Creating README..."
+      echo "# $name" >README.md
+      git add README.md
+      git commit -m "init: scaffold project"
+    fi
+  fi
+
+  echo ":: Pushing to main..."
+  git push -u origin main
+}
+
+# -----------------------------------------------------------------------------
+# MAIN DISPATCHER
+# -----------------------------------------------------------------------------
+
+case "$1" in
+"new")
+  # Usage: gh new [optional-name]
+  create_repo "--private" "$2"
+  ;;
+
+"pub")
+  # Usage: gh pub [optional-name]
+  create_repo "--public" "$2"
+  ;;
+
+"nuke")
+  # Usage: gh nuke my-repo
+  if [ -z "$2" ]; then
+    echo -e "${RED}:: Error: You must specify a repo name to nuke.${NC}"
+    exit 1
+  fi
+  echo -e "${RED}:: WARNING: Deleting $2 on GitHub...${NC}"
+  
+  # --yes skips the interactive confirmation
+  $REAL_GH repo delete "$2" --yes
+  ;;
+
+"web" | "open" | "browse")
+  # Shortcut for opening browser (gh uses 'browse', not 'open')
+  $REAL_GH browse
+  ;;
+
+"bug")
+  # Usage: gh bug "Title" "Description"
+  if [ -z "$2" ]; then
+    $REAL_GH issue create # Opens interactive editor
+  else
+    $REAL_GH issue create --title "$2" --body "${3:-No description provided.}"
+  fi
+  ;;
+
+*)
+  # PASSTHROUGH
+  # If the command isn't one of ours, send it to the real binary
+  $REAL_GH "$@"
+  ;;
+esac

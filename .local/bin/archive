@@ -1,0 +1,204 @@
+#!/usr/bin/env bash
+
+# ==============================================================================
+#  ARCHIVE v2.2 - Intelligent Media Downloader (Repaired)
+# ==============================================================================
+
+# --- LOCATIONS ---
+DIR_VIDEO="${XDG_VIDEOS_DIR:-$HOME/Videos}"
+DIR_MUSIC="${XDG_MUSIC_DIR:-$HOME/Music}"
+HIST_VIDEO="$HOME/.config/archive_history_video.txt"
+HIST_MUSIC="$HOME/.config/archive_history_music.txt"
+
+# --- COLORS ---
+GREEN='\033[1;32m'
+BLUE='\033[1;34m'
+CYAN='\033[1;36m'
+YELLOW='\033[1;33m'
+RED='\033[1;31m'
+NC='\033[0m'
+
+# --- CONFIGURATION ---
+BASE_ARGS=(
+  "--quiet" "--progress"
+  "--no-warnings"
+  "--ignore-errors"
+  "--add-metadata"
+  "--embed-thumbnail"
+  "--embed-subs"
+  "--sub-langs" "all,-live_chat"
+  "--embed-chapters"
+  "--no-mtime"
+  "--downloader" "aria2c"
+  "--downloader-args" "aria2c:-x 4 -k 1M" # Faster downloads if aria2 exists
+)
+
+# --- DEPENDENCY CHECK ---
+check_deps() {
+  local missing=0
+  for cmd in yt-dlp ffmpeg fzf awk; do
+    if ! command -v "$cmd" &>/dev/null; then
+      echo -e "${RED}Error: Required tool '$cmd' is missing.${NC}"
+      missing=1
+    fi
+  done
+
+  if [[ $missing -eq 1 ]]; then exit 1; fi
+
+  # Ensure directories exist
+  mkdir -p "$DIR_VIDEO" "$DIR_MUSIC" "$(dirname "$HIST_VIDEO")"
+  touch "$HIST_VIDEO" "$HIST_MUSIC"
+}
+
+# --- FUNCTIONS ---
+
+get_clipboard_url() {
+  if command -v wl-paste &>/dev/null; then
+    wl-paste
+  elif command -v xclip &>/dev/null; then
+    xclip -o -selection clipboard
+  elif command -v pbpaste &>/dev/null; then # macOS
+    pbpaste
+  else
+    echo ""
+  fi
+}
+
+# 1. Scan & Select (Interactive)
+scan_and_select() {
+  local url="$1"
+  echo -e "${CYAN}🔍 Scanning available formats...${NC}"
+
+  # Capture formats.
+  # 1. Run yt-dlp -F
+  # 2. Remove lines starting with '[' (metadata) or 'ID' (header)
+  # 3. Pass to FZF
+  local raw_formats
+  if ! raw_formats=$(yt-dlp -F "$url" 2>/dev/null); then
+    echo -e "${RED}❌ Failed to fetch formats. URL invalid or Geo-blocked.${NC}"
+    exit 1
+  fi
+
+  local selected_line
+  selected_line=$(echo "$raw_formats" |
+    grep -vE "^\[|format code|^ID" |
+    fzf --height=60% --layout=reverse --border \
+      --prompt="🎥 Select Format > " \
+      --header="ID  EXT  RES  FPS  SIZE  BITRATE  PROTO" \
+      --color="header:blue,info:yellow,pointer:cyan,marker:green")
+
+  if [[ -z "$selected_line" ]]; then
+    echo -e "${YELLOW}🚫 Selection cancelled.${NC}"
+    exit 0
+  fi
+
+  # Extract ID (Column 1)
+  local f_id
+  f_id=$(echo "$selected_line" | awk '{print $1}')
+
+  # Check if Audio Only (usually implies no video resolution in output)
+  # If the line contains "audio only", we shouldn't merge audio again.
+  if [[ "$selected_line" == *"audio only"* ]]; then
+    echo -e "${GREEN}✅ Selected Audio ID: $f_id${NC}"
+    # Just download that specific ID
+    dl_generic "$url" "$f_id" "$DIR_MUSIC" "$HIST_MUSIC"
+  else
+    echo -e "${GREEN}✅ Selected Video ID: $f_id${NC}"
+    # Download Video ID + Best Audio
+    dl_generic "$url" "${f_id}+bestaudio/best" "$DIR_VIDEO" "$HIST_VIDEO"
+  fi
+}
+
+# Generic Download Wrapper to reduce code duplication
+dl_generic() {
+  local url="$1"
+  local format="$2"
+  local target_dir="$3"
+  local hist_file="$4"
+
+  cd "$target_dir" || exit
+  echo -e "${BLUE}📂 Target: $target_dir${NC}"
+
+  yt-dlp "${BASE_ARGS[@]}" \
+    --download-archive "$hist_file" \
+    --merge-output-format mkv \
+    -f "$format" \
+    -o "%(title)s [%(id)s].%(ext)s" \
+    "$url"
+}
+
+# 2. Audio Mode (MP3 Conversion)
+dl_audio() {
+  local url="$1"
+  cd "$DIR_MUSIC" || exit
+  echo -e "${BLUE}📂 Target: $DIR_MUSIC${NC}"
+  echo -e "${BLUE}🎵 Mode: AUDIO (MP3)${NC}"
+
+  yt-dlp "${BASE_ARGS[@]}" \
+    --download-archive "$HIST_MUSIC" \
+    --extract-audio \
+    --audio-format mp3 \
+    --audio-quality 0 \
+    -o "%(title)s.%(ext)s" \
+    "$url"
+}
+
+# 3. Best Auto Mode
+dl_best() {
+  local url="$1"
+  cd "$DIR_VIDEO" || exit
+  echo -e "${BLUE}📂 Target: $DIR_VIDEO${NC}"
+  echo -e "${BLUE}🚀 Mode: AUTO BEST${NC}"
+
+  yt-dlp "${BASE_ARGS[@]}" \
+    --download-archive "$HIST_VIDEO" \
+    --merge-output-format mkv \
+    -f "bv+ba/b" \
+    -o "%(title)s [%(id)s].%(ext)s" \
+    "$url"
+}
+
+# --- MAIN LOGIC ---
+check_deps
+
+# Check args
+if [[ -z "$1" ]]; then
+  # Try Clipboard
+  CLIP_URL=$(get_clipboard_url)
+  if [[ "$CLIP_URL" =~ ^http ]]; then
+    echo -e "${YELLOW}📋 Found URL in clipboard: $CLIP_URL${NC}"
+    scan_and_select "$CLIP_URL"
+    exit 0
+  else
+    echo -e "${BLUE}Usage:${NC} archive <URL> [-a|-b]"
+    exit 1
+  fi
+fi
+
+MODE="scan"
+URL=""
+
+# Simple Arg Parser
+while [[ "$1" != "" ]]; do
+  case "$1" in
+  -a | --audio) MODE="audio" ;;
+  -b | --best) MODE="best" ;;
+  -h | --help)
+    echo "Usage: archive [URL] [-a|-b]"
+    exit 0
+    ;;
+  *) URL="$1" ;; # Assume it's the URL
+  esac
+  shift
+done
+
+if [[ -z "$URL" ]]; then
+  echo -e "${RED}Error: No URL provided.${NC}"
+  exit 1
+fi
+
+case "$MODE" in
+audio) dl_audio "$URL" ;;
+best) dl_best "$URL" ;;
+scan) scan_and_select "$URL" ;;
+esac

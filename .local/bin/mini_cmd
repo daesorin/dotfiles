@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+options="sus
+zzz
+lock
+off
+reboot"
+
+chosen=$(echo -e "$options" | rofi -dmenu -i -p "❯" -theme ~/.config/rofi/mini.rasi)
+
+case "$chosen" in
+    sus|zzz)  systemctl suspend ;;
+    lock)     hyprlock ;;
+    off)      poweroff ;;
+    reboot)   reboot ;;
+    
+    *)        nohup "$chosen" >/dev/null 2>&1 & ;;
+esac

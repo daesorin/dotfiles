@@ -1,0 +1,23 @@
+# --- WINDOW RULES ---
+windowrulev2 = float, class:^(pavucontrol)$
+windowrulev2 = float, class:^(blueman-manager)$
+windowrulev2 = float, class:^(nm-connection-editor)$
+
+windowrulev2 = float, class:(clipyazi)
+windowrulev2 = size 60% 60%, class:(clipyazi)
+windowrulev2 = center, class:(clipyazi)
+
+windowrulev2 = suppressevent maximize, class:.*
+
+windowrulev2 = size 800 40, class:^(miniterm)$
+windowrulev2 = center, class:^(miniterm)$
+
+windowrulev2 = float, title:^(Picture in picture)$, class:^(Brave-browser)$
+windowrulev2 = pin, title:^(Picture in picture)$, class:^(Brave-browser)$
+windowrulev2 = move 100%-w-15 100%-h-15, title:^(Picture in picture)$, class:^(Brave-browser)$
+windowrulev2 = size 30% 30%, title:^(Picture in picture)$, class:^(Brave-browser)$
+
+windowrulev2 = float, title:^(Picture-in-Picture)$, class:^(LibreWolf)$
+windowrulev2 = pin, title:^(Picture-in-Picture)$, class:^(LibreWolf)$
+windowrulev2 = move 100%-w-15 100%-h-15, title:^(Picture-in-Picture)$, class:^(LibreWolf)$
+windowrulev2 = size 30% 30%, title:^(Picture-in-Picture)$, class:^(LibreWolf)$

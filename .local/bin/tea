@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+
+# -----------------------------------------------------------------------------
+# MONOLITH WRAPPER FOR CODEBERG CLI (tea)
+# Wraps /usr/bin/tea to add "smart" functionality for repo creation and issues.
+# -----------------------------------------------------------------------------
+
+# Hardcoded path to avoid recursion since this script is also named 'tea'
+REAL_TEA="/usr/bin/tea"
+MY_USER="daesorin"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+function show_help() {
+  echo -e "${BLUE}Tea Monolith Wrapper${NC}"
+  echo "Custom Commands:"
+  echo "  new [name]   -> Init git, create private repo on Codeberg, push."
+  echo "  pub [name]   -> Same as new, but PUBLIC."
+  echo "  nuke [name]  -> Delete a repository remotely."
+  echo "  web          -> Open the current repo in browser."
+  echo ""
+  echo "Native Commands:"
+  $REAL_TEA help | grep "ENTITIES" -A 10
+}
+
+function create_repo() {
+  local privacy_flag="$1" # --private or empty (for public)
+  local name="${2:-$(basename "$PWD")}"
+
+  echo -e "${BLUE}:: Setting up '$name' on Codeberg ($privacy_flag)...${NC}"
+
+  # 1. Ensure Git is ready
+  if [ ! -d ".git" ]; then
+    git init
+    echo -e "${GREEN}:: Initialized empty Git repository.${NC}"
+  fi
+
+  # 2. Check if remote exists
+  if git remote | grep -q "origin"; then
+    echo -e "${RED}:: Error: Remote 'origin' already exists.${NC}"
+    return 1
+  fi
+
+  # 3. Create on Codeberg
+  # We capture the output to avoid clutter, but check return status
+  if $REAL_TEA repo create --name "$name" $privacy_flag; then
+    echo -e "${GREEN}:: Repository created successfully.${NC}"
+  else
+    echo -e "${RED}:: Failed to create repository.${NC}"
+    return 1
+  fi
+
+  # 4. Link and Push
+  local user
+  user=$($REAL_TEA whoami)
+
+  if ! git remote | grep -q "origin"; then
+    git remote add origin "git@codeberg.org:$MY_USER/$name.git"
+  fi
+
+  # SMART COMMIT LOGIC
+  # Check if there is a valid HEAD (any commits at all?)
+  if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
+    echo -e "${BLUE}:: No commits found. Checking for files...${NC}"
+
+    # If the directory is NOT empty (has untracked files)
+    if [ -n "$(git status --porcelain)" ]; then
+      echo ":: Found untracked files. Staging everything..."
+      git add .
+      git commit -m "init: import existing files"
+    else
+      # Directory is truly empty
+      echo ":: Directory empty. Creating README..."
+      echo "# $name" >README.md
+      git add README.md
+      git commit -m "init: scaffold project"
+    fi
+  fi
+
+  echo ":: Pushing to main..."
+  git push -u origin main
+}
+
+# -----------------------------------------------------------------------------
+# MAIN DISPATCHER
+# -----------------------------------------------------------------------------
+
+case "$1" in
+"new")
+  # Usage: tea new [optional-name]
+  create_repo "--private" "$2"
+  ;;
+
+"pub")
+  # Usage: tea pub [optional-name]
+  create_repo "" "$2"
+  ;;
+
+"nuke")
+  # Usage: tea nuke my-repo
+  if [ -z "$2" ]; then
+    echo -e "${RED}:: Error: You must specify a repo name to nuke.${NC}"
+    exit 1
+  fi
+  echo -e "${RED}:: WARNING: Deleting $2 on remote...${NC}"
+
+  $REAL_TEA repo delete --name "$2" --force
+  ;;
+
+"web" | "open")
+  # Shortcut for opening browser
+  $REAL_TEA open
+  ;;
+
+"bug")
+  # Usage: tea bug "Title" "Description"
+  # Shortcut to create an issue without typing flags
+  if [ -z "$2" ]; then
+    $REAL_TEA issue create # Opens interactive editor
+  else
+    $REAL_TEA issue create --title "$2" --description "${3:-No description provided.}"
+  fi
+  ;;
+
+*)
+  # PASSTHROUGH
+  # If the command isn't one of ours, send it to the real binary
+  $REAL_TEA "$@"
+  ;;
+esac
