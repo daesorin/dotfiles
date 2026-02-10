@@ -1,0 +1,91 @@
+/* --- THE NOIR THEME: MAIN MENU --- */
+
+configuration {
+    modi: "drun,run,emoji,calc";
+    show-icons: true;
+    font: "JetBrainsMono Nerd Font 12";
+    display-drun: "APP";
+    display-run: "RUN";
+    display-emoji: "SYM";
+    display-calc: "CALC";
+    drun-display-format: "{name}";
+}
+
+@theme "/dev/null"
+
+* {
+    /* The Noir Palette */
+    bg: #1a1a1a;
+    fg: #c0c0c0;
+    accent: #b0b0b0; /* Muted selection color */
+    
+    background-color: @bg;
+    text-color: @fg;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    spacing: 0;
+}
+
+window {
+    width: 40%;
+    /* A subtle 1px border to define the edge against the wallpaper */
+    border: 1px; 
+    border-color: @accent;
+    border-radius: 0px; /* Sharp corners */
+}
+
+mainbox {
+    children: [inputbar, listview];
+}
+
+inputbar {
+    children: [prompt, entry];
+    background-color: @bg;
+    padding: 12px;
+    border: 0 0 1px 0; /* Separator line below input */
+    border-color: @accent;
+}
+
+prompt {
+    background-color: transparent;
+    text-color: @accent; /* Dimmed prompt text */
+    padding: 6px 12px 6px 0px;
+    font: "JetBrainsMono Nerd Font Bold 12";
+}
+
+entry {
+    background-color: transparent;
+    padding: 6px;
+    placeholder: "_"; /* Minimalist cursor-like placeholder */
+    placeholder-color: @accent;
+}
+
+listview {
+    padding: 10px;
+    lines: 8;
+    columns: 1;
+    background-color: @bg;
+}
+
+element {
+    padding: 8px;
+    border-radius: 0px; /* No pill shapes */
+}
+
+element-icon {
+    size: 24px;
+    margin: 0 10px 0 0;
+    background-color: transparent;
+}
+
+element-text {
+    vertical-align: 0.5;
+    background-color: transparent;
+}
+
+/* Inverted Colors for Selection */
+element selected {
+    background-color: #b0b0b0; /* #c0c0c0 */
+    text-color: #1A1A1A;       /* #1a1a1a */
+}

@@ -1,0 +1,11 @@
+{
+  "custom/finance": {
+    "format": "💸 {}",
+    "return-type": "json",
+    "exec": "~/.config/waybar/scripts/finance.py",
+    "interval": 300, // Refresh every 5 mins automatically
+    "signal": 8, // Refresh instantly when we send signal 8
+    "on-click": "kitty -e mirror",
+    "tooltip": true,
+  },
+}
