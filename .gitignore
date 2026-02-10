@@ -1,10 +1,6 @@
-# 1. BLOCK EVERYTHING
 /*
 
-# 2. ALLOW THE CONFIG ITSELF
 !.gitignore
-
-# 3. THE GITHUB SEVEN (Your Whitelist)
 !hypr/
 !kitty/
 !nvim/
@@ -13,7 +9,5 @@
 !waybar/
 !zsh/
 
-# 4. SPECIAL EXCLUSIONS (Safety)
-# Explicitly ignore history files inside allowed folders
 zsh/.zhistory
 tmux/plugins/
