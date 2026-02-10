@@ -8,6 +8,7 @@
 !tmux/
 !waybar/
 !zsh/
+!README.md
 
 zsh/.zhistory
 tmux/plugins/
