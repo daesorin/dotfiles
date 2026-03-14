@@ -33,7 +33,7 @@ curl -fsSL https://raw.githubusercontent.com/daesorin/dotfiles/main/.dotfiles-me
 Then restart your shell. If you are on Arch and want to install packages:
 
 ```bash
-bash ~/.dotfiles/bootstrap.sh
+bash ~/.dotfiles-meta/bootstrap.sh
 ```
 
 ---
