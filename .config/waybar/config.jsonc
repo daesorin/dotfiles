@@ -1,0 +1,16 @@
+{
+  "include": [
+    "~/.config/waybar/modules/hyprland.jsonc",
+    "~/.config/waybar/modules/hardware.jsonc",
+    "~/.config/waybar/modules/media.jsonc",
+  ],
+
+  "layer": "top",
+  "position": "top",
+  "height": 27,
+  "spacing": 0,
+
+  "modules-left": ["hyprland/workspaces", "mpd"],
+  "modules-center": ["hyprland/window"],
+  "modules-right": ["network", "bluetooth", "battery", "clock", "tray"],
+}

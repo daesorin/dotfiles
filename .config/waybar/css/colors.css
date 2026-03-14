@@ -1,0 +1,10 @@
+@define-color text-main #c0c0c0;
+@define-color text-muted #4a4a4a;
+@define-color text-hover #ffffff;
+@define-color warning #f9e2af;
+@define-color critical #f38ba8;
+@define-color bg-transparent rgba(0,0,0,0);
+@define-color green #a6e3a1;
+@define-color purple #cba6f7;
+@define-color blue #b4befe;
+@define-color peach #fab387;

@@ -1,0 +1,92 @@
+/* --- THE NOIR THEME: MAIN MENU --- */
+
+configuration {
+    modi: "drun,run,emoji,calc";
+    show-icons: true;
+    font: "JetBrainsMono Nerd Font 12";
+    display-drun: "APP";
+    display-run: "RUN";
+    display-emoji: "SYM";
+    display-calc: "CALC";
+    drun-display-format: "{name}";
+}
+
+@theme "/dev/null"
+
+* {
+    /* Catppuccin Mocha */
+    bg:          #141414;
+    bg-alt:      #141414;
+    fg:          #cdd6f4;
+    accent:      #b4befe;
+    selected-bg: #585b70;
+    selected-fg: #cdd6f4;
+
+    background-color: @bg;
+    text-color: @fg;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    spacing: 0;
+}
+
+window {
+    width: 40%;
+    border: 1px;
+    border-color: @accent;
+    border-radius: 0px;
+}
+
+mainbox {
+    children: [inputbar, listview];
+}
+
+inputbar {
+    children: [prompt, entry];
+    background-color: @bg-alt;
+    padding: 12px;
+    border: 0 0 1px 0;
+    border-color: @accent;
+}
+
+prompt {
+    background-color: transparent;
+    text-color: @accent;
+    padding: 6px 12px 6px 0px;
+    font: "JetBrainsMono Nerd Font Bold 12";
+}
+
+entry {
+    background-color: transparent;
+    padding: 6px;
+    placeholder: "_";
+    placeholder-color: @accent;
+}
+
+listview {
+    padding: 10px;
+    lines: 8;
+    columns: 1;
+    background-color: @bg;
+}
+
+element {
+    padding: 8px;
+    border-radius: 0px;
+}
+
+element-icon {
+    size: 24px;
+    margin: 0 10px 0 0;
+    background-color: transparent;
+}
+
+element-text {
+    vertical-align: 0.5;
+    background-color: transparent;
+}
+
+element selected {
+    background-color: @selected-bg;
+    text-color: @selected-fg;
+}
