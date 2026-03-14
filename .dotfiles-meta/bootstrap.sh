@@ -8,33 +8,63 @@ if ! command -v pacman &>/dev/null; then
   exit 1
 fi
 
-META_DIR="$(dirname "$(realpath "$0")")"
-
 echo "-> Installing native packages..."
 
-if [ -f "$META_DIR/native-packages.txt" ]; then
-  PACKAGES=$(awk '{print $1}' "$META_DIR/native-packages.txt")
-  sudo pacman -S --needed --noconfirm $PACKAGES
-else
-  echo "!! native-packages.txt not found in $META_DIR"
-  exit 1
-fi
+PACKAGES=(
+  # Shell
+  zsh
+  starship
+  zoxide
+  eza
+
+  # Terminal & multiplexer
+  kitty
+  tmux
+
+  # Compositor & desktop
+  hyprland
+  hyprlock
+  hypridle
+  hyprpaper
+  waybar
+  rofi
+  mako
+
+  # Editor
+  neovim
+
+  # Media
+  mpd
+  ncmpcpp
+  mpv
+
+  # Utilities
+  btop
+  zathura
+  zathura-pdf-mupdf
+
+  # Base
+  git
+  go
+  base-devel
+)
+
+sudo pacman -S --needed --noconfirm "${PACKAGES[@]}"
 
 echo "-> Installing AUR packages..."
 
-if [ -f "$META_DIR/aur-packages.txt" ]; then
-  AUR_PACKAGES=$(awk '{print $1}' "$META_DIR/aur-packages.txt")
-  if command -v paru &>/dev/null; then
-    paru -S --needed --noconfirm $AUR_PACKAGES
-  elif command -v yay &>/dev/null; then
-    yay -S --needed --noconfirm $AUR_PACKAGES
-  else
-    echo "!! No AUR helper found. Install the following manually:"
-    echo "$AUR_PACKAGES"
-  fi
+AUR_PACKAGES=(
+  paru
+)
+
+if command -v paru &>/dev/null; then
+  echo "paru already installed."
+elif command -v yay &>/dev/null; then
+  echo "yay found. Installing AUR packages..."
+  yay -S --needed --noconfirm "${AUR_PACKAGES[@]}"
 else
-  echo "!! aur-packages.txt not found in $META_DIR"
-  exit 1
+  echo "!! No AUR helper found. Install paru manually:"
+  echo "   https://github.com/morganamilo/paru"
 fi
 
 echo "-> Installing gitmux via go..."
@@ -42,7 +72,6 @@ echo "-> Installing gitmux via go..."
 if ! command -v gitmux &>/dev/null; then
   go install github.com/arl/gitmux@latest
   echo "gitmux installed to ~/go/bin/"
-  echo "Make sure ~/go/bin is in your PATH."
 else
   echo "gitmux already installed."
 fi
