@@ -1,0 +1,30 @@
+# --- CONNECTION ---
+mpd_host = "127.0.0.1"
+mpd_port = "6600"
+
+# --- VISUALIZER (The Cool Part) ---
+visualizer_data_source = "/tmp/mpd.fifo"
+visualizer_output_name = "my_fifo"
+visualizer_in_stereo = "yes"
+visualizer_type = "spectrum"           # Options: spectrum, wave, ellipse
+visualizer_look = "●●"                 # The characters for the graph
+
+# --- UI TWEAKS ---
+playlist_display_mode = "columns"      # Classic table view
+browser_display_mode = "columns"
+search_engine_display_mode = "columns"
+playlist_editor_display_mode = "columns"
+autocenter_mode = "yes"
+centered_cursor = "yes"
+user_interface = "alternative"         # Cleaner look
+
+# --- COLORS (Arch-Droid Style) ---
+colors_enabled = "yes"
+main_window_color = "default"
+header_window_color = "cyan"
+volume_color = "green"
+progressbar_color = "black"
+progressbar_elapsed_color = "green"
+
+# --- SEEKING ---
+seek_time = "5"

@@ -1,0 +1,12 @@
+bridge-utils 1.7.1-5
+ente-auth-bin 4.4.17-1
+epr-git 2.4.15.r154.723c77d-1
+filen-cli-bin 0.0.39-1
+floorp-bin 12.10.4-1
+megacmd-bin 2.1.1-1
+nak-bin 0.18.1-1
+paru 2.1.0-2
+piper-tts-bin 2023.11.14-1
+python-questionary 2.1.1-2
+telegram-desktop-bin 6.6.2-1
+tut-bin 2.0.1-1
