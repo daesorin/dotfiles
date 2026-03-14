@@ -27,7 +27,7 @@ Managed with a bare git repository.
 Clone and set up the bare repo:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/daesorin/dotfiles/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/daesorin/dotfiles/main/.dotfiles-meta/install.sh | bash
 ```
 
 Then restart your shell. If you are on Arch and want to install packages:
