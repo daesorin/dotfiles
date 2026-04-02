@@ -88,12 +88,6 @@ alias usb='lsusb'
 alias pci='lspci'
 alias mycpu='grep MHz /proc/cpuinfo'
 
-# POWER MANAGEMENT
-alias sus='systemctl suspend'
-alias rb='sudo systemctl reboot'
-alias off='sudo systemctl poweroff'
-alias lock='loginctl lock-session'
-
 # --- ... --- 
 alias find='fd'
 alias ps='procs'

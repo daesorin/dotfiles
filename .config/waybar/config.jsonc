@@ -8,9 +8,25 @@
   "layer": "top",
   "position": "top",
   "height": 27,
-  "spacing": 0,
+  "mode": "overlay", // Forces Waybar to float over windows
+  "exclusive": false, // Tells Waybar NOT to ask for reserved space
+  "passthrough": false, // Ensures you can still click the modules
+  "ipc": true,
 
-  "modules-left": ["hyprland/workspaces", "mpd"],
+  "modules-left": ["hyprland/workspaces", "custom/updates", "mpd"],
   "modules-center": ["hyprland/window"],
-  "modules-right": ["network", "bluetooth", "battery", "clock", "tray"],
+  "modules-right": [
+    "pulseaudio",
+    "backlight",
+    "cpu",
+    "temperature",
+    "disk",
+    "memory",
+    "network",
+    "bluetooth",
+    "battery",
+    "idle_inhibitor",
+    "clock",
+    "tray",
+  ],
 }

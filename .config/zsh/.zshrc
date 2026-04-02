@@ -7,11 +7,9 @@ autoload -Uz compinit
 compinit
 
 # 2. Load Environment Variables (Always first)
-# We keep env.zsh separate because plugins might rely on $PATH or $EDITOR
 [[ -f "$ZDOTDIR/env.zsh" ]] && source "$ZDOTDIR/env.zsh"
 
 # 3. The Module Loader
-# This loop sources every .zsh file in the modules directory automatically.
 if [[ -d "$ZDOTDIR/modules" ]]; then
     for config in "$ZDOTDIR/modules/"*.zsh; do
         source "$config"
@@ -29,4 +27,3 @@ eval "$(zoxide init zsh)"
 # 6.
 bindkey -v
 export PATH="$HOME/.npm-global/bin:$PATH"
-export GOOGLE_API_KEY="AIzaSyAp9Q6kWrfmG25xTky1ySif2h7Ww-epML4"

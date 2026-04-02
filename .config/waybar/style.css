@@ -3,7 +3,7 @@
 * {
   border: none;
   font-family: "JetBrainsMono Nerd Font", monospace;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   min-height: 0;
 }
@@ -37,7 +37,13 @@ window#waybar {
 #clock,
 #tray,
 #mpd,
-#window {
+#window,
+#cpu,
+#memory,
+#backlight,
+#pulseaudio,
+#temperature,
+#custom-updates {
   padding: 0 10px;
   color: @text-main;
   background-color: @bg-transparent;
@@ -45,7 +51,8 @@ window#waybar {
 }
 
 /* --- STATES --- */
-#battery.warning {
+#battery.warning,
+#temperature.critical {
   color: @warning;
 }
 
@@ -54,10 +61,7 @@ window#waybar {
 }
 
 #network.disconnected,
-#network.disabled {
-  color: @text-muted;
-}
-
+#network.disabled,
 #bluetooth.disabled,
 #bluetooth.off {
   color: @text-muted;
@@ -68,10 +72,57 @@ window#waybar {
   font-style: italic;
 }
 
+/* --- MILD COLOR MAPPINGS --- */
 #mpd {
   color: @purple;
 }
 
 #clock {
   color: @blue;
+}
+
+#cpu {
+  color: @peach;
+}
+
+#memory {
+  color: @green;
+}
+
+#backlight {
+  color: @yellow;
+}
+
+#pulseaudio {
+  color: @teal;
+}
+
+#temperature {
+  color: @rosewater;
+}
+
+#custom-updates {
+  color: @flamingo;
+}
+
+@define-color lavender #b4befe;
+@define-color sapphire #74c7ec;
+
+#disk {
+  color: @sapphire;
+}
+
+#idle_inhibitor {
+  color: @text-muted;
+}
+
+#idle_inhibitor.activated {
+  color: @lavender;
+}
+
+#submap {
+  color: @critical;
+  background-color: @text-muted;
+  border-radius: 5px;
+  padding: 0 10px;
 }

@@ -30,4 +30,48 @@
     "tooltip-format": "<tt>{calendar}</tt>",
     "on-click": "toggle",
   },
+  "cpu": {
+    "format": "  {usage}%",
+    "tooltip": false,
+    "on-click": "kitty -e btop",
+  },
+  "disk": {
+    "interval": 60,
+    "format": "  {percentage_used}%",
+    "path": "/",
+    "tooltip-format": "{used} used out of {total}",
+    "on-click": "kitty -e ncdu /",
+  },
+  "memory": {
+    "interval": 3,
+    "format": "  {percentage}% 󰓡  {swapPercentage}%",
+    "tooltip-format": "RAM: {used:0.1f}GB / {total:0.1f}GB\nSwap: {swapUsed:0.1f}GB / {swapTotal:0.1f}GB",
+    "on-click": "kitty -e btop",
+  },
+  "backlight": {
+    "format": "{icon}  {percent}%",
+    "format-icons": ["", "", "", "", "", "", "", "", ""],
+    "on-scroll-up": "brightnessctl set 1%+",
+    "on-scroll-down": "brightnessctl set 1%-",
+  },
+  "pulseaudio": {
+    "format": "{icon}  {volume}%",
+    "format-muted": "   Muted",
+    "format-icons": {
+      "default": ["", "", ""],
+    },
+    "on-click": "pavucontrol",
+  },
+  "temperature": {
+    "critical-threshold": 80,
+    "format": "{icon}  {temperatureC}°C",
+    "format-icons": ["", "", ""],
+  },
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": "",
+      "deactivated": "",
+    },
+  },
 }

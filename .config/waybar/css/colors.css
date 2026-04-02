@@ -8,3 +8,9 @@
 @define-color purple #cba6f7;
 @define-color blue #b4befe;
 @define-color peach #fab387;
+
+/* New Mild Colors for Hardware Modules */
+@define-color yellow #f9e2af;
+@define-color teal #94e2d5;
+@define-color rosewater #f5e0dc;
+@define-color flamingo #f2cdcd;
