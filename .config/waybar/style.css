@@ -1,128 +1,54 @@
-@import "css/colors.css";
-
 * {
-  border: none;
-  font-family: "JetBrainsMono Nerd Font", monospace;
-  font-size: 12px;
-  font-weight: 600;
+  font-family: "JetBrainsMono Nerd Font", "Roboto", sans-serif;
+  font-size: 13px;
   min-height: 0;
-}
-
-window#waybar {
-  background-color: @bg-transparent;
-  color: @text-main;
-}
-
-/* --- WORKSPACES --- */
-#workspaces button {
-  padding: 0 8px;
-  background-color: @bg-transparent;
-  color: @text-muted;
+  border: none;
   border-radius: 0;
 }
 
+/* Edge-to-edge dark translucent bar */
+window#waybar {
+  background-color: rgba(10, 10, 10, 0.85);
+  color: #ffffff;
+}
+
+#workspaces {
+  margin-left: 8px;
+}
+
+#workspaces button {
+  padding: 0 8px;
+  color: #555555;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
 #workspaces button.active {
-  color: @text-main;
-  background-color: @bg-transparent;
+  color: #ffffff;
 }
 
 #workspaces button:hover {
-  color: @text-hover;
+  box-shadow: inherit;
+  text-shadow: inherit;
+  color: #aaaaaa;
 }
 
-/* --- MODULES --- */
-#network,
-#bluetooth,
-#battery,
 #clock,
-#tray,
-#mpd,
-#window,
-#cpu,
-#memory,
-#backlight,
 #pulseaudio,
-#temperature,
-#custom-updates {
-  padding: 0 10px;
-  color: @text-main;
-  background-color: @bg-transparent;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+#backlight,
+#battery,
+#tray {
+  padding: 0 12px;
+  color: #eeeeee;
 }
 
-/* --- STATES --- */
-#battery.warning,
-#temperature.critical {
-  color: @warning;
+/* Subtly dim the icons to keep the focus on the wallpaper */
+#pulseaudio,
+#backlight,
+#battery {
+  opacity: 0.9;
 }
 
-#battery.critical {
-  color: @critical;
-}
-
-#network.disconnected,
-#network.disabled,
-#bluetooth.disabled,
-#bluetooth.off {
-  color: @text-muted;
-}
-
-#window {
-  color: @text-muted;
-  font-style: italic;
-}
-
-/* --- MILD COLOR MAPPINGS --- */
-#mpd {
-  color: @purple;
-}
-
-#clock {
-  color: @blue;
-}
-
-#cpu {
-  color: @peach;
-}
-
-#memory {
-  color: @green;
-}
-
-#backlight {
-  color: @yellow;
-}
-
-#pulseaudio {
-  color: @teal;
-}
-
-#temperature {
-  color: @rosewater;
-}
-
-#custom-updates {
-  color: @flamingo;
-}
-
-@define-color lavender #b4befe;
-@define-color sapphire #74c7ec;
-
-#disk {
-  color: @sapphire;
-}
-
-#idle_inhibitor {
-  color: @text-muted;
-}
-
-#idle_inhibitor.activated {
-  color: @lavender;
-}
-
-#submap {
-  color: @critical;
-  background-color: @text-muted;
-  border-radius: 5px;
-  padding: 0 10px;
+#battery.critical:not(.charging) {
+  color: #ff5555;
 }
