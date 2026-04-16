@@ -24,6 +24,7 @@ deno 2.7.11-1
 dnscrypt-proxy 2.1.15-1
 docker 1:29.3.1-1
 docker-compose 5.1.1-1
+dolphin 25.12.3-1
 dolphin-emu 1:2512-1
 dosfstools 4.2-5
 dust 1.2.4-2
@@ -42,13 +43,13 @@ gemini-cli 1:0.36.0-1
 git 2.53.0-1
 git-crypt 0.8.0-1
 git-delta 0.19.2-1
-github-cli 2.89.0-1
 go 2:1.26.1-1
 gptfdisk 1.0.10-2
 grim 1.5.0-2
 grub 2:2.14-1
 hexyl 0.17.0-1
 httpie 3.2.4-2
+hugo 0.160.0-1
 hunspell 1.7.2-3
 hunspell-en_gb 2026.02.25-1
 hypridle 0.1.7-8
@@ -168,5 +169,5 @@ zathura-pdf-mupdf 2026.02.03-6
 zip 3.0-11
 zoxide 0.9.9-2
 zsh 5.9-5
-zsh-autosuggestions 0.7.1-1
-zsh-syntax-highlighting 0.8.0-1
+zsh-completions 0.36.0-1
+zsh-syntax-highlighting 0.8.0-2
