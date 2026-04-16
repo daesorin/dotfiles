@@ -1,56 +1,26 @@
-# Enable colors
-autoload -Uz colors && colors
+# ~/.config/zsh/module/env.zsh
+# Environment variables and path configuration
 
-# History configuration (Stored in .config/zsh now)
-HISTFILE="$ZDOTDIR/.zhistory"
-HISTSIZE=1000000
-SAVEHIST=1000000
-setopt appendhistory
-setopt sharehistory
+export EDITOR='nvim'
+export VISUAL='nvim'
+export PAGER='less'
 
-# LANGUAGE ENVIRONMENT  
-export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
+# XDG Base Directories
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
 
-# EDITOR
-export EDITOR=nvim
-
-# Zsh options
-setopt AUTO_CD
-export FINANCE="$HOME/Documents/finance/2026.journal"
-
-setopt HIST_IGNORE_DUPS
-setopt HIST_IGNORE_SPACE
-setopt SHARE_HISTORY
-setopt EXTENDED_HISTORY
-setopt NO_BEEP
-setopt INC_APPEND_HISTORY
-setopt HIST_EXPIRE_DUPS_FIRST
-setopt GLOBAL_RCS
-setopt APPEND_HISTORY
-setopt PUSHD_IGNORE_DUPS
-setopt HIST_VERIFY
-
-# Completion Styling
-zstyle ':completion:*' menu select
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-
-# PATHS
+# Path configuration
+typeset -U path
 path=(
-  /usr/local/sbin
-  /usr/local/bin
-  /usr/sbin
-  /usr/bin
-  /sbin
-  /bin
+    "$HOME/.local/bin"
+    /usr/local/bin
+    /usr/bin
+    /bin
+    /usr/local/sbin
+    /usr/sbin
+    /sbin
+    $path
 )
-
-# [[ -d "$HOME/scripts" ]] && path=("$HOME/scripts" $path)
-[[ -d "$HOME/.local/bin" ]] && path=("$HOME/.local/bin" $path)
-[[ -d "$HOME/go/" ]] && path=("$HOME/go/" $path)
-[[ -d "$HOME/go/bin" ]] && path=("$HOME/go/bin" $path)
-
 export PATH
-
-# GPG
-export GPG_TTY=$(tty)
