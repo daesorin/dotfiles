@@ -1,9 +1,30 @@
-# ~/.config/zsh/module/tmux.zsh
-# Tmux integration
+# ── core ──────────────────────────────────────────────────────────────────────
+alias tx='tmux'
 
-alias t='tmux'
-alias ta='tmux attach -t'
-alias tn='tmux new-session -s'
-alias tl='tmux list-sessions'
-alias tk='tmux kill-session -t'
-alias tka='tmux kill-session -a'
+# ── sessions ──────────────────────────────────────────────────────────────────
+alias txls='tmux ls'
+alias txk='tmux kill-session -t'
+alias txka='tmux kill-server'
+
+# new named session: txn <name>
+txn() { tmux new-session -s "${1:-main}" }
+
+# attach to session (last if no arg, named if given): txa [name]
+txa() {
+    if [[ -n "$1" ]]; then
+        tmux attach-session -t "$1"
+    else
+        tmux attach-session 2>/dev/null || tmux new-session -s main
+    fi
+}
+
+# ── windows ───────────────────────────────────────────────────────────────────
+alias txnw='tmux new-window'
+alias txrw='tmux rename-window'
+
+# ── panes ─────────────────────────────────────────────────────────────────────
+alias txvs='tmux split-window -h'   # vertical split (side by side)
+alias txhs='tmux split-window -v'   # horizontal split (stacked)
+
+# ── config ────────────────────────────────────────────────────────────────────
+alias txr='tmux source-file ~/.config/tmux/tmux.conf && echo "config reloaded"'

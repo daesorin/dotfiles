@@ -1,26 +1,36 @@
-# ~/.config/zsh/module/env.zsh
-# Environment variables and path configuration
+# ── options ──────────────────────────────────────────────────────────────────
+setopt AUTO_CD
+setopt AUTO_PUSHD
+setopt PUSHD_IGNORE_DUPS
+setopt PUSHD_SILENT
+setopt CORRECT
+setopt INTERACTIVE_COMMENTS
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_REDUCE_BLANKS
+setopt SHARE_HISTORY
+setopt EXTENDED_HISTORY
 
-export EDITOR='nvim'
-export VISUAL='nvim'
-export PAGER='less'
+HISTSIZE=10000
+SAVEHIST=10000
+HISTFILE="/home/dil/.config/zsh/history"
 
-# XDG Base Directories
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_CACHE_HOME="$HOME/.cache"
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_STATE_HOME="$HOME/.local/state"
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 
-# Path configuration
-typeset -U path
+# ── paths ─────────────────────────────────────────────────────────────────────
+typeset -U path  # deduplicate
+
 path=(
     "$HOME/.local/bin"
+    "$HOME/.cargo/bin"
+    "$HOME/.go/bin"
     /usr/local/bin
-    /usr/bin
-    /bin
-    /usr/local/sbin
-    /usr/sbin
-    /sbin
     $path
 )
-export PATH
+
+export EDITOR=nvim
+export VISUAL=nvim
+export PAGER=bat
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+export BAT_THEME="base16"
+
