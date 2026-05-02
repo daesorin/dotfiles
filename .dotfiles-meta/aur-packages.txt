@@ -4,6 +4,7 @@ ente-auth-bin 4.4.17-1
 ente-desktop-bin 1.7.22-1
 epr-git 2.4.15.r154.723c77d-1
 filen-cli-bin 0.0.39-1
+jdupes 1.31.1-1
 mullvad-browser-bin 15.0.8-1
 nak-bin 0.18.1-1
 pandoc-bin 3.9.0.2-1
