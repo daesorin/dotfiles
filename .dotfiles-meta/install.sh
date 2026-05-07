@@ -3,7 +3,7 @@
 
 set -e
 
-DOTFILES_REPO="https://github.com/daesorin/dotfiles.git"
+DOTFILES_REPO="https://codeberg/daesorin/dotfiles.git"
 DOTFILES_DIR="$HOME/.dotfiles"
 
 echo "-> Cloning dotfiles..."
