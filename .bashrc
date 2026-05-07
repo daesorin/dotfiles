@@ -1,5 +1,5 @@
 # MAIN BASH CONFIGURATION
-# entry point for shell initialisation
+[[ $- == *i* ]] && source ~/.local/share/blesh/ble.sh
 
 # avoid running in non-interactive shells
 [[ $- != *i* ]] && return
