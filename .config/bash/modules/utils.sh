@@ -78,4 +78,7 @@ alias ipy='ipython'
 serve() { python3 -m http.server "${1:-8000}"; }
 
 # MKCD
+
+# FORGEJO
+alias fj='fj -H https://git.osaigbovo.xyz'
 mkcd() { mkdir -p "$1" && cd "$1"; }

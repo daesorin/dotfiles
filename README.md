@@ -50,3 +50,4 @@ All files live in their original locations under `$HOME`. No symlinks.
 - Neovim config is LazyVim-based.
 - tmux plugins managed by TPM. Run `prefix + I` after first launch to install.
 - gitmux is installed via `go install` -- see `bootstrap.sh`.
+
