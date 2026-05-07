@@ -28,3 +28,5 @@ eval "$(zoxide init bash)"
 # syntax highlighting for bash (available via aur/bash-syntax-highlighting)
 [[ -f /usr/share/bash-syntax-highlighting/bash-syntax-highlighting.sh ]] &&
   source /usr/share/bash-syntax-highlighting/bash-syntax-highlighting.sh
+
+# Testing
