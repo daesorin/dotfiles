@@ -1,0 +1,101 @@
+[user]
+    name = Osaigbovo Omere
+    email = daesorin+forgejo@proton.me
+	signingkey = /home/dil/.ssh/id_ed25519.pub
+
+[core]
+    editor = nvim
+    autocrlf = input
+    pager = less -RFX
+
+[init]
+    defaultBranch = main
+	templateDir = /home/dil/.git-templates
+
+[color]
+    ui = auto
+
+[pull]
+    rebase = true
+
+[push]
+    autoSetupRemote = true
+
+[merge]
+    tool = nvimdiff
+
+[mergetool]
+    prompt = false
+    keepBackup = false
+
+[credential]
+    helper = store
+
+[core]
+    pager = delta
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true
+    line-numbers = true
+    side-by-side = true
+[credential "https://codeberg.org"]
+	  helper = 
+	  helper = !tea login helper
+[commit]
+	gpgsign = true
+[tag]
+	  gpgsign = true
+
+[alias]
+    dot = "!git --git-dir=$HOME/.dotfiles --work-tree=$HOME"
+    
+    s   = status
+    st  = status -sb
+    aa  = add -A
+    cm  = commit -m
+    ps  = push
+    pl  = pull
+    lo  = log --oneline --graph --decorate
+    
+    dots = "!git --git-dir=$HOME/.dotfiles --work-tree=$HOME status -sb"
+    dota = "!git --git-dir=$HOME/.dotfiles --work-tree=$HOME add"
+    dotc = "!git --git-dir=$HOME/.dotfiles --work-tree=$HOME commit -m"
+    dotp = "!git --git-dir=$HOME/.dotfiles --work-tree=$HOME push"
+    
+    unstage = reset HEAD --
+    last    = log -1 HEAD
+    cleanup = "!git branch --merged | grep  -v '\\*' | xargs -n 1 git branch -d"
+
+    fire = "!f() { \
+        local branch=\"fire-$(date +%Y%m%d-%H%M)\"; \
+        git checkout -b \"$branch\" && \
+        git add -A && \
+        git commit -m \"FIRE EMERGENCY: $branch\" --no-verify && \
+        git push origin \"$branch\" --force; \
+    }; f"
+
+    abort = "!git reset --hard origin/$(git branch --show-current)"
+
+    nuke = "!f() { \
+        git checkout main && \
+        git branch -D \"$1\" && \
+        git push origin --delete \"$1\"; \
+    }; f"
+
+    lazy = "!f() { \
+        git add -A && \
+        git commit -m \"$1\" && \
+        git push; \
+    }; f"
+
+    today = log --since='24 hours ago' --oneline --graph --all
+    oops = commit --amend --no-edit
+    grab = "!f() { git checkout \"$1\" -- \"$2\"; }; f"
+
+[gpg "ssh"]
+	allowedSignersFile = ~/.ssh/allowed_signers
+[gpg]
+	format = ssh
