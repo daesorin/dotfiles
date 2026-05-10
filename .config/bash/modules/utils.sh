@@ -82,3 +82,6 @@ mkcd() { mkdir -p "$1" && cd "$1"; }
 
 # FORGEJO
 alias fgj='fj -H https://git.osaigbovo.xyz'
+
+# Power
+alias sus='systemctl suspend'
