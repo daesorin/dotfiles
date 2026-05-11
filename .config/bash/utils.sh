@@ -85,3 +85,4 @@ alias fgj='fj -H https://git.osaigbovo.xyz'
 
 # Power
 alias sus='systemctl suspend'
+alias fullcharge='sudo tlp fullcharge'

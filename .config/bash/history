@@ -1,0 +1,923 @@
+dkls
+sls
+l
+
+ic ls
+ls
+rm env.sh 
+,, *
+, *
+. ~/.bashrc 
+rm docker.sh incus.sh tmux.sh 
+eza
+l
+ic ls
+ic stop test-init --force
+pmR zsh
+sudo pacman -Rnsc zsh
+l
+cat /etc/passwd | grep bash
+,, /etc/passwd
+env | grep -iE 'shell|zsh'
+pacman -Qe | ,
+pacman -Q uswm
+pacman -Q uwsm
+pacman -Qi uwsm
+sudo systemctl restart uwsm
+systemctl --user show-environment | grep SHELL
+grep -r "zsh" ~/.config/environment.d/
+systemctl --user set-environment SHELL=/bin/bash
+systemctl --user show-environment | grep SHELL
+grep -r "zsh" ~/.config/environment.d/
+, .config/kitty/kitty.conf 
+llsl
+, .config/foot 
+grep / foo
+grep foot /home/dil/
+la
+pmR foot
+echo $SHELL
+loginctl terminate-user $USER
+pmR foot
+echo $SHELL
+loginctl terminate-user $USER
+lsl
+cat .gitignore 
+, .config/.gitignore 
+nvim .config/.gitignore 
+git dot check-ignore -v ~/.config/bash/modules/arch.sh
+sudo pacman -Rnsc zsh
+cat /etc/passwd | grep bash
+,, /etc/passwd
+env | grep -iE 'shell|zsh'
+pacman -Qe | ,
+pacman -Q uswm
+pacman -Q uwsm
+pacman -Qi uwsm
+sudo systemctl restart uwsm
+systemctl --user show-environment | grep SHELL
+grep -r "zsh" ~/.config/environment.d/
+systemctl --user set-environment SHELL=/bin/bash
+systemctl --user show-environment | grep SHELL
+grep -r "zsh" ~/.config/environment.d/
+, .config/kitty/kitty.conf 
+llsl
+, .config/foot 
+grep / foo
+grep foot /home/dil/
+pmR foot
+loginctl terminate-user $USER
+echo $SHELL
+, .config/hypr/config/variables.conf 
+hyprctl reload
+la
+l
+rm archzfs.gpg cloud-init.yaml daesorin.xyz.tar.xz init-rocky.yaml 
+rm -rf .config/zsh/
+git dot add .config/bash/
+, .gitignore 
+git dot add .config/bash/modules/*
+git dot add .config/hypr/config/variables.conf 
+git dot add .config/kitty/kitty.conf 
+git dot add .config/zsh/*
+git dot commit -m "made some updates"
+rm .zshenv 
+, README.md 
+git dot add ~/.bashrc 
+git dot add ~/README.md 
+lt ~/.config/bash
+tx new -t subliminally-peeved
+git dot add ~/.config/bash/modules/{arch,network,options,utils}.sh
+git rm .config/kitty/mini.conf
+git dot rm .config/kitty/mini.conf
+git dot rm .zshenv
+pacman -Qen
+pacman -Qen >> .dotfiles-meta/native-packages.txt
+pacman -Qem >> .dotfiles-meta/aur-packages.txt
+git dot add .
+git dot add .dotfiles-meta/aur-packages.txt
+git dot add .dotfiles-meta/native-packages.txt 
+git dot status
+git dot commit -m "dumped zsh for bash"
+git dot push origin main
+, .config/tmux/tmux.conf 
+sudo pacman -S bash-completion
+, .bashrc
+git clone --recursive --depth 1 --shallow-submodules https://github.com/akinomyoya/ble.sh.git /tmp/ble.sh
+git clone --recursive --depth 1 --shallow-submodules https://github.com/akinomyoga/ble.sh.git /tmp/ble.sh
+make -C /tmp/ble.sh install PREFIX=~/.local
+rm -rf /tmp/ble.sh
+, .bashrc 
+la
+ls
+lslocks 
+tmux
+zellij
+l
+la
+ls
+lslocks 
+tmux
+zellij
+l
+reboot
+nvim ~/.bash_profile
+ic images list
+incus images list
+incus image list
+incus image list remote
+incus images: list
+git dot add ~/.bash_profile 
+, .config/bash/modules/*
+git dot add ~/.bashrc
+git dot add ~/.config/bash/modules/arch.sh 
+git dot commit -m "createdd .bash_profile to have my bash configs synced in tmux. and made some other minor updates."
+, .config/mpv/mpv.conf 
+, README.md 
+git dot add .config/mpv/mpv.conf
+git dot add README.md
+sed -i 's/https:\/\/codeberg\//https:\/\/codeberg.org\//g' .dotfiles-meta/install.sh 
+git dot status
+git dot add .dotfiles-meta/install.sh
+git dot commit -m "more updates."
+git dot push origin main
+ic lsimg ; ic ls
+ic vms
+ic ct
+ic ip
+ic top
+ic snaps
+ic snap
+ic snaps alpine
+ic snaps test-init
+ic stt test-init
+ic sh test-init
+l ; clean
+l ; clear
+cls
+cat .config/bash/modules/utils.sh 
+cat .config/bash/modules/arch.sh 
+pkgcount 
+pkgexp 
+vw
+cat .config/bash/modules/network.sh 
+vw today
+vw 1
+ic ls
+ic stp nearby-piranha
+sus
+curl defuddle.md/https://github.com/dani-garcia/vaultwarden | wl-copy 
+l Downloads/
+, .dotfiles-meta/install.sh 
+ic ls
+incus init images:ubuntu/24.04
+ic image ls images: arch
+ic image ls images: ubuntu
+ic image ls images: debian
+incus init images:debian/14
+ls
+ic image ls
+du
+df
+du /
+df -h /
+incus storage info default
+pmorphans 
+du -sh /var/cache/pacman/pkg
+sudo paccache -r
+sudo du -sh /var/cache/pacman/pkg
+incus delete -f test-init
+incus image flush
+incus image copy images:debian/14 local: --copy-aliases
+ic lsimg
+incus launch debian/14
+ic bash nearby-piranha
+ssh oracle-host 
+ssh oracle-host 
+la
+ic image ls
+ic ls
+ic ls ; ic image ls
+, .config/incus/config.yml 
+wvgain 
+cat .config/bash/modules/network.sh 
+vw
+filen-cli 
+filen-cli export-api-key
+filen-cli
+cd Downloads/
+filen-cli ls Backup/vaultwarden
+filen-cli download Backup/vaultwarden/vaultwarden_backup_2026-05-07_150634.tar.gz
+mkdir ./test_restore
+tar -xzf vaultwarden_backup_*.tar.gz -C ./test_restore
+sqlite3 ./test_restore/db.sqlite3 "PRAGMA integrity_check;"
+l
+rm bitwarden_encrypted_export_20260507151526.json vaultwarden_backup_2026-05-07_150634.tar.gz test_restore/ -rf
+git dot remove origin
+git dot remote remove origin
+git dot remote add origin ssh://git@git.osaigbovo.xyz:2222/daesorin/dotfiles.git
+cat .ssh/id_ed25519.pub | wl-copy 
+echo -n '00e7439ad4de93363321268f995b613a863b79142aa28cfd2747f13aa623949c' | ssh-keygen -Y sign -n git.osaigbovo.xyz -f ~/.ssh/id_ed25519 # or the path to the private key if it is different.
+l
+ssh -T -p 2222 git@git.osaigbovo.xyz
+git dot push -u origin --all
+git push origin --tags
+, .bashrc 
+git dot status
+git dot add .bashrc
+git dot commit -m "testing mirror to github"
+git dot push origin --tags
+git dot push origin main
+echo "" >> README.md
+tea list repo
+tea repo list
+paru -S forgejo-cli
+fj login https://git.osaigbovo.xyz
+fj --help
+fj
+fj auth
+fj auth login
+fj auth login https://git.osaigbovo.xyz
+man fj
+mandb fj
+sudo mandb fj
+fj --host https://git.osaigbovo.xyz auth login
+fj auth add-key
+fj auth add-key daesorin "9215ce7e5f30ccb768a41818de8ce67768cd1238"
+fj -H https://git.osaigbovo.xyz auth add-key daesorin "9215ce7e5f30ccb768a41818de8ce67768cd1238"
+fj -H https://git.osaigbovo.xyz whoami
+, .config/bash/modules/utils.sh 
+. ~/.bashrc 
+fj whoami
+git config --global gpg.format ssh
+eval -- $'git config --global gpg.format ssh\ngit config --global user.signingkey ~/.ssh/id_ed25519.pub\n'
+eval -- $'# SET SIGNING FORMAT TO SSH\ngit config --global gpg.format ssh\n\n# POINT TO YOUR PUBLIC KEY FOR SIGNATURES\ngit config --global user.signingkey ~/.ssh/id_ed25519.pub\n\n# OPTIONAL: ENABLE GLOBAL SIGNING\n# if you want every commit to be signed without typing -S\ngit config --global commit.gpgsign true'
+cat .ssh/id_ed25519.pub | wl-copy 
+echo -n '7ff2f5fe831f066ec4c173c6bd90c0de652d70c6845256d65b198350492a0e2a' | ssh-keygen -Y sign -n git.osaigbovo.xyz -f ~/.ssh/id_ed25519 # or the path to the private key if it is different.
+echo -n '7ff2f5fe831f066ec4c173c6bd90c0de652d70c6845256d65b198350492a0e2a' | ssh-keygen -Y sign -n git.osaigbovo.xyz -f ~/.ssh/id_ed25519 | wl-copy 
+eval -- $'git dot commit -am "test: verifying ssh signature"\ngit dot push'
+eval -- $'git config --global gpg.format ssh\ngit config --global user.signingkey "~/.ssh/id_ed25519.pub"'
+git dot config --list | grep gpg
+eval -- $'git dot config gpg.format ssh\ngit dot config user.signingkey "~/.ssh/id_ed25519.pub"'
+ssh-add -l
+eval -- $'eval "$(ssh-agent -s)"\nssh-add ~/.ssh/id_ed25519\n'
+git config --global user.signingkey "/home/dil/.ssh/id_ed25519.pub"
+, .bash_profile 
+eval -- $'git dot commit -am "verifying signature"\ngit dot push'
+cat .ssh/id_ed25519.pub
+, .ssh/config 
+echo -n '758071891879d46d5bd88a2974b29321d5ceb6e932a6767a7de69e91b2efa0e1' | ssh-keygen -Y sign -n git.osaigbovo.xyz -f ~/.ssh/id_ed25519 | wl-copy 
+ssh-add -D
+ssh-add ~/.ssh/id_ed25519
+git dot remote -v
+ssh-keygen -R [git.osaigbovo.xyz]:2222
+eval -- $'ssh-add -D\nssh-add ~/.ssh/id_ed25519'
+ssh -T -p 2222 git@git.osaigbovo.xyz
+, .ssh/id_ed25519
+, .ssh/id_ed25519.pub
+cat .ssh/id_ed25519.pub | wl-copy
+echo -n '02183207dc5725950dcb8b105eade0601012fbaf707250c09aa3465232d5051e' | ssh-keygen -Y sign -n git.osaigbovo.xyz -f ~/.ssh/id_ed25519 |  wl-copy 
+gpg --full-generate-key
+gpg --list-secret-keys --keyid-format LONG
+gpg --armor --export 2CB4B66B8C810A26 | wl-copy
+echo "f091b1a969b3d9dbc06f716673c59f1b49451903c495ecbc8eb88a0090ebc97e" | gpg -a --default-key 2CB4B66B8C810A26 --detach-sig | wl-copy 
+echo "f091b1a969b3d9dbc06f716673c59f1b49451903c495ecbc8eb88a0090ebc97e" | gpg -a --default-key 2CB4B66B8C810A26 --detach-sig
+echo "fa3f18478c2047ca641f98277ca2606ed40da632da732d5603ba4b6cc38dc7d6" | gpg -a --default-key 2CB4B66B8C810A26 --detach-sig
+eval -- $'git config --global --unset gpg.format\ngit config --global --unset user.signingkey\n'
+eval -- $'git config --global user.signingkey 2CB4B66B8C810A26\ngit config --global commit.gpgsign true'
+git dot remote set-url origin https://git.osaigbovo.xyz/daesorin/dotfiles.git
+git dot push
+ssh -v -p 2222 git@git.osaigbovo.xyz
+git dot remote set-url origin ssh://git@git.osaigbovo.xyz:2222/daesorin/dotfiles.git
+eval -- $'# PERFORM THE INITIAL PUSH\ngit dot push -u origin main\n'
+, .gitconfig 
+echo "$(git config user.email) namespaces=\"git\" $(cat ~/.ssh/id_ed25519.pub)" > ~/.ssh/allowed_signers
+git config --global gpg.ssh.allowedSignersFile "~/.ssh/allowed_signers"
+eval -- $'git config --global gpg.format ssh\ngit config --global user.signingkey "/home/dil/.ssh/id_ed25519.pub"\ngit config --global commit.gpgsign true'
+git dot commit --amend --no-edit -S
+git dot log --show-signature -1
+git dot push -f origin main
+ssh ish
+cd Downloads/Telegram\ Desktop/
+l
+scp ./ ish:/mnt/pocketbook/versus/
+rsync -avP ./* ish:/mnt/pocketbook/versus/
+ssh oracle-host 
+sus
+lls
+ls
+tx new -t subliminally-peeved
+of
+off
+mv web projects/
+cd projects/web/
+, hugo.toml 
+, layouts/index.html 
+, layouts/partials/footer.html 
+cd ..
+cd sigils/
+cat ~/.ssh/id_ed25519.pub | wl-copy
+echo -n '3897d727b56860e22a80fc3e968fefaf5dcf1754f85f1dfb79418608a2fae37b' | ssh-keygen -Y sign -n codeberg.org -f ~/.ssh/id_ed25519 # or the path to the private key if it is different.
+git clone ssh://git@codeberg.org/daesorin/sigils.git
+..
+l
+la ~/Documents/finance
+git clone ssh://git@codeberg.org/daesorin/finance.git
+rm -rf ~/bin/tea 
+tea
+tea repo --help
+tea repo rm article/
+cd
+tea repo list
+tea repo rm ssh://git@codeberg.org/daesorin/article.git
+tea repos delete ssh://git@codeberg.org/daesorin/article.git
+tea repos delete article
+tea repos delete
+eval -- $'for repo in $(tea repo list --output simple | awk \'{print $2}\'); do\n  tea repos delete --name "$repo" --owner daesorin --force\ndone'
+pmS github-cli
+gh auth
+gh auth login
+man gh
+cd .dotfiles
+gh browse
+gh browse --help
+fj --help
+fj repo
+fj repo dotfiles vew
+fj repo dotfiles
+fj repo --view
+fj repo view
+fj repo --help
+fj repo view dotfiles
+fj repo view https:/git.osaigbovo.xyz/daesorin/dotfiles
+, ~/.config/bash/modules/utils.sh 
+which fj
+. ~/.bashrc 
+which fj
+tx detach
+, ~/.config/bash/modules/utils.sh 
+. ~/.bashrc 
+cat ~/.ssh/id_ed25519.pub | wl-copy 
+sudo tlp setcharge 0 100
+sudo tlp-stat 
+sudo tlp-stat --battery 
+cd projects/web/ && hugo server -D
+which fgj
+mkcd life
+fgj repo dotfiles
+fgj repo view dotfiles
+fgj repo view daesorin/dotfiles
+which mkcd
+, ~/.config/bash/modules/utils.sh 
+type mkcd
+type fgj
+eval -- $'unalias fgj\nunalias fj\n'
+alias fj='fj -H https://git.osaigbovo.xyz'
+fj auth logout daesorin
+fj auth login daesorin
+fj auth login
+fj auth add-key 'dd072288b04f7df832fc59bebc4d82b83c0a2a46'
+fj auth add-key 
+fj --help
+fj auth --help
+unalias fj
+fj auth logout https:git.osaigbovo.xyz
+fj auth logout
+fj auth logout https://git.osaigbovo.xyz
+fj auth add-key daesorin "dd072288b04f7df832fc59bebc4d82b83c0a2a46" --host https://git.osaigbovo.xyz
+fj auth add-key daesorin "dd072288b04f7df832fc59bebc4d82b83c0a2a46"-- --host https://git.osaigbovo.xyz
+fj auth add-key daesorin "dd072288b04f7df832fc59bebc4d82b83c0a2a46" -H https://git.osaigbovo.xyz
+fj auth add-key daesorin "dd072288b04f7df832fc59bebc4d82b83c0a2a46"
+git dot remote set-url origin git@git.osaigbovo.xyz:daesorin/dotfiles.git
+fj repo view dotfiles
+cd
+fj repo view daesorin/dotfiles
+fj repo view daesorin/dotfiles --host https://git.osaigbovo.xyz
+sudo tlp fullcharge BAT0
+eval -- $'echo "alias fj=\'fj --host https://git.osaigbovo.xyz\'" >> ~/.bash_profile\nsource ~/.bash_profile'
+eval -- $'# VIEW REPOSITORY DETAILS\ntea repo view daesorin/dotfiles'
+eval -- $'sed -i \'/alias fj/d\' ~/.bash_profile\nsource ~/.bash_profile'
+sudo tlp setcharge 96 100 BAT0
+sudo tlp-stat --battery 
+watch -n 2sudo tlp-stat --battery 
+watch -n 2 sudo tlp-stat --battery 
+cd web
+rm -rf .git
+la
+git init
+git remote add origin git@git.osaigbovo.xyz:daesorin/personal-website.git
+git add .
+git commit -m "first commit"
+git push origin main
+rm -rf public/
+git status
+./deploy.sh 
+l
+git add public/
+git status 
+, .git/hooks/prepare-commit-msg
+chmod +x .git/hooks/prepare-commit-msg
+eval -- $'mkdir -p ~/.git-templates/hooks\ngit config --global init.templateDir ~/.git-templates'
+cp .git/hooks/prepare-commit-msg ~/.git-templates/hooks/prepare-commit-msg
+, .bash_profile 
+, ~/.bash_profile 
+. ~/.bashrc 
+. ~/.bash_profile 
+rm ~/.local/bin/fj
+sudo pacman -S tea
+tea login add --name osaigbovo --url https://git.osaigbovo.xyz --token "dd072288b04f7df832fc59bebc4d82b83c0a2a46"
+tea login default osaigbovo
+tea repo view daesorin/dotfiles
+tea repos view daesorin/dotfiles
+tea repos c personal-website
+tea repos create --name personal-website --private
+tea repos ls
+tea repos --help
+git dot add ~/.bash_profile 
+git dot add ~/.config/bash/modules/utils.sh 
+git dot status
+git dot commit -m "added some aliases"
+git dot pull
+git dot push origin main
+cd ~/bin
+rm -rf claude 
+pkg-audit-2 
+sudo systemctl status ufw.service 
+ufw --help
+ufw status
+sudo ufw status
+pkg-audit
+rm -rf pkg-audit-2
+git init
+tea repos create --name utils --public
+tea repos create --name utils
+git remote add origin git@git.osaigbovo.xyz:2222/daesorin/utils.git
+l old-scripts/
+git remote add origin git@git.osaigbovo.xyz/daesorin/utils.git
+git push origin main
+git remote -D
+git remote origin -D
+git remote --help
+git remote remove
+tea repos ls daesorin/utils
+tea repos ls daesorin/utils --path "old-scripts"
+tea repos ls --help
+eval -- $'# PRINT FILE CONTENT TO STDOUT\ntea repo cat daesorin/dotfiles --path "README.md"\n'
+eval -- $'# PRINT FILE CONTENT TO STDOUT\ntea repo cat --help'
+tea repo ls daesorin/personal-website -b dev
+tea tree daesorin/dotfiles
+tea --help
+tea repo --help
+tea tree --help
+tea code --help
+gh repo create --help
+gh repo create utils --public
+git repo ls
+git repo list
+gh repo --help
+gh repo list --help
+gh repo ls
+cd README.md 
+, README.md 
+gcd
+cd ~/projects/
+mv web/ ./personal-web
+mv sigils/* ./
+l sigils/ 
+rmdir sigils/
+rm -rf sigils/
+l .git
+..
+la
+rm -rf .git
+cd sigils/
+git init 
+git remote add origin ssh://git@git.osaigbovo.xyz:2222/daesorin/utils.git
+git push -u origin
+git push
+git remote add origin ssh://git@git.osaigbovo.xyz:2222/daesorin/sigil.git
+tea repo create --help
+tea repo create --name sigils
+git commit -m "first commit"
+git remote remove origin
+eval -- $'git remote add origin ssh://git@git.osaigbovo.xyz:2222/daesorin/sigils.git\ngit push -u origin main'
+l -o
+chmod 755 deception element* famine kill plague silence three_moons.py war wisdom 
+git status 
+git add .
+git commit -m "updated permissions"
+git push -u origin main
+type tea ; which tea
+py famine 
+pip install matplotlib
+rm -rf venv
+python -m venv venv
+source venv/bin/activate
+pip install matplotlib numpy
+python famine
+imv famine_ribs.png famine_scarcity.png famine_restriction.png
+py element 
+imv element*
+py kill
+imv kill*
+py three_moons.py
+imv group_icon.png 
+filen-cli ls
+filen-cli mkdir /pictures
+filen-cli ./group_icon.png /pictures
+filen-cli upload ./group_icon.png /pictures
+filen-cli upload ./element* /pictures
+filen-cli upload ./element_air.png /pictures
+filen-cli ls /pictures
+filen-cli upload ./element_earth.png /pictures
+filen-cli upload ./element_fire.png /pictures
+filen-cli upload ./element_water.png /pictures
+l
+filen-cli upload --help
+sus
+ssh oracle-host 
+cat .config/starship.toml | wl-copy 
+aldsa
+cat .config/starship.toml | wl-copy 
+cat README.md 
+git dot status
+git dot diff
+git dot -diff
+git dot --diff
+l Videos/
+l projects/
+l projects/v
+l projects/skywiper/
+cd projects/skywiper/SkyWiper/
+l
+la
+pmS flask
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt 
+py app.py 
+systemctl suspend 
+, .config/kitty/kitty.conf 
+, ~/.config/kitty/kitty.conf 
+cd
+, .config/hypr/config/binds.conf 
+, .config/hypr/config/variables.conf
+, .config/starship.toml 
+pmS emacs
+emacs --help
+emacs bin/sus
+, bin/sus
+cd bin
+pmR emacs
+pmorphans 
+bash audit_users 
+rm off sus
+sysinfo 
+cat sysinfo | wl-copy 
+which fastfetch neofetch
+pmR fastfetch
+, sysinfo 
+./sysinfo 
+rm spend 
+rm mirror earn 
+cat pkg-audit | wl-copy 
+, pkg-audit 
+./pkg-audit 
+rm reboot 
+sudo recon
+sudo ./recon
+cat recon | wl-copy 
+, recon 
+./recon 
+sudo ./recon 
+./recon -t 30 https:git.osaigbovo.xyz
+rm recon 
+cat investigate-domain | wl-copy 
+, investigate-domain 
+investigate-domain daesorin.xyz
+ic ls
+, launch-boxes 
+launch-boxes 
+rm launch-boxes 
+rm low-power 
+rm remove_users 
+./create-image 
+bash ./create-image 
+rm create_users 
+mv audit_users audit-users && chmod 755 audit-users
+, md
+md
+md life dkd "de, kk"
+rm -rf md old-scripts/
+, focus 
+rm focus 
+cat extract | wl-copy 
+, extract 
+cat compress | wl-copy 
+, compress 
+, currency 
+l archive 
+, archive 
+cat get | wl-copy 
+rm archive 
+, get
+get "https://static.mstdn.science/media_attachments/files/116/539/210/240/050/015/original/62d61601dd333d80.jpeg"
+imv 62d61601dd333d80.jpeg 
+rm 62d61601dd333d80.jpeg 
+cat adbx | wl-copy 
+, adbx 
+,
+cat sync_to_ish | wl-copy 
+, sync_to_ish 
+cat README.md 
+cat audit-users | wl-copy 
+, README.md 
+, audit-users 
+./audit-users 
+last -n 5
+git add audit-users 
+git commit -m "removed some scripts. rewrote some. would prefer to change them all to python--but my py-skills are still subpar"
+git status 
+mv sync_to_ish sync-md
+git add .
+git commit -m "updated my vault sync-script"
+git push -u origin main
+git dot status
+suspend
+sudo systemctl suspend 
+ssh oracle-host 
+cd bash
+cd modules/
+l
+, prompt.sh
+source ~/.config/bash/prompt.sh
+rm -rf ~/.config/starship.toml 
+pmR starship
+, .bashrc
+, ~/.bashrc
+cd projects/personal-web/
+l
+la
+, .gitignore 
+, ~/.bashrc
+, ~/.config/bash/modules/prompt.sh 
+la
+cd projects/personal-web/
+, ~/.config/bash/modules/prompt.sh 
+cd projects/personal-web/
+cd sigils
+source venv/bin/activate
+, .gitignore 
+git add .gitignore 
+git commit -m "added .gitignore"
+serve
+cd pages/
+eval -- $'git remote add origin ssh://git@git.osaigbovo.xyz:2222/daesorin/pages.git\ngit push -u origin main'
+..
+deactivate 
+cd ppp
+cd ../skywiper/SkyWiper/
+la
+git add __pycache__/wiper.cpython-314.pyc
+git status 
+gcd
+git remote remove origin
+eval -- $'git remote add origin ssh://git@git.osaigbovo.xyz:2222/daesorin/skywiper.git\ngit push -u origin main'
+, README.md 
+git add README.md 
+git commit -m "updated link"
+git push -u origin main
+../..
+tea repo list --help
+l
+, ~/.config/bash/modules/utils.sh 
+. ~/.bash_profile 
+sus
+sudo tlp setcharge 96 100 BAT0
+cd
+git add .bashrc .config/bash/modules/utils.sh .config/hypr/config/binds.conf .config/hypr/config/variables.conf .config/kitty/kitty.conf .config/starship.toml
+git add .bashrc,.config/bash/modules/utils.sh,.config/hypr/config/binds.conf,.config/hypr/config/variables.conf,.config/kitty/kitty.conf,.config/starship.toml
+git dot add .bashrc,.config/bash/modules/utils.sh,.config/hypr/config/binds.conf,.config/hypr/config/variables.conf,.config/kitty/kitty.conf,.config/starship.toml
+git dot add .bashrc .config/bash/modules/utils.sh .config/hypr/config/binds.conf .config/hypr/config/variables.conf .config/kitty/kitty.conf .config/starship.toml
+git status 
+git dot status
+git dot commit -m "just some updates ... and fixed my kitty's issue"
+git push -u origin main
+git dot push -u origin main
+lt
+l
+la
+, .bash*
+, .bashrc
+cp .bashrc ~/.config/bash
+, .bash_profile 
+mv .bashrc .bashrc.bak
+tea repo create --name pages --private
+tea repo create --name skywiper
+tea repo list
+tea repo list --help
+tea repo list --page
+tea repo list --page 1
+tea repo list --output json
+tea repo list --output csv
+ssh oracle-host 
+cd projects/personal-web/
+cd ~/projects/sigils/
+source venv/bin/activate
+deactivate 
+, ~/.config/bash/modules/prompt.sh 
+which fj
+tmux attach
+tx new -t drastical-beever
+, .bash_history 
+rm .bash_history 
+la
+cd bash
+rm .bashrc 
+cd modules/
+mv .sh ../
+cp *.sh ../
+.. ; la
+, ~/.bashrc
+rm -rf modules/
+l
+cd
+l homelabs-ops/
+tea repo create --name homelabs-ops
+cd homelabs-ops/
+git remote remove origin
+eval -- $'git remote add origin ssh://git@git.osaigbovo.xyz:2222/daesorin/homelabs-ops.git\ngit push -u origin main'
+git repo --help
+cd bas
+l
+, options.sh 
+killall waybar && waybar &!
+exit
+cd hypr
+cd config/
+l
+, binds.conf 
+, rules.conf 
+, appearance.conf 
+hyprctl reload
+vw
+, ~ /.local/bin/waybar-net
+, ~/.local/bin/waybar-net
+chmod 744 ~/.local/bin/waybar-net
+, ~/.config/waybar/config 
+killall waybar && waybar &!
+, ~/.config/waybar/style.css 
+waybar &!
+sudo tlp setcharge 0 100 BAT0
+cd
+sudo tlp-stat BAT0
+sudo tlp fullcharge
+sudo tlp-stat -b
+watch -n 1sudo tlp-stat -b
+,, /etc/tlp.conf 
+watch -n 1 sudo tlp-stat -b
+exit
+cd
+hostnamectl 
+sysinfo 
+incus bash alpine-01 
+rm ~/.ssh/known_hosts
+ssh 172.20.10.1
+nvim ~/.ssh/config 
+ssh ish
+cd modules
+cd bash
+, utils.sh 
+watch -n 1 sudo tlp-stat -b
+ic image alias create 20ba7 alpine/3.23
+incus image alias create 20ba723a0245 alpine/3.23
+incus image list images:alpine/3.23
+incus image alias add alpine/3.23 20ba723a0245
+incus image alias add ubuntu/24.04.vm f57c0edc5b4f88f16724dd2c70818efd283b1119e119189fc939de56f3c0ad04 
+incus image list 
+incus image info b33e3176c329
+incus image alias delete debian/14
+incus image list
+incus image alias delete debian/forky 
+incus image alias delete debian/14/amd64 
+incus image alias delete debian/14/default 
+incus image alias delete debian/14/default/amd64 
+incus image alias delete debian/forky/amd64 
+incus image alias delete debian/forky/default
+incus image alias delete debian/forky/default/amd64 
+ic image alias add debian/14 b33e31
+ic image ls
+incus launch ubuntu/24.04.vm linux-box --vm -c limits.memory=4GiB
+incus delete ubuntu-vm 
+incus delete ubuntu-vm --force
+systemctl set-default graphical.target
+incus bash linux-box 
+incus restart ubuntu/24.04.vm
+incus restart linux-box 
+incus console linux-box --type=vga
+incus stop --all
+sus
+ic ls
+ic start nearby-piranha
+incus shell nearby-piranha 
+l
+incus imgls
+cd
+cat .config/incus/config.yml 
+incus lsimg 
+incus launch alpine/3.23 alpine-01
+incus ls
+incus sh alpine-01 
+incus bash alpine-01 
+git cm "updated README.md"
+git ps
+, ~/.gitconfig 
+cd
+echo "*" >> ~/.dotfiles/info/exclude
+dota -f ~/.gitconfig
+git dota -f ~/.gitconfig
+git dotc "added .gitconfig"
+git dotp
+git today
+git dot today
+eval -- $'mkdir /tmp/key-backup\nchmod 700 /tmp/key-backup'
+eval -- $'gpg --export --armor > /tmp/key-backup/public-keys.asc\ngpg --export-secret-keys --armor > /tmp/key-backup/private-keys.asc\ngpg --gen-revoke "daesorin+git@proton.me" > /tmp/key-backup/revoke.asc'
+eval -- $'gpg --export --armor > /tmp/key-backup/public-keys.asc\ngpg --export-secret-keys --armor > /tmp/key-backup/private-keys.asc\ngpg --gen-revoke "daesorin+forgejo@proton.me" > /tmp/key-backup/revoke.asc'
+cp -r ~/.ssh /tmp/key-backup/
+tar -czf - -C /tmp key-backup | gpg --symmetric --cipher-algo AES256 -o identity-backup.tar.gz.gpg
+rm -rf /tmp/key-backup
+rm -rf old-obsidian/ obsidian-staging obsidian.bak/
+rm bin
+filen-cli ls
+filen-cli ls Backup/
+filen-cli ls -l Backup/
+filen-cli ls -l Backup/vaultwarden
+filen-cli mkdir /Backups/keys
+filen-cli ls -l Backups
+filen-cli mkdir /Backup/keys
+filen-cli ls -l Backup
+filen-cli upload ./identity-backup.tar.gz.gpg /Backup/keys/
+eval -- $';\nl\n'
+rm identity-backup.tar.gz.gpg 
+la
+, .git-credentials 
+rm .git-credentials 
+rm -rf ~/.npm ~/.npm-global ~/.npmrc
+gemini
+pacman -Qi gemini-cli 
+pacman -Rns gemini-cli 
+sudo pacman -Rns gemini-cli 
+ic ls
+ic imgls
+, ~/.config/incus/config.yml 
+ic lsimg
+sync-md --pull
+, .local/bin/sync-md 
+cat .local/bin/sync-md 
+sync-md pull
+incus launch images:ubuntu/24.04 ubuntu-vm --vm
+ic bash ubuntu-vm
+ic lsimg ; ic ls
+ic exec ubuntu-vm -- apt update
+ic exec ubuntu-vm -- apt install ubuntu-desktop
+l
+incus console ubuntu-vm --type=vga
+eval -- $'# If using Incus:\nincus exec ubuntu-vm -- bash'
+incus console ubuntu-vm --type=vga
+l
+l ; clear
+cd
+l
+git repo --help
+man tea repo
+tea repo --help
+tea repo edit --help
+tea repo list
+cd homelabs-ops/
+tea repo edit --private true homelabs-ops
+, README.md 
+git add README.md 
+git aliases
+git alias
+, ~/.gitconfig 
+tx new -t greeting-heaven
+sus ; clear
+ssh oracle-host 
+cat .ssh/config 
+cat .ssh/id_oracle*
+ssh root@144.24.200.123
+ls
+cd ssh
+cat id_ed25519*
+l
+ssh ish
+l
+cd ssh
+cat config | wl-copy 
+man ssh
+mandb ssh
+sudo mandb ssh
+cd bash
+, options.sh 
+cd ; clear
+. .bashrc
