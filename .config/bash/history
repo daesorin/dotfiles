@@ -921,3 +921,12 @@ cd bash
 , options.sh 
 cd ; clear
 . .bashrc
+l
+cat README.md 
+ll
+la
+cat .gitconfig 
+, .gitconfig 
+tea tags --help
+ssh ish "ls -la"
+ssh ish
