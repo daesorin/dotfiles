@@ -1,7 +1,17 @@
-set recolor "true"
+# ZATHURA CONFIGURATION
+# disable automatic recolouring on startup
+set recolor "false"
+
+# COLOUR MAPPINGS
+# preserve image hues when recolouring is activated
 set recolor-keephue "true"
-set recolor-lightcolor "#1e1e2e" 
-set recolor-darkcolor "#cdd6f4"  
+
+# recolour variables applied only when toggled
+set recolor-lightcolor "#1e1e2e"
+set recolor-darkcolor "#cdd6f4"
+
+# USER INTERFACE
+# static dark theme for the application chrome
 set default-bg "#1e1e2e"
 set default-fg "#cdd6f4"
 set statusbar-bg "#1e1e2e"

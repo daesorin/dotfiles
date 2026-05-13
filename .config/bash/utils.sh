@@ -27,6 +27,7 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias -- -='cd -'
+alias cdc='cd ; clear'
 
 # NVIM
 alias ,='nvim'
