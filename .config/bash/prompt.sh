@@ -10,21 +10,21 @@ c_gray="\[\e[1;30m\]"
 c_reset="\[\e[0m\]"
 
 build_prompt() {
-  local ext=$?
+  local exit_code=$?
 
-  # conditional ssh context
-  local ctx=""
-  if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
-    ctx="${c_purple}\u@\h "
+  # Error indicator (only when non-zero)
+  local err=""
+  if ((exit_code != 0)); then
+    err="${c_red}[err:${exit_code}] "
   fi
 
-  # virtual environment detection
+  # Virtual environment
   local venv=""
   if [[ -n "$VIRTUAL_ENV" ]]; then
     venv="${c_cyan}venv:$(basename "$VIRTUAL_ENV") "
   fi
 
-  # git branch and dirty state
+  # Git branch and dirty marker
   local git_info=""
   if git rev-parse --is-inside-work-tree &>/dev/null; then
     local branch
@@ -33,17 +33,15 @@ build_prompt() {
     if [[ -n $(git status --porcelain 2>/dev/null) ]]; then
       dirty="*"
     fi
-    git_info=" ${c_gray}git:${c_blue}${branch}${c_red}${dirty}"
+    git_info="${c_gray}git:${c_blue}${branch}${c_red}${dirty} "
   fi
 
-  # error catching
-  local err=""
-  if [ $ext -ne 0 ]; then
-    err="${c_red}[err:${ext}] "
-  fi
+  # Current directory (replace $HOME with ~)
+  local dir
+  dir=$(dirs +0) # same as $PWD but respects pushd if used
 
-  # final construction
-  PS1="\n${err}${ctx}${venv}${c_green}\w${git_info}\n${c_blue}❯${c_reset} "
+  # Build the [ ... ] part
+  PS1="${err}${c_gray}[${c_reset}${venv}${git_info}${c_green}${dir}${c_gray}]${c_reset} ${c_blue}❯${c_reset} "
 }
 
 PROMPT_COMMAND=build_prompt
