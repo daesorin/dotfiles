@@ -20,6 +20,8 @@ alias cdi='zi' # interactive picker
 alias cp='cp -iv'
 alias mv='mv -iv'
 alias rm='rm -Iv' # prompt once for 3+ files; -i is less annoying than -i
+alias rmr='rm -Irv'
+alias rmf='rm -frv'
 alias mkdir='mkdir -pv'
 
 # NAVIGATION
