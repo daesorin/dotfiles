@@ -6,6 +6,7 @@ set $muted_accent #506507
 # APPLICATIONS
 set $mainMod Mod4
 set $term foot
+set $term_2 alacritty
 set $launcher fuzzel
 set $files yazi
 set $browser_1 zen-bin

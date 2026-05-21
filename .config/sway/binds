@@ -1,6 +1,8 @@
 # APPLICATIONS
 bindsym $mainMod+Return exec $term
+bindsym $mainMod+Shift+Return exec $term_2
 bindsym $mainMod+space exec $launcher
+bindsym $mainMod+Shift+space exec ~/.local/bin/fuzzel-run
 bindsym $mainMod+e exec $term -e $files
 bindsym $mainMod+Shift+e exec $photo
 bindsym $mainMod+o exec $notes
@@ -78,8 +80,7 @@ bindsym $mainMod+Shift+0 move container to workspace number 10
 bindsym $mainMod+minus scratchpad show
 bindsym $mainMod+Shift+minus move scratchpad
 
-bindsym $mainMod+period exec bemoji -t
-
+bindsym $mainMod+period exec rofimoji --selector fuzzel --action type --clipboarder wl-copy
 # MOUSE
 bindsym --whole-window $mainMod+button2 floating toggle
 bindsym --whole-window $mainMod+button3 resize set
