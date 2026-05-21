@@ -1,0 +1,14 @@
+# MONITORS
+
+# INPUT
+input type:keyboard {
+    xkb_layout gb
+    xkb_numlock enabled
+}
+
+input type:touchpad {
+    natural_scroll enabled
+}
+
+# MOUSE BINDINGS
+floating_modifier $mainMod normal

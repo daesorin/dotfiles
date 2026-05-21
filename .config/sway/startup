@@ -1,0 +1,25 @@
+# ENVIRONMENT VARIABLES
+
+# AUTOSTART
+exec /usr/lib/polkit-kde-authentication-agent-1
+
+# wallpaper
+output * bg /home/dil/Pictures/turtle.jpg fill
+
+# IDLE AND LOCKING
+exec swayidle -w \
+    timeout 150 'brightnessctl -s set 10' resume 'brightnessctl -r' \
+    timeout 200 'swaylock -f -c 000000' \
+    timeout 250 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
+    timeout 1800 'systemctl suspend' \
+    before-sleep 'swaylock -f -c 000000'
+
+# ui components
+exec waybar
+exec mako
+
+# clipboard management
+exec wl-paste --type text --watch cliphist store
+exec wl-paste --type image --watch cliphist store
+
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP DBUS_SESSION_BUS_ADDRESS

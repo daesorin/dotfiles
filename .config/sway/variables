@@ -1,0 +1,18 @@
+# COLOURS
+set $background #100f0f
+set $foreground #343331
+set $muted_accent #506507
+
+# APPLICATIONS
+set $mainMod Mod4
+set $term foot
+set $launcher fuzzel
+set $files yazi
+set $browser_1 zen-bin
+set $browser_2 mullvad-browser
+set $notes obsidian
+set $auth enteauth
+set $photo ente-desktop
+set $passwdm bitwarden-desktop
+set $game_1 dolphin-emu
+set $game_2 azahar

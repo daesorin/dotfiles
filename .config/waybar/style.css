@@ -23,7 +23,7 @@ window#waybar {
   transition: all 0.2s ease;
 }
 
-#workspaces button.active {
+#workspaces button.focused {
   color: #ffffff;
 }
 
@@ -35,6 +35,8 @@ window#waybar {
 
 #clock,
 #custom,
+#network,
+#bluetooth,
 #pulseaudio,
 #backlight,
 #battery,
@@ -44,6 +46,8 @@ window#waybar {
 }
 
 /* Subtly dim the icons to keep the focus on the wallpaper */
+#network,
+#bluetooth,
 #pulseaudio,
 #backlight,
 #battery {
