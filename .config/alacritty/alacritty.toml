@@ -1,0 +1,63 @@
+# --- CORE CAPABILITIES ---
+[env]
+TERM = "alacritty"
+
+[window]
+padding = { x = 8, y = 8 }
+dynamic_padding = true
+# sway manages window borders and aesthetics
+decorations = "none"
+opacity = 1.0
+
+[scrolling]
+history = 10000
+multiplier = 3
+
+# --- TYPOGRAPHY ---
+[font]
+size = 9.0
+
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+style = "Regular"
+
+[font.bold]
+family = "JetBrainsMono Nerd Font"
+style = "Bold"
+
+[font.italic]
+family = "JetBrainsMono Nerd Font"
+style = "Italic"
+
+# --- FLEXOKI INK DARK ---
+[colors.primary]
+background = "#100f0f"
+foreground = "#cecdc3"
+
+[colors.cursor]
+text = "#100f0f"
+cursor = "#cecdc3"
+
+[colors.normal]
+black   = "#100f0f"
+red     = "#af3029"
+green   = "#66800b"
+yellow  = "#ad8301"
+blue    = "#205ea6"
+magenta = "#5e409d"
+cyan    = "#24837b"
+white   = "#cecdc3"
+
+[colors.bright]
+black   = "#282726"
+red     = "#d14d41"
+green   = "#879a39"
+yellow  = "#d0a215"
+blue    = "#4385be"
+magenta = "#8b7ec8"
+cyan    = "#3aa99f"
+white   = "#e6e4d9"
+
+# --- KEYBOARD AND MOUSE ---
+[mouse]
+hide_when_typing = true
