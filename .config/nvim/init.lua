@@ -90,5 +90,33 @@ require("lazy").setup({
         })
       })
     end,
+  },
+  {
+    "akinsho/bufferline.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function()
+      -- BUFFER VISUALISATION
+      -- render background buffers as a top navigational bar
+      require("bufferline").setup({
+        options = {
+          mode = "buffers",
+          numbers = "ordinal",
+          show_buffer_close_icons = false,
+          show_close_icon = false,
+          separator_style = "thin",
+          enforce_regular_tabs = true,
+          always_show_bufferline = true,
+        }
+      })
+
+      -- KEY MAPS
+      -- bind shift-h and shift-l to cycle through the open buffers
+      vim.keymap.set("n", "<S-h>", "<cmd>BufferLineCyclePrev<CR>", { desc = "previous buffer" })
+      vim.keymap.set("n", "<S-l>", "<cmd>BufferLineCycleNext<CR>", { desc = "next buffer" })
+      
+      -- buffer termination
+      -- bind leader-x to safely unload the current buffer from memory
+      vim.keymap.set("n", "<leader>x", "<cmd>bdelete<CR>", { desc = "close current buffer" })
+    end,
   }
 })

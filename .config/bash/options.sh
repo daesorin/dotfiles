@@ -15,7 +15,7 @@ export HISTFILE="$HOME/.config/bash/history"
 
 # PATH HANDLING
 # Bash does not have typeset -U; use a manual export.
-export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$HOME/.go/bin:$HOME/.npm-global/bin:/usr/local/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$HOME/go/bin:$HOME/.npm-global/bin:/usr/local/bin:$PATH"
 
 # DEDUPLICATE PATH (OPTIONAL HELPER)
 export PATH=$(echo -n "$PATH" | awk -v RS=: '!($0 in a) {a[$0]; printf "%s%s", (i++ ? ":" : ""), $0}')

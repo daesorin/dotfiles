@@ -5,11 +5,11 @@ set $muted_accent #506507
 
 # APPLICATIONS
 set $mainMod Mod4
-set $term foot
-set $term_2 alacritty
+set $term alacritty
+set $term_2 foot
 set $launcher fuzzel
 set $files yazi
-set $browser_1 zen-bin
+set $browser_1 zen-browser
 set $browser_2 mullvad-browser
 set $notes obsidian
 set $auth enteauth
