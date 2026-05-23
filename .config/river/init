@@ -1,0 +1,87 @@
+#!/bin/sh
+
+# VARIABLES
+# core applications
+TERM='alacritty'
+TERM2='foot'
+LAUNCHER='fuzzel'
+FILES='yazi'
+BROWSER1='zen-browser'
+BROWSER2='mullvad-browser'
+NOTES='obsidian'
+AUTH='enteauth'
+PHOTO='ente-desktop'
+PASSWDM='bitwarden-desktop'
+GAME1='dolphin-emu'
+GAME2='azahar'
+
+# APPEARANCE
+# colours background unfocused 100f0f foreground focused 343331 urgent 506507
+riverctl border-width 1
+riverctl border-color-focused   0x343331
+riverctl border-color-unfocused 0x100f0f
+riverctl border-color-urgent    0x506507
+
+# GENERAL BEHAVIOUR
+riverctl focus-follows-cursor normal
+riverctl set-cursor-warp on-output-change
+riverctl hide-cursor when-typing enabled
+
+# INPUT
+# gb layout numlock via numlockx or a udev rule
+riverctl keyboard-layout gb
+
+# touchpad natural scroll and tap to click
+riverctl list-inputs | grep -i touchpad | while IFS= read -r id; do
+    riverctl input "$id" natural-scroll enabled
+    riverctl input "$id" tap enabled
+done
+
+# LAYOUT
+# spawn rivertile before binding layout keys
+riverctl default-layout rivertile
+rivertile -inner-gaps 2 -outer-gaps 2 -main-ratio 0.55 &
+
+# KEYBINDS APPLICATIONS
+riverctl map normal Super         Return  spawn "$TERM"
+riverctl map normal Super+Shift   Return  spawn "$TERM2"
+riverctl map normal Super         Space   spawn "$LAUNCHER"
+riverctl map normal Super+Shift   Space   spawn "$HOME/.local/bin/fuzzel-run"
+riverctl map normal Super         E       spawn "$TERM -e $FILES"
+riverctl map normal Super+Shift   E       spawn "$PHOTO"
+riverctl map normal Super         O       spawn "$NOTES"
+riverctl map normal Super         B       spawn "$BROWSER1"
+riverctl map normal Super+Shift   B       spawn "$BROWSER2"
+riverctl map normal Super         G       spawn "$GAME1"
+riverctl map normal Super+Shift   G       spawn "$GAME2"
+riverctl map normal Super         A       spawn "$AUTH"
+riverctl map normal Super+Shift   A       spawn "$PASSWDM"
+
+# KEYBINDS THINKPAD SPECIAL KEYS
+riverctl map normal None XF86Display   spawn 'nwg-displays'
+riverctl map normal None XF86Favorites spawn "$TERM --hold -e $HOME/.local/bin/sysinfo"
+
+# KEYBINDS WINDOW MANAGEMENT
+riverctl map normal Super       Q close
+riverctl map normal Super+Shift Q exit
+
+# float and sticky views
+riverctl map normal Super         V toggle-float
+# set window visible on all 32 tags simultaneously
+riverctl map normal Super+Shift   V set-view-tags $(( (1 << 32) - 1 ))
+
+# directional focus
+riverctl map normal Super H focus-view left
+riverctl map normal Super J focus-view down
+riverctl map normal Super K focus-view up
+riverctl map normal Super L focus-view right
+
+# swap within layout
+riverctl map normal Super+Shift H swap previous
+riverctl map normal Super+Shift L swap next
+riverctl map normal Super+Shift J swap previous
+riverctl map normal Super+Shift K swap next
+
+# resize main area and cycle locations
+riverctl map normal Super+Control H send-layout-cmd rivertile 'main-ratio delta -0.05'
+riverctl map normal Super+Control L send-layout-cmd
