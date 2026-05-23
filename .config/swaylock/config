@@ -1,0 +1,43 @@
+# CORE AESTHETICS
+# base background colour (flexoki ink dark)
+color=100f0f
+font=JetBrainsMono Nerd Font
+font-size=24
+
+# INDICATOR GEOMETRY
+indicator-radius=120
+indicator-thickness=12
+indicator-idle-visible
+
+# INTERNAL RING COLOURS
+inside-color=100f0f
+inside-clear-color=100f0f
+inside-ver-color=100f0f
+inside-wrong-color=100f0f
+
+# EXTERNAL RING COLOURS
+# normal state (grey)
+ring-color=cecdc3
+# clearing state (yellow)
+ring-clear-color=d0a215
+# verifying state (purple)
+ring-ver-color=8b7ec8
+# incorrect state (red)
+ring-wrong-color=af3029
+
+# KEYPRESS HIGHLIGHTS
+# highlight colour when typing (green)
+key-hl-color=879a39
+# highlight colour when backspacing (yellow)
+bshl-color=d0a215
+
+# TEXT COLOURS
+text-color=cecdc3
+text-clear-color=100f0f
+text-ver-color=cecdc3
+text-wrong-color=cecdc3
+
+# BEHAVIOUR
+# disable the caps lock warning to maintain minimalism
+ignore-empty-password
+show-failed-attempts
