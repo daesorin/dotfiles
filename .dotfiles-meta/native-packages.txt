@@ -22,10 +22,10 @@ capitaine-cursors 4-3
 cdrtools 3.02a09-6
 chrony 4.8-3
 cliphist 1:0.7.0-2
-deno 2.7.14-1
+deno 2.8.0-1
 dnscrypt-proxy 2.1.15-1
 docker 1:29.5.1-1
-docker-compose 5.1.3-1
+docker-compose 5.1.4-1
 dolphin-emu 1:2512-2
 dosfstools 4.2-5
 dust 1.2.4-2
@@ -41,8 +41,8 @@ foot-terminfo 1.27.0-1
 freerdp 2:3.26.0-1
 fuzzel 1.14.1-1
 fzf 0.72.0-1
-gemini-cli 1:0.42.0-1
-ghostscript 10.07.0-1
+gemini-cli 1:0.43.0-1
+ghostscript 10.07.1-1
 git 2.54.0-1
 git-crypt 0.8.0-1
 git-delta 0.19.2-1
@@ -62,6 +62,7 @@ intel-media-driver 26.1.5-1
 intel-ucode 20260512-1
 inter-font 4.1-1
 ipython 9.12.0-1
+jq 1.8.1-3
 keyd 2.6.0-5
 kvantum 1.1.7-1
 lazygit 0.61.1-1
@@ -98,7 +99,7 @@ nwg-displays 0.4.3-1
 nwg-look 1.1.1-1
 nyx 2.1.0-10
 obsidian 1.12.7-2
-openbsd-netcat 1.234_2-1
+openbsd-netcat 1.238_1-1
 openresolv 3.17.4-1
 openssh 10.3p1-1
 pacman-contrib 1.13.1-1
@@ -114,12 +115,12 @@ python-pip 26.1.1-1
 python-rich 15.0.0-1
 python-watchdog 6.0.0-2
 python-yaml 6.0.3-2
-qt5-wayland 5.15.18+kde+r55-1
+qt5-wayland 5.15.19+kde+r55-1
 qt5ct 1.9-1
 qt6-wayland 6.11.1-1
 qt6ct 0.11-6
 reflector 2023-5
-ripgrep 15.1.0-2
+ripgrep 15.1.0-3
 rkhunter 1.4.6-4
 rofimoji 6.7.0-2
 rust 1:1.95.0-1
@@ -151,7 +152,7 @@ unzip 6.0-23
 uwsm 0.26.4-1
 virt-viewer 11.0-4
 vnstat 2.13-2
-vulkan-intel 1:26.0.6-1
+vulkan-intel 1:26.1.1-2
 waybar 0.15.0-2
 wf-recorder 0.6.0-1
 whois 5.6.6-1
