@@ -1,0 +1,139 @@
+// STARTUP DAEMONS
+spawn-at-startup "/usr/lib/polkit-kde-authentication-agent-1"
+spawn-at-startup "swaybg" "-i" "/home/dil/Pictures/turtle.jpg" "-m" "fill"
+spawn-at-startup "waybar"
+spawn-at-startup "mako"
+spawn-at-startup "nm-applet"
+spawn-at-startup "blueman-applet"
+
+// HARDWARE OUTPUT
+output "eDP-1" {
+    scale 1.0
+}
+
+// CLIPBOARD TRACKING
+// initialise history buffers
+spawn-at-startup "wl-paste" "--type" "text" "--watch" "cliphist" "store"
+spawn-at-startup "wl-paste" "--type" "image" "--watch" "cliphist" "store"
+
+// IDLE MANAGEMENT
+// execute suspend logic and display power cycling
+spawn-at-startup "bash" "-c" "swayidle -w timeout 150 'brightnessctl -s set 10' resume 'brightnessctl -r' timeout 200 'swaylock -f -c 000000' timeout 250 'niri msg action power-off-monitors' resume 'niri msg action power-on-monitors' timeout 1800 'systemctl suspend' before-sleep 'swaylock -f -c 000000'"
+
+// INPUT CONFIGURATION
+input {
+    keyboard {
+        xkb {
+            layout "gb"
+        }
+    }
+    touchpad {
+        tap
+        natural-scroll
+    }
+
+    focus-follows-mouse max-scroll-amount="0%"
+}
+
+// APPEARANCE AND SPATIAL LAYOUT
+layout {
+    gaps 5
+    center-focused-column "never"
+    always-center-single-column
+    empty-workspace-above-first
+    default-column-width { proportion 0.5; }
+
+    border {
+        width 1
+        active-color "rgb(61, 76, 7)"
+        inactive-color "rgb(26, 30, 12)"
+    }
+
+    shadow {
+	off 
+    }
+
+    focus-ring {
+        off
+    }
+}
+
+// WINDOW RULES
+window-rule {
+    match app-id="pavucontrol"
+    match app-id="blueman-manager"
+    match app-id="nm-connection-editor"
+    match app-id="clipyazi"
+    match app-id="miniterm"
+    open-floating true
+}
+
+window-rule {
+    match app-id="zen" title="Picture-in-Picture"
+    open-floating true
+}
+
+// KEYBINDINGS
+binds {
+    Mod+Return repeat=false { spawn "alacritty"; }
+    Mod+Shift+Return repeat=false { spawn "foot"; }
+    Mod+Space { spawn "fuzzel"; }
+    Mod+Shift+Space { spawn "bash" "-c" "$HOME/.local/bin/fuzzel-run"; }
+    
+    Mod+B cooldown-ms=500 { spawn "zen-browser"; }
+    Mod+Shift+B cooldown-ms=500 { spawn "mullvad-browser"; }
+    Mod+O cooldown-ms=500 { spawn "obsidian"; }
+    Mod+A cooldown-ms=500 { spawn "enteauth"; }
+    Mod+Shift+A cooldown-ms=500 { spawn "bitwarden-desktop"; }
+    Mod+E cooldown-ms=500 { spawn "alacritty" "-e" "yazi"; }
+    Mod+Shift+E cooldown-ms=500 { spawn "ente-desktop"; }
+    Mod+G cooldown-ms=500 { spawn "dolphin-emu"; }
+    Mod+Shift+G cooldown-ms=500 { spawn "azahar"; }
+
+    Mod+Q repeat=false { close-window; }
+    Mod+Shift+Q { quit skip-confirmation=true; }
+
+    Mod+H { focus-column-left; }
+    Mod+L { focus-column-right; }
+    Mod+J { focus-window-down; }
+    Mod+K { focus-window-up; }
+
+    Mod+Shift+H { move-column-left; }
+    Mod+Shift+L { move-column-right; }
+    Mod+Shift+J { move-window-down; }
+    Mod+Shift+K { move-window-up; }
+
+    Mod+U { focus-workspace-down; }
+    Mod+I { focus-workspace-up; }
+    Mod+Shift+U { move-column-to-workspace-down; }
+    Mod+Shift+I { move-column-to-workspace-up; }
+
+    Mod+Minus { set-column-width "-10%"; }
+    Mod+Equal { set-column-width "+10%"; }
+    
+    Mod+Shift+Minus { set-window-height "-10%"; }
+    Mod+Shift+Equal { set-window-height "+10%"; }
+
+    Mod+Control+L { consume-window-into-column; }
+    Mod+Control+H { expel-window-from-column; }
+
+    Mod+F { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
+    Mod+V { toggle-window-floating; }
+
+    Mod+W { spawn-sh "killall -SIGUSR1 waybar"; }
+
+    XF86AudioRaiseVolume { spawn "pamixer" "-i" "5"; }
+    XF86AudioLowerVolume { spawn "pamixer" "-d" "5"; }
+    XF86AudioMute { spawn "pamixer" "-t"; }
+    XF86AudioMicMute { spawn "pamixer" "--default-source" "-t"; }
+    XF86MonBrightnessUp { spawn "brightnessctl" "s" "5%+"; }
+    XF86MonBrightnessDown { spawn "brightnessctl" "s" "5%-"; }
+
+    // shell scripts
+    Mod+Print { spawn "bash" "-c" "grim -g \"$(slurp)\" - | wl-copy"; }
+    Print { spawn "bash" "-c" "grim - | wl-copy"; }
+    Mod+C { spawn "bash" "-c" "cliphist list | fuzzel -d | cliphist decode | wl-copy"; }
+    Mod+Period { spawn "bash" "-c" "rofimoji --selector fuzzel --action type --clipboarder wl-copy"; }
+    Mod+Shift+Escape { spawn "~/.local/bin/powerctl"; }
+}
