@@ -23,8 +23,10 @@ window#waybar {
   transition: all 0.2s ease;
 }
 
-#workspaces button.focused {
-  color: #ffffff;
+/* Flexoki Yellow for active workspaces across both Niri and Sway */
+#workspaces button.focused,
+#workspaces button.active {
+  color: #d0a215;
 }
 
 #workspaces button:hover {
@@ -40,7 +42,8 @@ window#waybar {
 #pulseaudio,
 #backlight,
 #battery,
-#tray {
+#tray,
+#window {
   padding: 0 12px;
   color: #eeeeee;
 }

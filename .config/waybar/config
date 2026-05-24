@@ -4,9 +4,19 @@
     "height": 28,
     "spacing": 8,
 
-    "modules-left": ["sway/workspaces"],
+    "modules-left": ["sway/workspaces", "niri/window"],
     "modules-center": ["clock"],
-    "modules-right": ["custom/bandwidth", "network", "bluetooth", "pulseaudio", "backlight", "battery", "tray"],
+    "modules-right": ["custom/bandwidth", "pulseaudio", "backlight", "battery", "tray"],
+
+    "niri/window": {
+        "format": "{}",
+        "rewrite": {
+            "(.*) - Mozilla Firefox": "Firefox",
+            "(.*) - Zen Browser": "Zen",
+            "(.*) - Obsidian v(.*)": "Obsidian"
+        },
+        "max-length": 50
+    },
 
     "sway/workspaces": {
         "format": "{icon}",
@@ -17,7 +27,7 @@
     },
 
     "clock": {
-        "format": "{:%H:%M}",
+        "format": "{:%H:%M | %d}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
     },
 
@@ -26,21 +36,6 @@
         "return-type": "json",
         "interval": 60,
         "format": "{}"
-    },
-
-    "network": {
-        "format-wifi": "󰤨  {essid}",
-        "format-ethernet": "󰈀  {ipaddr}",
-        "format-disconnected": "󰤭  Offline",
-        "tooltip-format": "{ifname} via {gwaddr}",
-        "on-click": "nm-connection-editor"
-    },
-
-    "bluetooth": {
-        "format": "󰂯  {status}",
-        "format-connected": "󰂱  {device_alias}",
-        "format-disabled": "󰂲  Disabled",
-        "on-click": "blueman-manager"
     },
 
     "pulseaudio": {
