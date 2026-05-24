@@ -118,5 +118,40 @@ require("lazy").setup({
       -- bind leader-x to safely unload the current buffer from memory
       vim.keymap.set("n", "<leader>x", "<cmd>bdelete<CR>", { desc = "close current buffer" })
     end,
+  },
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    dependencies = { 
+      "nvim-treesitter/nvim-treesitter", 
+      "nvim-tree/nvim-web-devicons" 
+    },
+    opts = {
+      heading = {
+        sign = false,
+        icons = { '󰲡 ', '󰲣 ', '󰲥 ', '󰲧 ', '󰲩 ', '󰲫 ' },
+      },
+      code = {
+        sign = false,
+        width = "block",
+        right_pad = 1,
+      },
+    },
+  },
+  {
+    "folke/zen-mode.nvim",
+    config = function()
+      require("zen-mode").setup({
+        window = {
+          width = 80,
+          options = {
+            number = false,
+            relativenumber = false,
+          }
+        },
+      })
+      
+      -- map leader-z to toggle the writing mode
+      vim.keymap.set("n", "<leader>z", "<cmd>ZenMode<CR>", { desc = "toggle zen mode" })
+    end
   }
 })
