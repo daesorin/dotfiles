@@ -18,6 +18,9 @@ exec swayidle -w \
 exec waybar
 exec mako
 
+# ...
+exec nm-applet
+exec blueman-applet
 # clipboard management
 exec wl-paste --type text --watch cliphist store
 exec wl-paste --type image --watch cliphist store
