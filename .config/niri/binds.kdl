@@ -1,0 +1,64 @@
+// KEYBINDINGS
+binds {
+    Mod+Return repeat=false { spawn "alacritty"; }
+    Mod+Shift+Return repeat=false { spawn "foot"; }
+    Mod+Space { spawn "fuzzel"; }
+    Mod+Shift+Space { spawn "bash" "-c" "$HOME/.local/bin/fuzzel-run"; }
+    
+    Mod+B cooldown-ms=500 { spawn "zen-browser"; }
+    Mod+Shift+B cooldown-ms=500 { spawn "mullvad-browser"; }
+    Mod+O cooldown-ms=500 { spawn "obsidian"; }
+    Mod+A cooldown-ms=500 { spawn "enteauth"; }
+    Mod+Shift+A cooldown-ms=500 { spawn "bitwarden-desktop"; }
+    Mod+E cooldown-ms=500 { spawn "alacritty" "-e" "yazi"; }
+    Mod+Shift+E cooldown-ms=500 { spawn "ente-desktop"; }
+    Mod+G cooldown-ms=500 { spawn "dolphin-emu"; }
+    Mod+Shift+G cooldown-ms=500 { spawn "azahar"; }
+
+    Mod+Q repeat=false { close-window; }
+    Mod+Shift+Q { quit skip-confirmation=true; }
+
+    Mod+H { focus-column-left; }
+    Mod+L { focus-column-right; }
+    Mod+J { focus-window-down; }
+    Mod+K { focus-window-up; }
+
+    Mod+Shift+H { move-column-left; }
+    Mod+Shift+L { move-column-right; }
+    Mod+Shift+J { move-window-down; }
+    Mod+Shift+K { move-window-up; }
+
+    Mod+U { focus-workspace-down; }
+    Mod+I { focus-workspace-up; }
+    Mod+Shift+U { move-column-to-workspace-down; }
+    Mod+Shift+I { move-column-to-workspace-up; }
+
+    Mod+Minus { set-column-width "-10%"; }
+    Mod+Equal { set-column-width "+10%"; }
+    
+    Mod+Shift+Minus { set-window-height "-10%"; }
+    Mod+Shift+Equal { set-window-height "+10%"; }
+
+    Mod+Control+L { consume-window-into-column; }
+    Mod+Control+H { expel-window-from-column; }
+
+    Mod+F { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
+    Mod+V { toggle-window-floating; }
+
+    Mod+W { spawn-sh "killall -SIGUSR1 waybar"; }
+
+    XF86AudioRaiseVolume { spawn "pamixer" "-i" "5"; }
+    XF86AudioLowerVolume { spawn "pamixer" "-d" "5"; }
+    XF86AudioMute { spawn "pamixer" "-t"; }
+    XF86AudioMicMute { spawn "pamixer" "--default-source" "-t"; }
+    XF86MonBrightnessUp { spawn "brightnessctl" "s" "5%+"; }
+    XF86MonBrightnessDown { spawn "brightnessctl" "s" "5%-"; }
+
+    // SHELL SCRIPTS
+    Mod+Print { spawn "bash" "-c" "grim -g \"$(slurp)\" - | wl-copy"; }
+    Print { spawn "bash" "-c" "grim - | wl-copy"; }
+    Mod+C { spawn "bash" "-c" "cliphist list | fuzzel -d | cliphist decode | wl-copy"; }
+    Mod+Period { spawn "bash" "-c" "rofimoji --selector fuzzel --action type --clipboarder wl-copy"; }
+    Mod+Shift+Escape { spawn "~/.local/bin/powerctl"; }
+}

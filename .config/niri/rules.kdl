@@ -1,0 +1,14 @@
+// WINDOW RULES
+window-rule {
+    match app-id="pavucontrol"
+    match app-id="blueman-manager"
+    match app-id="nm-connection-editor"
+    match app-id="clipyazi"
+    match app-id="miniterm"
+    open-floating true
+}
+
+window-rule {
+    match app-id="zen" title="Picture-in-Picture"
+    open-floating true
+}
