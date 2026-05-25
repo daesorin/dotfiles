@@ -39,8 +39,8 @@ input {
 layout {
     gaps 5
     center-focused-column "never"
-    always-center-single-column
-    empty-workspace-above-first
+    //always-center-single-column
+    //empty-workspace-above-first
     default-column-width { proportion 0.5; }
 
     border {
