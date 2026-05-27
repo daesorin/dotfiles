@@ -14,6 +14,7 @@ binds {
     Mod+Shift+E cooldown-ms=500 { spawn "ente-desktop"; }
     Mod+G cooldown-ms=500 { spawn "dolphin-emu"; }
     Mod+Shift+G cooldown-ms=500 { spawn "azahar"; }
+    Mod+Shift+C { spawn "/home/dil/.local/bin/pickerctl"; }
 
     Mod+Q repeat=false { close-window; }
     Mod+Shift+Q { quit skip-confirmation=true; }
@@ -60,5 +61,5 @@ binds {
     Print { spawn "bash" "-c" "grim - | wl-copy"; }
     Mod+C { spawn "bash" "-c" "cliphist list | fuzzel -d | cliphist decode | wl-copy"; }
     Mod+Period { spawn "bash" "-c" "rofimoji --selector fuzzel --action type --clipboarder wl-copy"; }
-    Mod+Shift+Escape { spawn "~/.local/bin/powerctl"; }
+    Mod+Escape { spawn "~/.local/bin/powerctl"; }
 }

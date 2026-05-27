@@ -10,7 +10,7 @@ fi
 # MODULE LOADER
 BASH_MOD_DIR="$HOME/.config/bash"
 if [[ -d "$BASH_MOD_DIR" ]]; then
-  for config in "$BASH_MOD_DIR"/*.sh; do
+  for config in "$BASH_MOD_DIR"/*.bash; do
     [[ -f "$config" ]] && source "$config"
   done
 fi
