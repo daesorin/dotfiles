@@ -16,3 +16,5 @@ set default-bg "#1e1e2e"
 set default-fg "#cdd6f4"
 set statusbar-bg "#1e1e2e"
 set statusbar-fg "#cdd6f4"
+
+unmap d

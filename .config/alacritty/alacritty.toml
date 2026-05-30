@@ -61,3 +61,7 @@ white   = "#e6e4d9"
 # --- KEYBOARD AND MOUSE ---
 [mouse]
 hide_when_typing = true
+
+# TMUX WRAPPER
+[terminal]
+shell = { program = "/home/dil/.local/bin/tmux-wrapper", args = [] }

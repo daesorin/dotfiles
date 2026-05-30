@@ -1,10 +1,11 @@
 // KEYBINDINGS
 binds {
     Mod+Return repeat=false { spawn "alacritty"; }
-    Mod+Shift+Return repeat=false { spawn "foot"; }
+    Mod+Shift+Return { spawn "bash" "-c" "~/.local/bin/scratch 'foot-scratch' 'foot --app-id foot-scratch'"; }
     Mod+Space { spawn "fuzzel"; }
     Mod+Shift+Space { spawn "bash" "-c" "$HOME/.local/bin/fuzzel-run"; }
     
+    // APPLICATION LAUNCHERS
     Mod+B cooldown-ms=500 { spawn "zen-browser"; }
     Mod+Shift+B cooldown-ms=500 { spawn "mullvad-browser"; }
     Mod+O cooldown-ms=500 { spawn "obsidian"; }
@@ -14,11 +15,25 @@ binds {
     Mod+Shift+E cooldown-ms=500 { spawn "ente-desktop"; }
     Mod+G cooldown-ms=500 { spawn "dolphin-emu"; }
     Mod+Shift+G cooldown-ms=500 { spawn "azahar"; }
-    Mod+Shift+C { spawn "/home/dil/.local/bin/pickerctl"; }
+    Mod+T cooldown-ms=500 { spawn "telegram-desktop"; }
+    Mod+P cooldown-ms=500 { spawn "pavucontrol"; }
 
+    // TUI SYSTEM WORKPLACES
+    Mod+D cooldown-ms=500 { spawn "alacritty" "-e" "btop"; }
+    Mod+Shift+Y cooldown-ms=500 { spawn "alacritty" "-e" "lazygit"; }
+    Mod+N cooldown-ms=500 { spawn "alacritty" "-e" "newsboat"; }
+    Mod+M cooldown-ms=500 { spawn "alacritty" "-e" "ncmpcpp"; }
+    Mod+Shift+T cooldown-ms=500 { spawn "alacritty" "-e" "tut"; }
+
+    // HARDWARE AND OVERLAYS
+    Mod+Shift+C { spawn "/home/dil/.local/bin/picker"; }
+    Mod+W { spawn-sh "killall -SIGUSR1 waybar"; }
+
+    // WINDOW MECHANICS
     Mod+Q repeat=false { close-window; }
     Mod+Shift+Q { quit skip-confirmation=true; }
 
+    // SPATIAL NAVIGATION
     Mod+H { focus-column-left; }
     Mod+L { focus-column-right; }
     Mod+J { focus-window-down; }
@@ -34,9 +49,9 @@ binds {
     Mod+Shift+U { move-column-to-workspace-down; }
     Mod+Shift+I { move-column-to-workspace-up; }
 
+    // INTERFACE GEOMETRY
     Mod+Minus { set-column-width "-10%"; }
     Mod+Equal { set-column-width "+10%"; }
-    
     Mod+Shift+Minus { set-window-height "-10%"; }
     Mod+Shift+Equal { set-window-height "+10%"; }
 
@@ -47,8 +62,13 @@ binds {
     Mod+Shift+F { fullscreen-window; }
     Mod+V { toggle-window-floating; }
 
-    Mod+W { spawn-sh "killall -SIGUSR1 waybar"; }
+    // NEWLY BOUND ACTIONS
+    Mod+Slash { show-hotkey-overlay; }
+    Mod+Tab { switch-preset-column-width; }
+    Mod+Shift+V { switch-focus-between-floating-and-tiling; }
+    Mod+R { open-overview; }
 
+    // HARDWARE MEDIA ROUTING
     XF86AudioRaiseVolume { spawn "pamixer" "-i" "5"; }
     XF86AudioLowerVolume { spawn "pamixer" "-d" "5"; }
     XF86AudioMute { spawn "pamixer" "-t"; }
@@ -56,10 +76,10 @@ binds {
     XF86MonBrightnessUp { spawn "brightnessctl" "s" "5%+"; }
     XF86MonBrightnessDown { spawn "brightnessctl" "s" "5%-"; }
 
-    // SHELL SCRIPTS
+    // SHELL AUTOMATIONS
     Mod+Print { spawn "bash" "-c" "grim -g \"$(slurp)\" - | wl-copy"; }
     Print { spawn "bash" "-c" "grim - | wl-copy"; }
     Mod+C { spawn "bash" "-c" "cliphist list | fuzzel -d | cliphist decode | wl-copy"; }
     Mod+Period { spawn "bash" "-c" "rofimoji --selector fuzzel --action type --clipboarder wl-copy"; }
-    Mod+Escape { spawn "~/.local/bin/powerctl"; }
+    Mod+Escape { spawn "~/.local/bin/power"; }
 }

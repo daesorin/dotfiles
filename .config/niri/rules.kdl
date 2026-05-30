@@ -5,6 +5,8 @@ window-rule {
     match app-id="nm-connection-editor"
     match app-id="clipyazi"
     match app-id="miniterm"
+    match app-id="org.telegram.desktop"
+    match app-id="foot-scratch"
     open-floating true
 }
 

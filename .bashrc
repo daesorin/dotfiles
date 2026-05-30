@@ -16,6 +16,7 @@ if [[ -d "$BASH_MOD_DIR" ]]; then
 fi
 
 eval "$(zoxide init bash)"
+eval "$(starship init bash)"
 
 # PLUGINS
 [[ -f /usr/share/bash-syntax-highlighting/bash-syntax-highlighting.sh ]] &&
