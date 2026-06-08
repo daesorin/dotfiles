@@ -10,15 +10,15 @@ Managed with a bare git repository.
 
 - Shell -- Bash with modular config
 - Prompt -- Starship
-- Terminal -- Kitty
+- Terminal -- Alacritty
 - Multiplexer -- tmux + TPM
-- Compositor -- Hyprland
+- Compositor -- Niri
 - Bar -- Waybar
 - Launcher -- Rofi
 - Editor -- Neovim (LazyVim)
 - Notifications -- Mako
-- Media -- mpd, ncmpcpp, mpv
-- Utilities -- btop, zathura, gitmux
+- Media -- mpc, mpd, ncmpcpp, mpv
+- Utilities -- btop, zathura
 
 ---
 
@@ -27,7 +27,7 @@ Managed with a bare git repository.
 Clone and set up the bare repo:
 
 ```bash
-curl -fsSL https://git.osaigbovo.xyz/daesorin/dotfiles/raw/branch/main/.dotfiles-meta/install.sh | bash
+curl -fsSL https://git.daesorin.xyz/daesorin/dotfiles/raw/branch/main/.dotfiles-meta/install.sh | bash
 ```
 
 Then restart your shell. If you are on Arch and want to install packages:
