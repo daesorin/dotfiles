@@ -76,6 +76,11 @@ binds {
     XF86MonBrightnessUp { spawn "brightnessctl" "s" "5%+"; }
     XF86MonBrightnessDown { spawn "brightnessctl" "s" "5%-"; }
 
+    // MPC BINDS
+    Mod+Alt+Space { spawn "mpc" "toggle"; }
+    Mod+Alt+L { spawn "mpc" "next"; }
+    Mod+Alt+H { spawn "mpc" "prev"; }
+    Mod+Alt+K { spawn "mpc" "stop"; }
     // SHELL AUTOMATIONS
     Mod+Print { spawn "bash" "-c" "grim -g \"$(slurp)\" - | wl-copy"; }
     Print { spawn "bash" "-c" "grim - | wl-copy"; }

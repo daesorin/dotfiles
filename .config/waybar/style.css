@@ -6,12 +6,14 @@
   border-radius: 0;
 }
 
-/* Edge-to-edge dark translucent bar */
+/* BASE WINDOW */
+/* edge-to-edge dark translucent bar */
 window#waybar {
-  background-color: rgba(10, 10, 10, 0.85);
-  color: #ffffff;
+  background-color: rgba(15, 15, 15, 0.85);
+  color: #cdd6f4;
 }
 
+/* WORKSPACES */
 #workspaces {
   margin-left: 8px;
 }
@@ -23,7 +25,7 @@ window#waybar {
   transition: all 0.2s ease;
 }
 
-/* Flexoki Yellow for active workspaces across both Niri and Sway */
+/* flexoki yellow for active workspaces */
 #workspaces button.focused,
 #workspaces button.active {
   color: #d0a215;
@@ -35,6 +37,7 @@ window#waybar {
   color: #aaaaaa;
 }
 
+/* MODULE SPACING */
 #clock,
 #custom,
 #network,
@@ -45,18 +48,57 @@ window#waybar {
 #tray,
 #window {
   padding: 0 12px;
-  color: #eeeeee;
-}
-
-/* Subtly dim the icons to keep the focus on the wallpaper */
-#network,
-#bluetooth,
-#pulseaudio,
-#backlight,
-#battery {
   opacity: 0.9;
 }
 
+/* HARDWARE COLOURS */
+/* assigning distinct muted hues to logical blocks */
+#clock {
+  color: #babbf1;
+}
+
+#network {
+  color: #8caaee;
+}
+
+#bluetooth {
+  color: #ca9ee6;
+}
+
+#pulseaudio {
+  color: #81c8be;
+}
+
+#backlight {
+  color: #e5c890;
+}
+
+#battery {
+  color: #a6d189;
+}
+
+#battery.charging {
+  color: #a6e3a1;
+}
+
 #battery.critical:not(.charging) {
-  color: #ff5555;
+  color: #e78284;
+}
+
+/* MPD CONTROLS */
+#mpd {
+  padding: 0 10px;
+  font-family: monospace;
+  color: #cdd6f4;
+}
+
+/* dim the text when inactive */
+#mpd.disconnected,
+#mpd.stopped {
+  color: #6c7086;
+}
+
+/* green hue when active */
+#mpd.playing {
+  color: #a6e3a1;
 }

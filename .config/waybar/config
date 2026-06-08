@@ -4,7 +4,7 @@
     "height": 28,
     "spacing": 8,
 
-    "modules-left": ["sway/workspaces", "niri/window"],
+    "modules-left": ["sway/workspaces", "niri/window", "mpd"],
     "modules-center": ["clock"],
     "modules-right": ["custom/bandwidth", "pulseaudio", "backlight", "battery", "tray"],
 
@@ -29,6 +29,23 @@
     "clock": {
         "format": "{:%H:%M | %d}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+
+    "mpd": {
+        "format": "{stateIcon} {artist} - {title}",
+        "format-disconnected": " offline",
+        "format-stopped": " stopped",
+        "state-icons": {
+            "paused": "",
+            "playing": ""
+        },
+        "max-length": 40,
+        "tooltip-format": "MPD (connected)",
+        "tooltip-format-disconnected": "MPD (disconnected)",
+        "on-click": "mpc toggle",
+        "on-scroll-up": "mpc next",
+        "on-scroll-down": "mpc prev",
+        "on-click-right": "alacritty -e ncmpcpp"
     },
 
     "custom/bandwidth": {

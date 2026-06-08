@@ -15,11 +15,17 @@ if [[ -d "$BASH_MOD_DIR" ]]; then
   done
 fi
 
-eval "$(zoxide init bash)"
 eval "$(starship init bash)"
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init bash --cmd cd)"
+fi
 
 # PLUGINS
 [[ -f /usr/share/bash-syntax-highlighting/bash-syntax-highlighting.sh ]] &&
   source /usr/share/bash-syntax-highlighting/bash-syntax-highlighting.sh
 
 # Testing
+
+
+# filen-cli
+PATH=$PATH:~/.filen-cli/bin

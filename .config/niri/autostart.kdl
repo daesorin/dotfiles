@@ -7,10 +7,8 @@ spawn-at-startup "nm-applet"
 spawn-at-startup "blueman-applet"
 
 // CLIPBOARD TRACKING
-// initialise history buffers
 spawn-at-startup "wl-paste" "--type" "text" "--watch" "cliphist" "store"
 spawn-at-startup "wl-paste" "--type" "image" "--watch" "cliphist" "store"
 
 // IDLE MANAGEMENT
-// execute suspend logic and display power cycling
 spawn-at-startup "bash" "-c" "swayidle -w timeout 150 'brightnessctl -s set 10' resume 'brightnessctl -r' timeout 200 'swaylock -f -c 000000' timeout 250 'niri msg action power-off-monitors' resume 'niri msg action power-on-monitors' timeout 1800 'systemctl suspend' before-sleep 'swaylock -f -c 000000'"

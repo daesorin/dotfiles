@@ -1,11 +1,9 @@
-# --- CORE CAPABILITIES ---
 [env]
 TERM = "alacritty"
 
 [window]
 padding = { x = 8, y = 8 }
 dynamic_padding = true
-# sway manages window borders and aesthetics
 decorations = "none"
 opacity = 1.0
 
@@ -13,7 +11,6 @@ opacity = 1.0
 history = 10000
 multiplier = 3
 
-# --- TYPOGRAPHY ---
 [font]
 size = 9.0
 
@@ -29,7 +26,6 @@ style = "Bold"
 family = "JetBrainsMono Nerd Font"
 style = "Italic"
 
-# --- FLEXOKI INK DARK ---
 [colors.primary]
 background = "#100f0f"
 foreground = "#cecdc3"
@@ -58,10 +54,8 @@ magenta = "#8b7ec8"
 cyan    = "#3aa99f"
 white   = "#e6e4d9"
 
-# --- KEYBOARD AND MOUSE ---
 [mouse]
 hide_when_typing = true
 
-# TMUX WRAPPER
 [terminal]
 shell = { program = "/home/dil/.local/bin/tmux-wrapper", args = [] }
