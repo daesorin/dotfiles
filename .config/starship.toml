@@ -1,0 +1,13 @@
+# STARSHIP CORE CONFIGURATION
+format = "$character"
+
+# PROMPT CHARACTER
+[character]
+success_symbol = "[>](bold green)"
+error_symbol = "[x](bold red)"
+vicmd_symbol = "[v](bold green)"
+
+# EXECUTION TIME
+[cmd_duration]
+min_time = 2000
+format = "took [$duration](yellow) "
