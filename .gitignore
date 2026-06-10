@@ -5,6 +5,7 @@
 !.gitignore
 !.config/
 !.config/bash/
+!.config/bash/*
 !.config/kitty/
 !.config/hypr/
 !.config/hypr/config/
@@ -18,6 +19,8 @@
 !.config/mako/
 !.config/alacritty/
 !.config/alacritty/*
+!.config/niri/
+!.config/niri/*
 !.config/sway/
 !.config/sway/*
 !.config/swaylock

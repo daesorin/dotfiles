@@ -26,7 +26,10 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias -- -='cd -'
-alias cdc='cd ; clear'
+
+cdc() {
+	cd "$1" ; clear
+}
 
 # NVIM
 alias ,='nvim'
