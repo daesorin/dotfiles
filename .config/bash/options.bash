@@ -8,8 +8,8 @@ shopt -s dirspell
 shopt -s cdspell
 
 # WRITE MODE
-set -o emacs
-#set -o vi
+#set -o emacs
+set -o vi
 
 # HISTORY MANAGEMENT
 export HISTSIZE=10000
