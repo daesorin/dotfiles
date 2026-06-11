@@ -6,6 +6,10 @@
 !.config/
 !.config/bash/
 !.config/bash/*
+!.zshrc
+!.zprofile
+!.config/zsh/
+!.config/zsh/*
 !.config/kitty/
 !.config/hypr/
 !.config/hypr/config/
