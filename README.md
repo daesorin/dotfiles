@@ -8,7 +8,7 @@ Managed with a bare git repository.
 
 ## What Is In Here
 
-- Shell -- Bash with modular config
+- Shell -- zsh with modular config
 - Prompt -- Starship
 - Terminal -- Alacritty
 - Multiplexer -- tmux + TPM
