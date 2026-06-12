@@ -5,6 +5,7 @@ spawn-at-startup "waybar"
 spawn-at-startup "mako"
 spawn-at-startup "nm-applet"
 spawn-at-startup "blueman-applet"
+spawn-at-startup "bash" "-lc" "gnome-keyring-daemon --start --components=secrets,ssh"
 
 // CLIPBOARD TRACKING
 spawn-at-startup "wl-paste" "--type" "text" "--watch" "cliphist" "store"
