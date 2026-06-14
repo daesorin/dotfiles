@@ -76,3 +76,4 @@ __pycache__/
 .config/.zcompdump*
 .config/tut/
 .config/zsh/history
+.config/zen
