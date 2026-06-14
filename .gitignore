@@ -58,6 +58,7 @@
 # RE-IGNORE FILES INSIDE TRACKED DIRECTORIES
 .config/bash/history
 ~/.config/bash/history
+~/.config/zsh/history
 .bash_history
 .DS_Store
 __pycache__/
@@ -74,3 +75,4 @@ __pycache__/
 .config/zsh/.zcompdump*
 .config/.zcompdump*
 .config/tut/
+.config/zsh/history
