@@ -3,6 +3,8 @@
 
 # UN-IGNORE TRACKED CONFIGURATION
 !.gitignore
+!.gitconfig
+!.config/git/base.gitconfig
 !.config/
 !.config/bash/
 !.config/bash/*
@@ -77,3 +79,4 @@ __pycache__/
 .config/tut/
 .config/zsh/history
 .config/zen
+.config/git/local.gitconfig
