@@ -26,8 +26,8 @@ setopt NUMERIC_GLOB_SORT
 
 # History
 HISTFILE="$HOME/.config/zsh/history"
-HISTSIZE=10000
-SAVEHIST=10000
+HISTSIZE=1000000
+SAVEHIST=2000000
 
 setopt APPEND_HISTORY
 setopt INC_APPEND_HISTORY
@@ -39,7 +39,7 @@ setopt HIST_FIND_NO_DUPS
 setopt HIST_VERIFY
 setopt SHARE_HISTORY
 setopt EXTENDED_HISTORY
-
+alias hist='fc -l -t "%Y-%m-%d %H:%M:%S"'
 
 # SAFETY AND CONTROL
 setopt NO_CLOBBER
