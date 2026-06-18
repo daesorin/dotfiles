@@ -1,0 +1,21 @@
+[general]
+framerate = 60
+autosens = 1
+
+[input]
+method = fifo
+source = /tmp/mpd.fifo
+sample_rate = 44100
+channels = stereo
+
+[output]
+method = ncurses
+
+[smoothing]
+noise_reduction = 0.77
+
+[color]
+gradient = 1
+gradient_color_1 = cyan
+gradient_color_2 = green
+gradient_color_3 = magenta

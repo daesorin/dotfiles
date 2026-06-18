@@ -1,7 +1,7 @@
 // KEYBINDINGS
 binds {
-    Mod+Return repeat=false { spawn "alacritty"; }
-    Mod+Shift+Return { spawn "bash" "-c" "~/.local/bin/scratch 'foot-scratch' 'foot --app-id foot-scratch'"; }
+    Mod+Return cooldown-ms=500 { spawn "kitty"; }
+    Mod+Shift+Return cooldown-ms=500 { spawn "foot"; }
     Mod+Space { spawn "fuzzel"; }
     Mod+Shift+Space { spawn "bash" "-c" "$HOME/.local/bin/fuzzel-run"; }
     

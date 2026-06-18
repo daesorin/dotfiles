@@ -1,5 +1,9 @@
 # STARSHIP CORE CONFIGURATION
-format = "$character"
+format = "$hostname$character"
+
+[hostname]
+ssh_only = true
+format = "[$hostname](blue) "
 
 # PROMPT CHARACTER
 [character]
