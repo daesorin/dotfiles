@@ -29,6 +29,17 @@ if command -v zoxide >/dev/null 2>&1; then
     eval "$(zoxide init zsh --cmd cd)"
 fi
 
+# TMUX
+if [ -n "$TMUX" ] && ! tmux info >/dev/null 2>&1; then
+  unset TMUX
+  unset TMUX_PANE
+fi
+
+# SEARCH
+if [[ -f /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh ]]; then 
+	source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+fi
+
 # AUTOSUGGESTIONS
 if [[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
     source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
