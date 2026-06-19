@@ -1,4 +1,4 @@
-# dotfiles
+# dotfiles  
 
 Personal configuration files for Arch Linux.
 Managed with a bare git repository.

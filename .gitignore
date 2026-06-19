@@ -80,3 +80,12 @@ __pycache__/
 .config/zsh/history
 .config/zen
 .config/git/local.gitconfig
+.config/dconf/
+.config/mimeapps.list
+.config/pavucontrol.ini
+.config/pulse/
+.config/tea/
+.config/user-dirs.dirs
+.config/user-dirs.locale
+.config/virt-viewer/
+.config/systemd/
