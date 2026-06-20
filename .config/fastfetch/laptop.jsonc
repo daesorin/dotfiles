@@ -1,0 +1,71 @@
+{
+  "modules": [
+    "title",
+    "separator",
+
+    "os",
+    "host",
+    "chassis",
+    "kernel",
+    "uptime",
+
+    "separator",
+
+    "shell",
+    "terminal",
+    "terminalfont",
+
+    {
+      "type": "command",
+      "key": "Editor",
+      "text": "printf '%s' \"${EDITOR:-none}\""
+    },
+
+    {
+      "type": "command",
+      "key": "Tmux",
+      "text": "tmux -V 2>/dev/null || echo not-running"
+    },
+
+    "separator",
+
+    "cpu",
+    "cpuusage",
+    "loadavg",
+
+    "memory",
+    "swap",
+
+    "separator",
+
+    "gpu",
+    "display",
+    "brightness",
+
+    "separator",
+
+    "battery",
+    "poweradapter",
+
+    "separator",
+
+    "physicaldisk",
+    "disk",
+
+    "separator",
+
+    "wifi",
+    "localip",
+
+    "separator",
+
+    "bluetooth",
+
+    "packages",
+
+    "separator",
+
+    "datetime",
+    "locale"
+  ]
+}

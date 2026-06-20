@@ -1,0 +1,23 @@
+{
+  "modules": [
+    "title",
+    "separator",
+
+    "os",
+    "host",
+    "kernel",
+    "uptime",
+
+    "shell",
+    "terminal",
+
+    "cpu",
+    "memory",
+
+    "disk",
+
+    "localip",
+
+    "packages"
+  ]
+}

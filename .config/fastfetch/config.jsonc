@@ -1,0 +1,84 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+
+  "modules": [
+    "title",
+    "separator",
+
+    "os",
+    "host",
+    "chassis",
+    "kernel",
+    "uptime",
+
+    "separator",
+
+    "shell",
+    "terminal",
+    "terminalfont",
+    "editor",
+
+    {
+      "type": "command",
+      "key": "Brew",
+      "text": "brew --version | head -1"
+    },
+
+    {
+      "type": "command",
+      "key": "Tmux",
+      "text": "tmux -V 2>/dev/null || echo not-running"
+    },
+
+    "separator",
+
+    "cpu",
+    "cpucache",
+    "cpuusage",
+    "loadavg",
+
+    "memory",
+    "physicalmemory",
+    "swap",
+
+    "separator",
+
+    "gpu",
+    "display",
+    "brightness",
+
+    "battery",
+    "poweradapter",
+
+    "separator",
+
+    "physicaldisk",
+    "disk",
+    "diskio",
+
+    "separator",
+
+    "localip",
+    "publicip",
+    "wifi",
+    "dns",
+
+    "separator",
+
+    "bluetooth",
+    "camera",
+    "sound",
+
+    "separator",
+
+    "packages",
+    "processes",
+    "users",
+
+    "datetime",
+    "locale",
+
+    "break",
+    "version"
+  ]
+}
