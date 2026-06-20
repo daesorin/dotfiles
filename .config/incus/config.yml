@@ -32,7 +32,7 @@ aliases:
   user: exec @ARG1@ -- sudo -iu @ARG2@
   zsh: exec @ARGS@ -- zsh
 defaults:
-  list_format: ""
+  list_format: "compact,noheader"
   console_type: ""
   console_spice_command: ""
   no_color: false

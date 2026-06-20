@@ -92,3 +92,4 @@ __pycache__/
 .config/virt-viewer/
 .config/systemd/
 .config/mpd/state
+.config/mpd/state
