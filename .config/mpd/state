@@ -1,8 +1,9 @@
 sw_volume: 100
 audio_device_state:1:pulse audio
 audio_device_state:1:visualiser
-state: stop
-current: 148
+state: pause
+current: 157
+time: 11.234
 random: 0
 repeat: 0
 single: 0
@@ -161,4 +162,19 @@ playlist_begin
 146:08 - Tunng - Tsunami [EOT9H5CBxsI].opus
 147:12 - Tunng - Woman [sQfKnqWFRGA].opus
 148:The_architecture_of_managed_dependency.m4a
+149:Arrested Youth - Riot!.{ext}.opus
+150:Arrested Youth - Dr. Evil.{ext}.opus
+151:Arrested Youth - Clear My Throat.{ext}.opus
+152:Arrested Youth - Everything I Need.{ext}.opus
+153:Arrested Youth - I See You.{ext}.opus
+154:Arrested Youth - Inner Child.{ext}.opus
+155:Arrested Youth - One Last Song.{ext}.opus
+156:Arrested Youth - Window Pains.{ext}.opus
+157:Arrested Youth - Dr. Evil.{ext}.opus
+158:Arrested Youth - Clear My Throat.{ext}.opus
+159:Arrested Youth - Everything I Need.{ext}.opus
+160:Arrested Youth - I See You.{ext}.opus
+161:Arrested Youth - Inner Child.{ext}.opus
+162:Arrested Youth - One Last Song.{ext}.opus
+163:Arrested Youth - Window Pains.{ext}.opus
 playlist_end

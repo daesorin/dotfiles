@@ -55,8 +55,8 @@ copy() {
 }
 
 # FIND HELPERS
-ff() { find "${2:-.}" -type f -iname "*$1*" 2>/dev/null; }
-command -v fdfind &>/dev/null && alias fd='fdfind'
+#ff() { find "${2:-.}" -type f -iname "*$1*" 2>/dev/null; }
+#command -v fdfind &>/dev/null && alias fd='fdfind'
 
 # MKCD
 mkcd() { mkdir -p "$1" && cd "$1"; }

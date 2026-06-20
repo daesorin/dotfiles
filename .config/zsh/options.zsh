@@ -45,7 +45,7 @@ alias hist='fc -l -t "%Y-%m-%d %H:%M:%S"'
 setopt NO_CLOBBER
 
 # Vi Mode
-bindkey -v
+bindkey -e
 
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
