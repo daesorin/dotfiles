@@ -91,5 +91,3 @@ __pycache__/
 .config/user-dirs.locale
 .config/virt-viewer/
 .config/systemd/
-.config/mpd/state
-.config/mpd/state

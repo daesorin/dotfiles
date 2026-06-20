@@ -1,9 +1,9 @@
-sw_volume: 100
+sw_volume: 98
 audio_device_state:1:pulse audio
 audio_device_state:1:visualiser
 state: pause
-current: 157
-time: 11.234
+current: 3
+time: 97.519
 random: 0
 repeat: 0
 single: 0
@@ -13,168 +13,12 @@ mixrampdb: 0
 mixrampdelay: -1
 lastloadedplaylist: 
 playlist_begin
-0:Alana Henderson - Wax & Wane.{ext}.opus
-1:Amigo the Devil - Cocaine and Abel.{ext}.opus
-2:Amigo the Devil - Small Stone.{ext}.opus
-3:Birdtalker - Better in the Morning.{ext}.opus
-4:Charming Disaster - Blacksnake.{ext}.opus
-5:Charming Disaster - Ghost Story.{ext}.opus
-6:Damien Jurado - Ohio.{ext}.opus
-7:Dan Bern - Jerusalem.{ext}.opus
-8:Danny Schmidt - A Prayer for the Sane.{ext}.opus
-9:Danny Schmidt - This Too Shall Pass.{ext}.opus
-10:Dax - JOKER.{ext}.opus
-11:Eliza Rickman - Black Rose.{ext}.opus
-12:Eliza Rickman, Jherek Bischoff - Riches and Wonders.{ext}.opus
-13:Forest Blakk - Breathe.{ext}.opus
-14:Goodnight, Texas - Keep Movin'.{ext}.opus
-15:Grand Commander - I Hope You Die in a Fire.{ext}.opus
-16:grandson - Blood Water.{ext}.opus
-17:grandson - thoughts & prayers.{ext}.opus
-18:Jesse Welles - The Poor.{ext}.opus
-19:Johnny Cash - The Man Comes Around.{ext}.opus
-20:Leonard Cohen - You Want It Darker.{ext}.opus
-21:Mal Blum - San CristÃ³bal.{ext}.opus
-22:Mass of Man, Mack Harrison - Fallen Angel.{ext}.opus
-23:Mike Shinoda - Place To Start.{ext}.opus
-24:Mount Eerie - Real Death.{ext}.opus
-25:NF - The Search.{ext}.opus
-26:nothing,nowhere. - Letdown.{ext}.opus
-27:nothing,nowhere. - Pieces of You.{ext}.opus
-28:Robby Hecht - The Ends and the Means.{ext}.opus
-29:San Fermin - The Woods.{ext}.opus
-30:Scott Walker - Farmer In The City (Remembering Pasolini).{ext}.opus
-31:Sun Kil Moon - Carissa.{ext}.opus
-32:The Bridge City Sinners - Break the Chain.{ext}.opus
-33:The Ghost of Paul Revere - After Many Miles.{ext}.opus
-34:Token - Code Red.{ext}.opus
-35:Token - Still Believe In Heroes.{ext}.opus
-36:Yes Ma'am - Tell Me.{ext}.opus
-37:Amigo the Devil - Quiet as a Rat.{ext}.opus
-38:AnaÃ¯s Mitchell - Of a Friday Night.{ext}.opus
-39:Atmosphere, Slug, Ant - Trying To Find A Balance.{ext}.opus
-40:BONES - HDMI.{ext}.opus
-41:Carrie Elkin, Danny Schmidt - Echo In the Hills.{ext}.opus
-42:Current 93 - All The Pretty Little Horsies.{ext}.opus
-43:Daniel Knox - What Have They Done To You Now.{ext}.opus
-44:David Wirsig - Black Eyes.{ext}.opus
-45:Goodnight, Texas - Hypothermic.{ext}.opus
-46:Have A Nice Life - Bloodhail.{ext}.opus
-47:Jason Webley - Ways to Love.{ext}.opus
-48:Jelly Roll - Save Me.{ext}.opus
-49:Lucidious - Save Me.{ext}.opus
-50:Murder By Death - Lost River.{ext}.opus
-51:The Bridge City Sinners - Rock Bottom.{ext}.opus
-52:Tom Waits - Dirt In The Ground - 2023 Remaster.{ext}.opus
-53:Amigo the Devil - Iâ€™m Going to Heaven.{ext}.opus
-54:Bitter Ruin - Tom Thumb.{ext}.opus
-55:Danny Schmidt - Dark-Eyed Prince.{ext}.opus
-56:Danny Schmidt - Standard Deviation.{ext}.opus
-57:Jason Webley - Almost Time to Go.{ext}.opus
-58:Nick Cave & The Bad Seeds - People Ain't No Good.{ext}.opus
-59:PigPen Theatre Co. - Crow.{ext}.opus
-60:Squalloscope - Open Water Reckless Fishes.{ext}.opus
-61:Tejon Street Corner Thieves - Whiskey.{ext}.opus
-62:The Jane Austen Argument - Maintain the Madness.{ext}.opus
-63:Townes Van Zandt - Waiting Around to Die.{ext}.opus
-64:Barton Carroll - Those Days Are Gone, and My Heart Is Breaking.{ext}.opus
-65:Danny Schmidt - Happy All the Time.{ext}.opus
-66:Delaney Davidson, Marlon Williams - Death Don't Have No Mercy.{ext}.opus
-67:Goodnight, Texas - Jesse Got Trapped in a Coal Mine.{ext}.opus
-68:Jason Webley - Icarus.{ext}.opus
-69:Jayne Trimble - Meet You At The Gate.{ext}.opus
-70:Murder By Death - No Oath, No Spell.{ext}.opus
-71:Parker Millsap - Heaven Sent.{ext}.opus
-72:PigPen Theatre Co. - The Graveyard Song.{ext}.opus
-73:The Bridge City Sinners - Song of the Siren.{ext}.opus
-74:Amigo the Devil - Hell and You.{ext}.opus
-75:Arrested Youth - Riot!.{ext}.opus
-76:Elliott Smith - Everything Means Nothing To Me.{ext}.opus
-77:Goodnight, Texas - I'd Rather Not.{ext}.opus
-78:Mark Lanegan - One Hundred Days.{ext}.opus
-79:nothing,nowhere. - hammer.{ext}.opus
-80:PigPen Theatre Co. - Bremen.{ext}.opus
-81:The Bridge City Sinners - Doubt.{ext}.opus
-82:The Bridge City Sinners - Through and Through.{ext}.opus
-83:Danny Schmidt - Firestorm.{ext}.opus
-84:Devil and the Deep Blue Sea - Home to Me.{ext}.opus
-85:Jason Webley - Map.{ext}.opus
-86:Lera Lynn, Shovels & Rope - Wolf Like Me ft. Shovels & Rope.{ext}.opus
-87:Low - Lullaby.{ext}.opus
-88:NF - Let You Down.{ext}.opus
-89:Nico - Afraid.{ext}.opus
-90:Passenger - David.{ext}.opus
-91:The Haunted Windchimes - Hallelujah.{ext}.opus
-92:The Narcissist Cookbook - FUNGUS.{ext}.opus
-93:Amigo the Devil - Another Manâ€™s Grave.{ext}.opus
-94:Danny Schmidt - Serpentine Cycle Of Money.{ext}.opus
-95:Danny Schmidt - Stained Glass.{ext}.opus
-96:Eliza Rickman - Pretty Little Head.{ext}.opus
-97:Giles Corey - No One Is Ever Going to Want Me.{ext}.opus
-98:Jason Webley - Dance While the Sky Crashes Down.{ext}.opus
-99:Lucidious, Xavier Frye - Face the Truth.{ext}.opus
-100:Mother Falcon - Alligator Teeth.{ext}.opus
-101:Slaid Cleaves - Millionaire.{ext}.opus
-102:The Mountain Goats - No Children.{ext}.opus
-103:Vandaveer - Spite.{ext}.opus
-104:Danny Schmidt - Ghosts.{ext}.opus
-105:Joji - Sanctuary.{ext}.opus
-106:Sea Wolf - Dear Fellow Traveller.{ext}.opus
-107:The Bridge City Sinners - Satan's Song.{ext}.opus
-108:The Dead Brothers - I Am All I Got.{ext}.opus
-109:AlicebanD - It Gets Better.{ext}.opus
-110:PigPen Theatre Co. - We Stand Alone.{ext}.opus
-111:Father John Misty - Holy Shit.{ext}.opus
-112:PigPen Theatre Co. - Just Like the Sea.{ext}.opus
-113:Squalloscope - Big Houses.{ext}.opus
-114:Tejon Street Corner Thieves - Demons.{ext}.opus
-115:PigPen Theatre Co. - Grand Old Paris.{ext}.opus
-116:Those Poor Bastards - God's Dark Heaven.{ext}.opus
-117:Jon Bellion, Travis Mendes - Guillotine.{ext}.opus
-118:Witt Lowry - Numb.{ext}.opus
-119:Days N Daze - Damaged Goods.{ext}.opus
-120:Night Lovell - Dark Light.{ext}.opus
-121:Jason Webley - Last Song.{ext}.opus
-122:NF - Trauma.{ext}.opus
-123:EDEN - XO.{ext}.opus
-124:08 - A Culture of Fragments [s_EcPL1iSsY].opus
-125:06 - A Legacy of Unrest [-VLjCj3593E].opus
-126:12 - Flight in Formation [TgWiWtWTjo0].opus
-127:11 - Flowers from Exile [2DtD0vcU5go].opus
-128:03 - Odessa [HvuRfLfDxEQ].opus
-129:10 - Swords to Rust - Hearts to Dust [blW1HCQntME].opus
-130:02 - The Accidents of Gesture [bgz15dwPhRE].opus
-131:05 - The Hollow Self [i1uqxb_n6gs].opus
-132:04 - The Secret Sons of Europe [EyZ31xgDDNY].opus
-133:01 - To a Generation of Destroyers [mP5IC_5GSpc].opus
-134:07 - To Die Among Strangers [APVXFH-pCeU].opus
-135:09 - We Who Fell in Love with the Sea [OHrLr_s3K9w].opus
-136:05 - Tunng - A Million Colours [vnBvaYy_C20].opus
-137:06 - Tunng - Carry You [7Xn-j4Lfwq8].opus
-138:02 - Tunng - Death is the New Sex [JmN_OW8VMYU].opus
-139:01 - Tunng - Eating the Dead [V8irBermE8Y].opus
-140:11 - Tunng - Fatally Human [Xxu5PSYqzCY].opus
-141:09 - Tunng - Man [Pwj6F9YuZT4].opus
-142:10 - Tunng - Scared to Death [0tYq1JaY59k].opus
-143:03 - Tunng - Sdc [umf-A0sIR9M].opus
-144:07 - Tunng - The Last Day [6azLuwCBWws].opus
-145:04 - Tunng - Three Birds [GdW-OcEMo58].opus
-146:08 - Tunng - Tsunami [EOT9H5CBxsI].opus
-147:12 - Tunng - Woman [sQfKnqWFRGA].opus
-148:The_architecture_of_managed_dependency.m4a
-149:Arrested Youth - Riot!.{ext}.opus
-150:Arrested Youth - Dr. Evil.{ext}.opus
-151:Arrested Youth - Clear My Throat.{ext}.opus
-152:Arrested Youth - Everything I Need.{ext}.opus
-153:Arrested Youth - I See You.{ext}.opus
-154:Arrested Youth - Inner Child.{ext}.opus
-155:Arrested Youth - One Last Song.{ext}.opus
-156:Arrested Youth - Window Pains.{ext}.opus
-157:Arrested Youth - Dr. Evil.{ext}.opus
-158:Arrested Youth - Clear My Throat.{ext}.opus
-159:Arrested Youth - Everything I Need.{ext}.opus
-160:Arrested Youth - I See You.{ext}.opus
-161:Arrested Youth - Inner Child.{ext}.opus
-162:Arrested Youth - One Last Song.{ext}.opus
-163:Arrested Youth - Window Pains.{ext}.opus
+0:Arrested Youth - Riot!.{ext}.opus
+1:Arrested Youth - Dr. Evil.{ext}.opus
+2:Arrested Youth - Clear My Throat.{ext}.opus
+3:Arrested Youth - Everything I Need.{ext}.opus
+4:Arrested Youth - I See You.{ext}.opus
+5:Arrested Youth - Inner Child.{ext}.opus
+6:Arrested Youth - One Last Song.{ext}.opus
+7:Arrested Youth - Window Pains.{ext}.opus
 playlist_end
