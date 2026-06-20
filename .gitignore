@@ -13,6 +13,8 @@
 !.config/zsh/
 !.config/zsh/*
 !.config/kitty/
+!.config/fastfetch/
+!.config/zsh/fastfetch.zsh
 !.config/hypr/
 !.config/hypr/config/
 !.config/tmux/
