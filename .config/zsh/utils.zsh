@@ -28,7 +28,7 @@ alias ....='cd ../../..'
 alias -- -='cd -'
 
 cdc() {
-	cd "$1" ; clear
+	cd "$1" ; clear; 
 }
 
 # NVIM
