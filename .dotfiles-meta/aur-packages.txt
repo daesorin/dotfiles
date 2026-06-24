@@ -1,7 +1,7 @@
 ansifilter 2.22-1
 azahar-appimage-wayland 1:2124.3-1
-ente-auth-bin 4.4.17-1
-ente-desktop-bin 1.7.22-1
+ente-auth-bin 4.4.23-2
+ente-desktop-bin 1.7.24-1
 epr-git 2.4.15.r154.723c77d-1
 filen-cli-bin 0.0.39-1
 jdupes 1.31.1-1
@@ -11,8 +11,9 @@ pandoc-bin 3.9.0.2-1
 paru 2.1.0-2
 piper-tts-bin 2023.11.14-1
 python-questionary 2.1.1-2
-spotdl 4.5.0-2
-telegram-desktop-bin 6.6.2-1
+spotdl 4.5.0-3
+telegram-desktop-bin 6.9.3-1
 tut-bin 2.0.1-1
-zen-browser-bin 1.19.5b-1
+zen-browser-bin 1.21.3b-1
+zennotes-bin 2.5.0-1
 zt 0.8.0-1

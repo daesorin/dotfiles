@@ -64,6 +64,11 @@ $path
 
 export PATH
 
+# RUN-HLP
+unalias run-help 2>/dev/null
+autoload -Uz run-help
+bindkey '^[h' run-help
+
 # Environment
 export EDITOR="nvim"
 export VISUAL="nvim"
