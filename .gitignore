@@ -10,8 +10,8 @@
 !.config/bash/*
 !.zshrc
 !.zprofile
-!.config/zsh/
-!.config/zsh/*
+!.zsh/
+!.zsh/*
 !.config/kitty/
 !.config/fastfetch/
 !.config/zsh/fastfetch.zsh

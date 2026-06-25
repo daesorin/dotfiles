@@ -13,7 +13,7 @@ fpath=(
 compinit
 
 # MODULE LOADER
-ZSH_MOD_DIR="$HOME/.config/zsh"
+ZSH_MOD_DIR="$HOME/.zsh"
 
 if [[ -d "$ZSH_MOD_DIR" ]]; then
     for config in "$ZSH_MOD_DIR"/*.zsh(N); do
