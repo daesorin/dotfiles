@@ -1,0 +1,18 @@
+# VIRTUAL ENVIRONMENT MANAGER
+# creates a new environment if it does not exist, then activates it
+local venv_dir="${1:-.venv}"
+
+if [[ ! -d "$venv_dir" ]]; then
+    echo "initialising new virtual environment in ./$venv_dir..."
+    python3 -m venv "$venv_dir"
+fi
+
+# ACTIVATE ENVIRONMENT
+# source the activation script into the current shell session
+if [[ -f "$venv_dir/bin/activate" ]]; then
+    source "$venv_dir/bin/activate"
+    echo "activated $venv_dir"
+else
+    echo "error: activation script not found in ./$venv_dir"
+    return 1
+fi

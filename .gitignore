@@ -11,7 +11,7 @@
 !.zshrc
 !.zprofile
 !.zsh/
-!.zsh/*
+!.zshenv
 !.config/kitty/
 !.config/fastfetch/
 !.config/zsh/fastfetch.zsh
@@ -97,3 +97,5 @@ __pycache__/
 .config/azahar-emu/
 .config/calibre/
 .config/spotdl/
+.zsh/.history
+.zsh/.zcompdump
