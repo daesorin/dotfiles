@@ -99,3 +99,4 @@ __pycache__/
 .config/spotdl/
 .zsh/.history
 .zsh/.zcompdump
+.config/Bitwarden\ CLI
