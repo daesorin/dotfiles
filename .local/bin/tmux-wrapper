@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+if [ -n "$TMUX" ]; then
+    exec "$SHELL"
+    exit 0
+fi
+
+if [ -n "$SSH_CONNECTION" ] || [ -n "$SSH_TTY" ]; then
+    exec "$SHELL"
+    exit 0
+fi
+
+if [ -n "$VSCODE_INJECTION" ] || [ "$TERM_PROGRAM" = "vscode" ]; then
+    exec "$SHELL"
+    exit 0
+fi
+
+if [ -n "$VSCODE_IPC_HOOK_CLI" ]; then
+    exec "$SHELL"
+    exit 0
+fi
+
+exec tmux new -A -s main

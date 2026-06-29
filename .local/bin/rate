@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+
+# COLOURS
+# standard terminal output hues
+red='\033[1;31m'
+green='\033[1;32m'
+yellow='\033[1;33m'
+blue='\033[1;34m'
+cyan='\033[1;36m'
+nc='\033[0m'
+
+# DEPENDENCY CHECK
+# validates required packages before execution
+check_deps() {
+    for cmd in jq bc curl; do
+        if ! command -v "$cmd" >/dev/null 2>&1; then
+            printf "${red}error: '%s' is missing.${nc}\n" "$cmd"
+            printf "install it via: sudo pacman -S %s\n" "$cmd"
+            exit 1
+        fi
+    done
+}
+
+# FORMATTING UTILITY
+# standardises numeric output with thousands separators
+fmt_num() {
+    local num="$1"
+    local decimals="${2:-2}"
+    printf "%'.${decimals}f" "$num"
+}
+
+# BITCOIN SCANNER
+# queries the mempool and coingecko apis to calculate wallet value
+scan_btc() {
+    local addr="$1"
+    printf "${blue}scanning bitcoin address...${nc}\n"
+
+    local sats
+    sats=$(curl -s --connect-timeout 5 "https://mempool.space/api/address/$addr" | jq '.chain_stats.funded_txo_sum - .chain_stats.spent_txo_sum')
+
+    if [[ "$sats" == "null" || -z "$sats" ]]; then
+        printf "${red}error: invalid address or api failure.${nc}\n"
+        exit 1
+    fi
+
+    local rate
+    rate=$(curl -s --connect-timeout 5 "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=ngn" | jq '.bitcoin.ngn')
+    
+    local val
+    val=$(echo "scale=2; $sats * $rate / 100000000" | bc -l)
+
+    printf "%s\n" "-----------------------------------"
+    printf "balance:   ${green}%s sats${nc}\n" "$(fmt_num "$sats" 0)"
+    printf "rate:      ${yellow}n%s / btc${nc}\n" "$(fmt_num "$rate" 2)"
+    printf "value:     ${green}n%s${nc}\n" "$(fmt_num "$val" 2)"
+    printf "%s\n" "-----------------------------------"
+}
+
+# FIAT TO NGN
+# calculates the conversion rate from foreign fiat to local currency
+to_ngn() {
+    local code amount
+
+    # validates if the first argument is a number to allow flexible syntax
+    if [[ "$1" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+        amount="$1"
+        code="${2:-usd}"
+    else
+        code="${1:-usd}"
+        amount="${2:-1}"
+    fi
+
+    local target
+    target=$(echo "$code" | tr '[:lower:]' '[:upper:]')
+    printf "${blue}fetching %s rate...${nc}\n" "$target"
+
+    local data rate
+    data=$(curl -s --connect-timeout 5 "https://open.er-api.com/v6/latest/$target")
+    rate=$(echo "$data" | jq '.rates.NGN')
+
+    if [[ "$rate" == "null" || -z "$rate" ]]; then
+        printf "${red}error: currency '%s' not found.${nc}\n" "$target"
+        exit 1
+    fi
+
+    local val
+    val=$(echo "$amount * $rate" | bc -l)
+
+    printf "%s\n" "-----------------------------------"
+    printf "pair:      %s / ngn\n" "$target"
+    printf "rate:      ${yellow}n%s${nc}\n" "$(fmt_num "$rate")"
+    printf "value:     ${green}n%s${nc} (%s %s)\n" "$(fmt_num "$val")" "$target" "$(fmt_num "$amount" 0)"
+    printf "%s\n" "-----------------------------------"
+}
+
+# NGN TO FIAT
+# calculates the conversion rate from local currency to foreign fiat
+from_ngn() {
+    local code="${1:-usd}"
+    local amount="${2:-1}"
+    local target
+    target=$(echo "$code" | tr '[:lower:]' '[:upper:]')
+
+    printf "${blue}converting n%s to %s...${nc}\n" "$(fmt_num "$amount" 0)" "$target"
+
+    local data rate
+    data=$(curl -s --connect-timeout 5 "https://open.er-api.com/v6/latest/NGN")
+    rate=$(echo "$data" | jq ".rates.$target")
+
+    if [[ "$rate" == "null" || -z "$rate" ]]; then
+        printf "${red}error: currency '%s' not found.${nc}\n" "$target"
+        exit 1
+    fi
+
+    local rate_decimal val
+    rate_decimal=$(printf "%.10f" "$rate")
+    val=$(echo "$amount * $rate_decimal" | bc -l)
+
+    printf "%s\n" "-----------------------------------"
+    printf "rate:      1 ngn = %s %s\n" "$rate_decimal" "$target"
+    printf "result:    ${green}%s %s${nc}\n" "$target" "$(fmt_num "$val")"
+    printf "%s\n" "-----------------------------------"
+}
+
+# USAGE GUIDE
+# provides instructions if arguments are missing
+show_help() {
+    printf "${cyan}rate - currency evaluation utility${nc}\n"
+    printf "usage:\n"
+    printf "  rate <amount> <code>     foreign -> ngn\n"
+    printf "  rate to <code> <amt>     ngn -> foreign\n"
+    printf "  rate btc <address>       check bitcoin wallet value\n"
+    exit 1
+}
+
+# EXECUTION
+check_deps
+
+if [[ -z "$1" ]]; then
+    show_help
+fi
+
+# COMMAND ROUTER
+# routes inputs to the correct functional block
+case "$1" in
+    btc)
+        if [[ -z "$2" ]]; then
+            printf "${red}error: missing address.${nc}\n"
+            exit 1
+        fi
+        scan_btc "$2"
+        ;;
+    to)
+        if [[ -z "$2" ]]; then
+            printf "${red}error: missing code.${nc}\n"
+            exit 1
+        fi
+        from_ngn "$2" "$3"
+        ;;
+    *)
+        to_ngn "$1" "$2"
+        ;;
+esac
