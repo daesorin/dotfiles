@@ -1,0 +1,35 @@
+# SSH KEY GENERATOR
+# creates an ed25519 keypair and copies the public key to the clipboard
+local email=$1
+local keytype="ed25519"
+local keyname=${2:-id_ed25519}
+
+if [[ -z "$email" ]]; then
+    echo "Usage: sshkeygen <email> [keyname]"
+    return 1
+fi
+
+local ssh_dir="$HOME/.ssh"
+mkdir -p "$ssh_dir"
+chmod 700 "$ssh_dir"
+
+local keypath="$ssh_dir/$keyname"
+if [[ -f "$keypath" ]]; then
+    echo "\033[31m❌ Key already exists at $keypath\033[0m"
+    return 1
+fi
+
+ssh-keygen -t "$keytype" -C "$email" -f "$keypath" -N ""
+echo "\033[32m✅ SSH key created at $keypath\033[0m"
+
+# CLIPBOARD INTEGRATION
+# auto-copy the public key based on the active display server
+if command -v wl-copy &> /dev/null; then
+    cat "$keypath.pub" | wl-copy
+    echo "\033[36m📋 Public key copied to clipboard (Wayland)!\033[0m"
+elif command -v xclip &> /dev/null; then
+    cat "$keypath.pub" | xclip -selection clipboard
+    echo "\033[36m📋 Public key copied to clipboard (X11)!\033[0m"
+else
+    cat "$keypath.pub"
+fi

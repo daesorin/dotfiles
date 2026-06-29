@@ -1,0 +1,60 @@
+[gpg]
+    format = ssh
+
+[core]
+    editor = nvim
+    autocrlf = input
+    pager = delta
+
+[init]
+    defaultBranch = main
+
+[color]
+    ui = auto
+
+[pull]
+    rebase = true
+
+[push]
+    autoSetupRemote = true
+
+[merge]
+    tool = nvimdiff
+
+[mergetool]
+    prompt = false
+    keepBackup = false
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true
+    line-numbers = true
+    side-by-side = true
+
+[commit]
+    gpgsign = true
+
+[tag]
+    gpgsign = true
+
+[alias]
+    s  = status
+    st = status -sb
+    lg = log --oneline --graph --decorate --all
+
+    aa = add -A
+    cm = commit -m
+    am = commit -am
+
+    ps = push
+    pl = pull
+
+    lo = log --oneline --graph --decorate
+
+    unstage = reset HEAD --
+    last = log -1 HEAD
+    oops = commit --amend --no-edit
+
+    dot = "!git --git-dir=$HOME/.dotfiles --work-tree=$HOME"

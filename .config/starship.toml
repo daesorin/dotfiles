@@ -1,0 +1,33 @@
+format = "$directory$git_branch$git_status$hostname$character"
+right_format = """$jobs$time"""
+
+[directory]
+style = "cyan"
+truncate_to_repo = true
+truncation_length = 3
+format = "[$path]($style) "
+
+[git_branch]
+format = "[$branch]($style) "
+style = "yellow"
+
+[git_status]
+style = "red"
+format = "[$all_status]($style) "
+
+[hostname]
+ssh_only = true
+format = "[$hostname](blue) "
+
+[character]
+success_symbol = "[>](bold green)"
+error_symbol = "[x](bold red)"
+vicmd_symbol = "[v](bold green)"
+
+[jobs]
+symbol = "✦ "
+
+[time]
+disabled = false
+time_format = "%T"
+format = "[$time]($style)"

@@ -1,0 +1,3 @@
+[[ -z "$1" ]] && { echo "Usage: portscan <host>"; return 1; }
+nmap "$1"
+
