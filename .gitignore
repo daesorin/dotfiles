@@ -57,6 +57,7 @@
 !.config/systemd/
 !.dotfiles-meta/
 !.dotfiles-meta/*
+!.local/bin
 !LICENSE
 
 # RE-IGNORE FILES INSIDE TRACKED DIRECTORIES
