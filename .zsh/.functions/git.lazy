@@ -1,8 +1,0 @@
-if [ -z "$1" ]; then
-	echo "Usage: git.lazy \"commit message\""
-	return 1
-fi
-
-git add -A &&
-git commit -m "$1" &&
-git push

@@ -1,4 +1,0 @@
-local branch
-branch=$(git branch --show-current)
-git fetch origin &&
-git reset --hard "origin/$branch"

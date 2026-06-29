@@ -1,4 +1,0 @@
-# SSH KEY LISTER
-# displays all public keys currently stored in the local ssh directory
-echo "\033[36m📂 Existing SSH keys in ~/.ssh:\033[0m"
-ls -lh "$HOME/.ssh/"*.pub 2>/dev/null || echo "No SSH keys found."

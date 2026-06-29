@@ -1,7 +1,0 @@
-if [ -z "$1" ]; then
-	echo "Usage: git.nuke <branch>"
-	return 1
-fi
-
-git branch -D "$1"
-git push origin --delete "$1"

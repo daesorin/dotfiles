@@ -1,5 +1,0 @@
-local branch="fire-$(date +%Y%m%d-%H%M)"
-git checkout -b "$branch" &&
-git add -A &&
-git commit -m "FIRE EMERGENCY: $branch" --no-verify &&
-git push -u origin "$branch"

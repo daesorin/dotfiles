@@ -1,5 +1,0 @@
-if command -v speedtest-cli &> /dev/null; then
-		speedtest-cli
-	else
-		echo "Install speedtest-cli: sudo pacman -S speedtest-cli"
-fi
