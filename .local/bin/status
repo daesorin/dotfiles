@@ -3,15 +3,15 @@ set -o pipefail
 export LC_ALL=C
 
 # COLOURS
-# define standard terminal output hues
 green='\033[1;32m'
 cyan='\033[1;36m'
 yellow='\033[1;33m'
 red='\033[1;31m'
 nc='\033[0m'
 
-# HELPER FUNCTIONS
-# standardises section headers and validates executable presence
+# FORCE PATH FOR HOMEBREW UTILITIES
+export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
+
 section_header() {
     printf "\n${green}%s${nc}\n" "$1"
 }
@@ -20,333 +20,187 @@ cmd_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# SYSTEM CORE
-# prints basic kernel and hardware identity
 print_system_core() {
-    local kernel cpu uptime_raw load_avg
+    local kernel cpu uptime_seconds uptime_raw load_avg boot_time current_time
+    
     kernel=$(uname -r)
-    cpu=$(grep "model name" /proc/cpuinfo | head -1 | cut -d':' -f2 | xargs)
-    uptime_raw=$(uptime -p | sed 's/up //')
-    load_avg=$(awk '{print $1, $2, $3}' /proc/loadavg)
+    cpu=$(sysctl -n machdep.cpu.brand_string | xargs)
+    load_avg=$(sysctl -n vm.loadavg | tr -d '{}')
+    
+    boot_time=$(sysctl -n kern.boottime | awk -F 'sec = ' '{print $2}' | awk -F ',' '{print $1}')
+    current_time=$(date +%s)
+    uptime_seconds=$((current_time - boot_time))
+    uptime_raw="$((uptime_seconds / 86400))d $(((uptime_seconds % 86400) / 3600))h $(((uptime_seconds % 3600) / 60))m"
 
     section_header "SYSTEM CORE"
     printf "  kernel:      %s\n" "$kernel"
     printf "  cpu:         %s\n" "$cpu"
-    printf "  load:        %s\n" "$load_avg"
+    printf "  load:       %s\n" "$load_avg"
     printf "  uptime:      %s\n" "$uptime_raw"
 }
 
-# GRAPHICS
-# detects the display protocol and active compositor
 print_graphics() {
-    local wm_name session_type
-    session_type="${XDG_SESSION_TYPE:-unknown}"
-
-    wm_name="unknown"
-    if [ "$session_type" = "wayland" ]; then
-        wm_name="${XDG_CURRENT_DESKTOP:-Wayland}"
-    elif cmd_exists xprop; then
-        wm_name=$(xprop -root _NET_WM_NAME 2>/dev/null | cut -d'"' -f2)
-        [ -z "$wm_name" ] && wm_name=$(xprop -root WM_NAME 2>/dev/null | cut -d'"' -f2)
-    fi
+    local session_type wm_name gpus
+    session_type="Quartz"
+    wm_name="WindowServer"
 
     section_header "GRAPHICS"
     printf "  session:     %s\n" "$session_type"
     printf "  compositor:  %s\n" "$wm_name"
 
-    if cmd_exists lspci; then
-        local gpus
-        gpus=$(lspci -mm | awk -F'"' -v OFS='' '
-            tolower($2) ~ /^(vga compatible controller|3d controller|display controller)$/ {print $4}' | paste -sd ', ' -)
+    if cmd_exists system_profiler; then
+        gpus=$(system_profiler SPDisplaysDataType 2>/dev/null | awk -F': ' '/Chipset Model/ {print $2}' | paste -sd ', ' -)
         printf "  gpu:         %s\n" "${gpus:-unknown}"
     else
-        printf "  gpu:         (lspci missing)\n"
+        printf "  gpu:         (profiler missing)\n"
     fi
 }
 
-# HARDWARE
-# polls thermal sensors, power supply, and drive health
 print_hardware() {
     section_header "HARDWARE"
 
-    local temp=""
-    if cmd_exists sensors; then
-        if cmd_exists jq; then
-            temp=$(sensors -j 2>/dev/null | jq -r '.. | ."Package id 0"? // ."Tctl"? // empty | .temp1_input' 2>/dev/null)
-            if [ -n "$temp" ]; then
-                temp=$(printf "%.1f°C" "$temp")
-            fi
-        fi
-        if [ -z "$temp" ]; then
-            temp=$(sensors 2>/dev/null | grep -m1 -E 'Package id 0|Tctl|Tdie' | awk '{print $4}' | sed 's/+//;s/°C//')
-            [ -n "$temp" ] && temp="${temp}°C"
-        fi
-        [ -z "$temp" ] && temp=$(sensors 2>/dev/null | grep -m1 'temp1' | awk '{print $2}' | sed 's/+//')
-    else
-        for zone in /sys/class/thermal/thermal_zone*; do
-            local type temp_val
-            type=$(cat "$zone/type" 2>/dev/null)
-            temp_val=$(cat "$zone/temp" 2>/dev/null)
-            if [ -n "$temp_val" ]; then
-                temp="$((temp_val/1000))°C ($type)"
-                break
-            fi
-        done
-    fi
-    printf "  temp:        %s\n" "${temp:-unknown}"
+    printf "  temp:        (locked by corporate firmware)\n"
 
     local bat_info=""
-    for bat in /sys/class/power_supply/BAT*; do
-        if [ -d "$bat" ]; then
-            local level status name
-            name=$(basename "$bat")
-            level=$(cat "$bat/capacity" 2>/dev/null || echo "?")
-            status=$(cat "$bat/status" 2>/dev/null || echo "unknown")
-            bat_info="${bat_info}${name}: ${level}% (${status})  "
-        fi
-    done
-    if [ -n "$bat_info" ]; then
-        printf "  battery:     %s\n" "$(echo "$bat_info" | xargs)"
+    if cmd_exists pmset; then
+        bat_info=$(pmset -g batt | awk 'NR==2 {print $3}' | tr -d ';')
+        printf "  battery:     %s\n" "${bat_info:-unknown}"
     fi
 
     local smart_health=""
-    if cmd_exists nvme && [ -e /dev/nvme0 ]; then
-        smart_health=$(nvme smart-log /dev/nvme0 2>/dev/null | awk '/percentage_used/ {print $3"%" used}')
-    elif cmd_exists smartctl; then
-        smart_health=$(smartctl -H /dev/sda 2>/dev/null | awk '/SMART overall-health|SMART Health Status/ {print $NF}')
+    if cmd_exists diskutil; then
+        smart_health=$(diskutil info / 2>/dev/null | awk -F': +' '/SMART Status/ {print $2}')
     fi
     printf "  disk health: %s\n" "${smart_health:-not checked}"
 }
 
-# RESOURCES
-# calculates memory pressure and storage consumption
 print_resources() {
-    local mem_data total used avail mem_pct swap_data s_total s_used
-    mem_data=$(free -m | awk '/^Mem:/ {print $2,$3,$7}')
-    read -r total used avail <<<"$mem_data"
-    mem_pct=$((100 * used / total))
-
-    swap_data=$(free -m | awk '/^Swap:/ {print $2,$3}')
-    read -r s_total s_used <<<"$swap_data"
+    local total_ram used_ram swap_data s_total s_used
+    
+    total_ram=$(($(sysctl -n hw.memsize) / 1048576))
+    used_ram=$(vm_stat | awk '/Pages active/ {a=$3} /Pages wired down/ {w=$3} END {printf "%d", (a+w)*4096/1048576}')
+    
+    swap_data=$(sysctl -n vm.swapusage)
+    s_total=$(echo "$swap_data" | awk '{print $3}' | tr -d 'M')
+    s_used=$(echo "$swap_data" | awk '{print $6}' | tr -d 'M')
 
     section_header "RESOURCES"
-    printf "  ram:         %sMi / %sMi (%s%% used)\n" "$used" "$total" "$mem_pct"
-    printf "  avail:       %sMi reclaimable\n" "$avail"
+    printf "  ram:         %sMi / %sMi\n" "$used_ram" "$total_ram"
     printf "  swap:        %sMi / %sMi used\n" "$s_used" "$s_total"
     printf "  disk:        %s\n" "$(df -h / | awk 'NR==2 {print $3 " / " $2 " (" $5 " used)"}')"
 
-    if [ -d /var/cache/pacman/pkg ]; then
+    if cmd_exists brew; then
         local cache_size
-        cache_size=$(du -sh /var/cache/pacman/pkg 2>/dev/null | cut -f1)
-        printf "  pkg cache:   %s\n" "${cache_size:-?}"
-    else
-        printf "  pkg cache:   (missing)\n"
+        cache_size=$(du -sh "$(brew --cache)" 2>/dev/null | cut -f1)
+        printf "  brew cache:  %s\n" "${cache_size:-?}"
     fi
 }
 
-# NETWORK
-# outputs ipv4 addressing and routing states
 print_network() {
     section_header "NETWORK"
 
-    ip -4 addr show | grep "inet " | grep -v "127.0.0.1" | \
-        awk '{print "  " $NF ":       " $2}' | sed 's|/.*||'
+    ifconfig | awk '/^[a-z]/ {iface=$1} /inet / && !/127.0.0.1/ {print "  " iface "     " $2}' | sed 's/://'
 
-    local gateway
-    gateway=$(ip route | grep default | awk '{print $3}' | head -n1)
-    printf "  gateway:     %s\n" "$gateway"
+    local gateway dns ext_ip
+    gateway=$(route -n get default 2>/dev/null | awk '/gateway/ {print $2}')
+    printf "  gateway:     %s\n" "${gateway:-none}"
 
-    local dns
-    dns=$(grep nameserver /etc/resolv.conf 2>/dev/null | awk '{print $2}' | head -n2 | xargs)
-    [ -z "$dns" ] && dns="(none)"
-    printf "  dns:         %s\n" "$dns"
+    dns=$(scutil --dns 2>/dev/null | awk '/nameserver/ {print $3}' | head -n2 | paste -sd ', ' -)
+    printf "  dns:         %s\n" "${dns:-(none)}"
 
-    for iface in /sys/class/net/*; do
-        if [ "$(cat "$iface/operstate" 2>/dev/null)" = "up" ]; then
-            local iface_name
-            iface_name=$(basename "$iface")
-            local speed
-            speed=$(cat "$iface/speed" 2>/dev/null)
-            [ -n "$speed" ] && printf "  %s speed: %s Mbit/s\n" "$iface_name" "$speed"
-            
-            if cmd_exists iw; then
-                local ssid
-                ssid=$(iw dev "$iface_name" link 2>/dev/null | awk '/SSID/ {print $2}')
-                [ -n "$ssid" ] && printf "  %s ssid:  %s\n" "$iface_name" "$ssid"
-            fi
+    if cmd_exists networksetup; then
+        local wifi
+        wifi=$(networksetup -getairportnetwork en0 2>/dev/null | awk -F': ' '{print $2}')
+        if [ -n "$wifi" ] && [ "$wifi" != "You are not associated with an AirPort network." ]; then
+            printf "  en0 ssid:    %s\n" "$wifi"
         fi
-    done
+    fi
 
     if cmd_exists curl; then
-        local ext_ip
         ext_ip=$(curl -s --max-time 2 ifconfig.me 2>/dev/null)
         [ -n "$ext_ip" ] && printf "  external:    %s\n" "$ext_ip"
     fi
 }
 
-# PACKAGES
-# queries the local pacman database for state and updates
 print_packages() {
-    if ! cmd_exists pacman; then
+    if ! cmd_exists brew; then
         return
     fi
 
-    local pkg_total pkg_explicit pkg_aur pkg_updates pkg_orphan
-    pkg_total=$(pacman -Qq 2>/dev/null | wc -l)
-    pkg_explicit=$(pacman -Qe 2>/dev/null | wc -l)
-    pkg_aur=$(pacman -Qm 2>/dev/null | wc -l)
-    pkg_orphan=$(pacman -Qtdq 2>/dev/null | wc -l)
+    local pkg_total pkg_cask pkg_updates
+    pkg_total=$(brew leaves 2>/dev/null | wc -l | xargs)
+    pkg_cask=$(brew list --cask 2>/dev/null | wc -l | xargs)
 
     section_header "PACKAGES"
-    printf "  total:       %s\n" "$pkg_total"
-    printf "  explicit:    %s\n" "$pkg_explicit"
-    printf "  aur:         %s\n" "$pkg_aur"
-    printf "  orphans:     %s\n" "$pkg_orphan"
+    printf "  formulae:    %s\n" "$pkg_total"
+    printf "  casks:       %s\n" "$pkg_cask"
 
-    if cmd_exists checkupdates; then
-        pkg_updates=$(checkupdates 2>/dev/null | wc -l)
-        if [ "$pkg_updates" -gt 0 ]; then
-            printf "  updates:     ${yellow}%s pending${nc}\n" "$pkg_updates"
-        else
-            printf "  updates:     up to date\n"
-        fi
+    pkg_updates=$(brew outdated 2>/dev/null | wc -l | xargs)
+    if [ "$pkg_updates" -gt 0 ]; then
+        printf "  updates:     ${yellow}%s pending${nc}\n" "$pkg_updates"
     else
-        printf "  updates:     (checkupdates not installed)\n"
-    fi
-
-    local last_sync
-    last_sync=$(grep -i "full system upgrade" /var/log/pacman.log 2>/dev/null | tail -1 | awk '{print $1, $2}' | sed 's/\[//;s/\]//;s/ \[PACMAN\]//')
-    printf "  last sync:   %s\n" "${last_sync:-unknown}"
-
-    if grep -q '^\[testing\]' /etc/pacman.conf 2>/dev/null; then
-        printf "  testing:     ${yellow}enabled${nc}\n"
-    else
-        printf "  testing:     disabled\n"
+        printf "  updates:     up to date\n"
     fi
 }
 
-# SECURITY
-# checks kernel hardening and audits package vulnerabilities
 print_security() {
     section_header "SECURITY"
 
-    local kernel_type
-    kernel_type=$(uname -r | grep -qi "hardened" && echo "hardened" || echo "standard")
-    printf "  kernel:      %s\n" "$kernel_type"
-
-    if cmd_exists arch-audit; then
-        local vulns
-        vulns=$(arch-audit -q 2>/dev/null | wc -l)
-        if [ "$vulns" -gt 0 ]; then
-            printf "  vulns:       ${red}%d packages${nc}\n" "$vulns"
-        else
-            printf "  vulns:       none\n"
-        fi
-    fi
+    local sip_status
+    sip_status=$(csrutil status | awk '{print $5}' | tr -d '.')
+    printf "  sip:         %s\n" "${sip_status:-unknown}"
 }
 
-# PERFORMANCE
-# reports on cpu scaling and underlying disk scheduling
 print_performance() {
     section_header "PERFORMANCE"
 
-    if [ -f /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor ]; then
-        local gov freq
-        gov=$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor)
-        printf "  governor:    %s\n" "$gov"
-        if [ -f /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq ]; then
-            freq=$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq)
-            printf "  cpu freq:    %s MHz\n" $((freq / 1000))
-        fi
-    else
-        printf "  governor:    not available\n"
+    local freq
+    freq=$(sysctl -n hw.cpufrequency 2>/dev/null)
+    if [ -n "$freq" ]; then
+        printf "  base freq:   %s MHz\n" $((freq / 1000000))
     fi
 
-    local root_dev
-    root_dev=$(findmnt -n -o SOURCE / 2>/dev/null)
-    if [ -n "$root_dev" ]; then
-        local disk_name
-        disk_name=$(lsblk -ndo PKNAME "$root_dev" 2>/dev/null)
-        [ -z "$disk_name" ] && disk_name=$(lsblk -ndo NAME "$root_dev" 2>/dev/null)
-        if [ -n "$disk_name" ] && [ -f "/sys/block/$disk_name/queue/scheduler" ]; then
-            local scheduler
-            scheduler=$(grep -oP '\[\K[^\]]+' "/sys/block/$disk_name/queue/scheduler")
-            printf "  scheduler:   %s\n" "${scheduler:-unknown}"
-        else
-            printf "  scheduler:   (no sysfs entry)\n"
-        fi
-    else
-        printf "  scheduler:   (root device unknown)\n"
-    fi
+    printf "  governor:    xcpm (proprietary)\n"
+    printf "  scheduler:   apfs (locked)\n"
 }
 
-# SYSTEMD HEALTH
-# audits systemd for failed services and boot times
-print_systemd_health() {
-    if ! cmd_exists systemctl; then
+print_launchd_health() {
+    if ! cmd_exists launchctl; then
         return
     fi
 
-    section_header "SYSTEMD HEALTH"
+    section_header "LAUNCHD HEALTH"
 
     local failed_units
-    failed_units=$(systemctl --failed --no-legend 2>/dev/null | wc -l)
+    # We grep for exit statuses that are not 0. A status of 0 means the service is running or successfully suspended.
+    # An exit status greater than 0 generally indicates a crash or termination failure.
+    failed_units=$(launchctl list | awk 'NR>1 && $2 ~ /^[1-9]/ {print $3}' | wc -l | xargs)
+    
     if [ "$failed_units" -gt 0 ]; then
         printf "  failed units: ${red}%d${nc}\n" "$failed_units"
-        systemctl --failed --no-legend 2>/dev/null | awk '{print "    " $1}'
+        launchctl list | awk 'NR>1 && $2 ~ /^[1-9]/ {print "    " $3}'
     else
         printf "  failed units: none\n"
     fi
-
-    if cmd_exists journalctl; then
-        local boot_time
-        boot_time=$(journalctl --list-boots 2>/dev/null | tail -1 | awk '{print $4}')
-        [ -n "$boot_time" ] && printf "  boot time:   %s\n" "$boot_time"
-    fi
 }
 
-# CONTAINERS AND VIRTUALISATION
-# detects running instances across incus, docker, and libvirt
 print_containers_virt() {
     section_header "CONTAINERS & VIRTUALISATION"
 
+    if cmd_exists colima; then
+        local colima_status
+        colima_status=$(colima status 2>/dev/null | grep -c "Running")
+        if [ "$colima_status" -gt 0 ]; then
+            printf "  colima:      active\n"
+        fi
+    fi
+
     if cmd_exists incus; then
         local incus_count
-        incus_count=$(incus list status=running -c n --format csv 2>/dev/null | wc -l)
-        printf "  incus:       %d active instances\n" "$incus_count"
-    fi
-
-    if cmd_exists docker && systemctl -q is-active docker 2>/dev/null; then
-        local containers
-        containers=$(docker ps -q 2>/dev/null | wc -l)
-        printf "  docker:      %d running containers\n" "$containers"
-    fi
-
-    if cmd_exists podman && systemctl -q is-active podman 2>/dev/null; then
-        local pods
-        pods=$(podman ps -q 2>/dev/null | wc -l)
-        printf "  podman:      %d running containers\n" "$pods"
-    fi
-
-    if cmd_exists virsh && systemctl -q is-active libvirtd 2>/dev/null; then
-        local vms
-        vms=$(virsh list --name 2>/dev/null | grep -v "^$" | wc -l)
-        printf "  libvirt:     %d active VMs\n" "$vms"
-    fi
-}
-
-# TIMERS
-# counts active systemd chron tasks
-print_timers() {
-    if ! cmd_exists systemctl; then
-        return
-    fi
-
-    local timer_count
-    timer_count=$(systemctl list-timers --no-legend 2>/dev/null | wc -l)
-    if [ "$timer_count" -gt 0 ]; then
-        section_header "TIMERS"
-        printf "  active:      %d systemd timers\n" "$timer_count"
+        incus_count=$(incus list status=running -c n --format csv 2>/dev/null | wc -l | xargs)
+        if [ "$incus_count" -gt 0 ]; then
+             printf "  incus:       %d active instances\n" "$incus_count"
+        fi
     fi
 }
 
@@ -359,7 +213,6 @@ print_network
 print_packages
 print_security
 print_performance
-print_systemd_health
+print_launchd_health
 print_containers_virt
-print_timers
 printf "\n"
