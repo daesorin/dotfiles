@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/Users/dil/.virtualenvs/obsd-env/bin/python
 
 import argparse
 import time
@@ -21,15 +21,15 @@ excludes = [
 ]
 
 def build_rsync_cmd(src, dest):
-    return ["rsync", "-avz", "--delete"] + excludes + [src, dest]
+    return ["rsync", "-avvzP", "--delete"] + excludes + [src, dest]
 
 def pull_sync():
-    print(f"pulling changes from ish to arch...")
+    print(f"pulling changes from ish to mac...")
     subprocess.run(build_rsync_cmd(remote_dest, local_dir))
     print("pull complete.")
 
 def push_sync():
-    print(f"pushing changes from arch to ish...")
+    print(f"pushing changes from mac to ish...")
     subprocess.run(build_rsync_cmd(local_dir, remote_dest))
     print("push complete.")
 
