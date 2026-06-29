@@ -1,0 +1,49 @@
+default-remote: colima
+remotes:
+  colima:
+    last_working_address: http://unix.socket
+    auth_type: tls
+    project: default
+    protocol: incus
+    public: false
+    addr: unix:///Users/dil/.config/colima/default/incus.sock
+  docker:
+    protocol: oci
+    public: true
+    addr: https://docker.io
+  images:
+    protocol: simplestreams
+    public: true
+    addr: https://images.linuxcontainers.org
+  local:
+    protocol: incus
+    public: false
+    addr: unix://
+aliases:
+  aka: alias
+  apus: pause --all
+  astp: stop --all
+  astr: start --all
+  bash: exec @ARGS@ -- bash
+  c: config
+  del: delete
+  df: exec @ARG1@ -- df -h
+  e: exec
+  i: info
+  img: image
+  imgl: image list --columns lfst
+  l: list --columns=ns4 --format=compact,noheader
+  logs: exec @ARG1@ -- journalctl -u @ARG2@
+  ps: exec @ARG1@ -- ps aux
+  pus: pause
+  shell: exec @ARG1@ -- su -l
+  stp: stop
+  str: start
+  top: exec @ARG1@ -- top
+  user: exec @ARG1@ -- sudo -iu @ARG2@
+  zsh: exec @ARGS@ -- zsh
+defaults:
+  list_format: compact,noheader
+  console_type: ""
+  console_spice_command: ""
+  no_color: false
