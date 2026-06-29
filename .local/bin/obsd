@@ -9,7 +9,7 @@ from watchdog.events import FileSystemEventHandler
 from pathlib import Path
 
 # PRODUCTION CONFIGURATION
-local_dir = "/home/dil/obsidian/"
+local_dir = "/Users/dil/obsidian/obsidian/"
 remote_dest = "ish:/root/obsidian/"
 debounce_seconds = 2.0
 

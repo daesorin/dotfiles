@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-# Generate a list of all commands, remove duplicates, and pipe to Fuzzel
-selected=$(compgen -c | sort -u | fuzzel -d --prompt="RUN: ")
-
-# Execute the selected binary through the compositor
-[ -n "$selected" ] && swaymsg exec -- "$selected"
