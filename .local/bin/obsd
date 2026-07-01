@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+
+import argparse
+import time
+import subprocess
+from threading import Timer
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+from pathlib import Path
+
+# PRODUCTION CONFIGURATION
+local_dir = "/home/dsrn/obsidian/"
+remote_dest = "ish:/root/obsidian/"
+debounce_seconds = 2.0
+
+# ignore workspace ui states to prevent infinite sync loops
+excludes = [
+    "--exclude=.obsidian/workspace*",
+    "--exclude=.trash/",
+    "--exclude=.git/"
+]
+
+def build_rsync_cmd(src, dest):
+    return ["rsync", "-avz", "--delete"] + excludes + [src, dest]
+
+def pull_sync():
+    print(f"pulling changes from ish to arch...")
+    subprocess.run(build_rsync_cmd(remote_dest, local_dir))
+    print("pull complete.")
+
+def push_sync():
+    print(f"pushing changes from arch to ish...")
+    subprocess.run(build_rsync_cmd(local_dir, remote_dest))
+    print("push complete.")
+
+class watchdog_push_handler(FileSystemEventHandler):
+    def __init__(self):
+        self.sync_timer = None
+
+    def on_any_event(self, event):
+        # ignore directory changes and workspace/hidden cache updates
+        if event.is_directory or any(x in event.src_path for x in [".obsidian", ".trash"]):
+            return
+            
+        print(f"local change detected: {event.event_type}")
+        if self.sync_timer:
+            self.sync_timer.cancel()
+            
+        self.sync_timer = Timer(debounce_seconds, push_sync)
+        self.sync_timer.start()
+
+def watch_mode():
+    print(f"arch watchdog listening on {local_dir}")
+    handler = watchdog_push_handler()
+    observer = Observer()
+    observer.schedule(handler, local_dir, recursive=True)
+    observer.start()
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\nstopping watchdog...")
+        observer.stop()
+    observer.join()
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="arch sync node")
+    parser.add_argument("mode", nargs="?", default="watch", choices=["watch", "push", "pull"])
+    args = parser.parse_args()
+
+    if args.mode == "pull":
+        pull_sync()
+    elif args.mode == "push":
+        push_sync()
+    else:
+        watch_mode()

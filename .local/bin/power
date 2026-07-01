@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# MENU ENTRIES
+# define the string values for the power options
+lock="lock"
+suspend="suspend"
+hibernate="hibernate"
+logout="log out"
+reboot="reboot"
+shutdown="shutdown"
+
+# USER INPUT
+# pipe options into fuzzel and capture the string output
+selected=$(printf "%s\n%s\n%s\n%s\n%s\n%s" "$lock" "$suspend" "$hibernate" "$logout" "$reboot" "$shutdown" | fuzzel --dmenu --prompt "power: ")
+
+# EXECUTION ROUTING
+# match the captured string to the system daemon command
+case "$selected" in
+    "$lock")
+        swaylock -f -c 000000
+        ;;
+    "$suspend")
+        swaylock -f -c 000000
+        systemctl suspend
+        ;;
+    "$hibernate")
+        swaylock -f -c 000000
+        systemctl hibernate
+        ;;
+    "$logout")
+        loginctl terminate-session "$XDG_SESSION_ID"
+        ;;
+    "$reboot")
+        systemctl reboot
+        ;;
+    "$shutdown")
+        systemctl poweroff
+        ;;
+    *)
+        exit 0
+        ;;
+esac

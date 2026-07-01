@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# COLOURS
+cyan='\033[0;36m'
+nc='\033[0m'
+
+# USER AUDIT
+printf "${cyan}AUTHORISED HUMAN USERS${nc}\n"
+printf "%-12s %-6s %-15s %-30s %s\n" "user" "uid" "shell" "groups" "last login"
+
+# filter for uids between 1000 and 60000
+awk -F: '$3 >= 1000 && $3 < 60000 {print $1}' /etc/passwd | while read -r user; do
+  uid=$(id -u "$user")
+  groups=$(groups "$user" | cut -d: -f2 | xargs)
+  shell=$(getent passwd "$user" | cut -d: -f7)
+
+  # parse lastlog for the second line and strip the username to get the timestamp
+  last_raw=$(lastlog -u "$user" | awk 'NR==2 { $1=""; print $0 }' | xargs)
+
+  printf "%-12s %-6s %-15s %-30s %s\n" \
+    "$user" "$uid" "$shell" "$groups" "${last_raw:-never logged in}"
+done

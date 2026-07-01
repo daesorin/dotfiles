@@ -1,0 +1,254 @@
+#!/usr/bin/env bash
+
+# COLOURS
+red='\033[1;31m'
+green='\033[1;32m'
+blue='\033[1;34m'
+cyan='\033[1;36m'
+yellow='\033[1;33m'
+nc='\033[0m'
+
+# CONFIGURATION
+session_file="$HOME/.aria2_session"
+xdg_videos="${XDG_VIDEOS_DIR:-$HOME/Videos}"
+xdg_music="${XDG_MUSIC_DIR:-$HOME/Music}"
+hist_video="$HOME/.config/archive_history_video.txt"
+hist_music="$HOME/.config/archive_history_music.txt"
+
+# establish configuration directory
+mkdir -p "$HOME/.config"
+touch "$session_file"
+
+# UTILITIES
+log() {
+    local col="$1"
+    local msg="$2"
+    printf "${col}%s${nc}\n" "$msg"
+}
+
+# verify core binaries and clipboard providers
+check_dependencies() {
+    local deps=("aria2c" "yt-dlp" "spotdl")
+    for dep in "${deps[@]}"; do
+        if ! command -v "$dep" >/dev/null 2>&1; then
+            log "$red" "missing core dependency: $dep. install via pacman or the aur."
+            exit 1
+        fi
+    done
+
+    if ! command -v wl-paste >/dev/null 2>&1 && ! command -v xclip >/dev/null 2>&1; then
+        log "$yellow" "warning: missing wl-clipboard or xclip. clipboard polling disabled."
+    fi
+}
+
+# extract link from wayland or x11
+get_clipboard_url() {
+    local content=""
+
+    if command -v wl-paste >/dev/null 2>&1; then
+        content=$(wl-paste)
+    elif command -v xclip >/dev/null 2>&1; then
+        content=$(xclip -o -selection clipboard)
+    fi
+
+    content="$(echo "$content" | xargs)"
+
+    [[ "$content" == http* ]] && echo "$content"
+}
+
+# ARIA2C CORE
+run_aria2c() {
+    # increased min-split-size to 5M to reduce local i/o overhead
+    aria2c \
+        --continue=true \
+        --max-connection-per-server=16 \
+        --split=16 \
+        --min-split-size=5M \
+        --user-agent="Mozilla/5.0" \
+        --save-session="$session_file" \
+        --save-session-interval=60 \
+        --seed-time=0 \
+        "$@" || log "$red" "aria2c failed"
+}
+
+# SPOTIFY CORE
+run_spotdl() {
+    local url="$1"
+    local target_dir="$2"
+
+    log "$cyan" "circumventing spotify restrictions routing to $target_dir"
+
+    mkdir -p "$target_dir"
+    cd "$target_dir" || return 1
+
+    local cmd=(
+        spotdl download "$url"
+        --format opus
+        --output "{artists} - {title}.{ext}"
+    )
+
+    local attempt
+    for attempt in 1 2 3; do
+        log "$cyan" "spotdl execution attempt $attempt"
+
+        # timeout constrained to 60 seconds to prevent pipeline stalls during corporate api hangs
+        if timeout 60 "${cmd[@]}"; then
+            return 0
+        fi
+
+        log "$yellow" "spotdl network or api failure on attempt $attempt"
+        sleep 2
+    done
+
+    log "$red" "spotdl failed permanently due to api restrictions"
+    return 1
+}
+
+# YT-DLP CORE
+run_ytdlp() {
+    local url="$1"
+    local target_dir="$2"
+    local hist_file="$3"
+    local out_tmpl="$4"
+    shift 4
+    local extra_args=("$@")
+
+    log "$cyan" "media routing to $target_dir"
+
+    mkdir -p "$target_dir"
+
+    # modern client impersonation bypasses monopolistic platform throttling
+    yt-dlp \
+        --progress \
+        --ignore-errors \
+        --add-metadata \
+        --embed-thumbnail \
+        --embed-subs \
+        --embed-chapters \
+        --extractor-args "youtube:player_client=ios,web" \
+        --downloader aria2c \
+        --downloader-args "aria2c:-x 16 -k 5M" \
+        --download-archive "$hist_file" \
+        -o "${target_dir}/${out_tmpl}" \
+        "${extra_args[@]}" \
+        "$url" \
+        || log "$yellow" "yt-dlp finished with errors"
+}
+
+# MODES
+mode_media() {
+    local url="$1"
+    local media_type="$2"
+    local format_arg="$3"
+    local playlist_flag="$4"
+
+    local audio_tmpl="%(playlist_index|)s%(playlist_index& - |)s%(artist,uploader|Unknown)s - %(title)s [%(id)s].%(ext)s"
+    local video_tmpl="%(playlist_index|)s%(playlist_index& - |)s%(uploader,channel|Unknown)s - %(title)s [%(id)s].%(ext)s"
+
+    local extra_args=()
+    [[ -n "$playlist_flag" ]] && extra_args+=("$playlist_flag")
+
+    if [[ "$media_type" == "audio" ]]; then
+        run_ytdlp "$url" "$xdg_music" "$hist_music" "$audio_tmpl" \
+            "${extra_args[@]}" \
+            --extract-audio --audio-format opus --audio-quality 0
+    else
+        if [[ "$format_arg" == "best" ]]; then
+            run_ytdlp "$url" "$xdg_videos" "$hist_video" "$video_tmpl" \
+                "${extra_args[@]}" -f "bv*+ba/b" --merge-output-format mkv
+
+        elif [[ "$format_arg" == "ask" ]]; then
+            log "$cyan" "querying upstream for format manifests"
+            yt-dlp -F "$url"
+            printf "\n${cyan}enter desired format code:${nc} "
+            read -r selected_format
+            
+            if [[ -n "$selected_format" ]]; then
+                run_ytdlp "$url" "$xdg_videos" "$hist_video" "$video_tmpl" \
+                    "${extra_args[@]}" -f "$selected_format" --merge-output-format mkv
+            else
+                log "$red" "aborted: no format code provided"
+                exit 1
+            fi
+        else
+            run_ytdlp "$url" "$xdg_videos" "$hist_video" "$video_tmpl" \
+                "${extra_args[@]}" -f "$format_arg" --merge-output-format mkv
+        fi
+    fi
+}
+
+# BATCH MODE
+mode_batch() {
+    local filepath="$1"
+
+    [[ ! -f "$filepath" ]] && {
+        log "$red" "batch file missing: $filepath"
+        exit 1
+    }
+
+    log "$blue" "batch mode execution for $filepath"
+
+    local tmp
+    tmp=$(mktemp)
+
+    # strip comments and empty lines
+    grep -vE '^\s*#|^\s*$' "$filepath" > "$tmp"
+
+    run_aria2c --input-file="$tmp" --max-concurrent-downloads=4
+
+    rm -f "$tmp"
+}
+
+# ARG PARSING
+target=""
+media_type="video"
+format_arg="best"
+playlist_flag=""
+resume=0
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -t|--type)
+            media_type="$2"; shift 2 ;;
+        -f|--format)
+            format_arg="$2"; shift 2 ;;
+        -p|--playlist)
+            playlist_flag="--yes-playlist"; shift ;;
+        -r|--resume)
+            resume=1; shift ;;
+        *)
+            [[ -z "$target" ]] && target="$1"
+            shift ;;
+    esac
+done
+
+# ROUTER
+check_dependencies
+
+[[ -z "$target" ]] && target=$(get_clipboard_url)
+
+if [[ -z "$target" && $resume -eq 0 ]]; then
+    log "$yellow" "usage: fetch [url|file] [-t audio|video] [-f best|ask|code] [-p]"
+    exit 1
+fi
+
+if [[ $resume -eq 1 ]]; then
+    log "$yellow" "resuming global aria2 session"
+    run_aria2c --input-file="$session_file"
+
+elif [[ -f "$target" ]]; then
+    mode_batch "$target"
+
+elif [[ "$target" =~ \.(iso|zip|rar|tar|gz|bz2|7z|torrent|pdf|png|jpg|mp4|mkv)$ ]]; then
+    log "$blue" "direct file payload detected"
+    run_aria2c "$target"
+
+elif [[ "$target" =~ spotify\.com ]]; then
+    run_spotdl "$target" "$xdg_music" || {
+        log "$red" "spotdl failed. yt-dlp cannot natively parse walled-garden spotify urls. manual extraction required."
+        exit 1
+    }
+
+else
+    mode_media "$target" "$media_type" "$format_arg" "$playlist_flag"
+fi

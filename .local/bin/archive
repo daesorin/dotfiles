@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+set -e
+
+# COLOURS
+red='\033[1;31m'
+green='\033[1;32m'
+blue='\033[1;34m'
+yellow='\033[1;33m'
+nc='\033[0m'
+
+# USAGE GUIDE
+# displays the help menu if arguments are missing or incorrect
+show_help() {
+    printf "${blue}usage:${nc} archivectl <command> <arguments>\n\n"
+    printf "commands:\n"
+    printf "  compress <source> [output]  compresses a file or directory\n"
+    printf "  extract <file>              extracts a supported archive\n\n"
+    printf "examples:\n"
+    printf "  archivectl compress myfolder\n"
+    printf "  archivectl compress myfolder data.zip\n"
+    printf "  archivectl extract data.tar.gz\n"
+    exit 1
+}
+
+# COMPRESSION ROUTINE
+# handles the creation of new archives
+do_compress() {
+    if [ -z "$1" ]; then
+        printf "${red}error: target missing for compression.${nc}\n"
+        exit 1
+    fi
+
+    local source_path="${1%/}"
+    if [ ! -e "$source_path" ]; then
+        printf "${red}error: source '%s' not found.${nc}\n" "$source_path"
+        exit 1
+    fi
+
+    local output
+    if [ -n "$2" ]; then
+        output="$2"
+    else
+        output="${source_path}.tar.gz"
+    fi
+
+    printf "${blue}compressing ${yellow}%s${nc} into ${yellow}%s${nc}...\n" "$source_path" "$output"
+
+    case "$output" in
+        *.tar.gz | *.tgz) tar -czf "$output" "$source_path" ;;
+        *.tar.xz) tar -cJf "$output" "$source_path" ;;
+        *.tar.bz2) tar -cjf "$output" "$source_path" ;;
+        *.tar) tar -cf "$output" "$source_path" ;;
+        *.zip) zip -r "$output" "$source_path" ;;
+        *.7z) 7z a "$output" "$source_path" ;;
+        *.rar) rar a "$output" "$source_path" ;;
+        *)
+            printf "${red}error: format not recognised.${nc}\n"
+            exit 1
+            ;;
+    esac
+
+    printf "${green}compression complete.${nc}\n"
+    du -h "$output" | awk '{print $1 "  " $2}'
+}
+
+# EXTRACTION ROUTINE
+# handles the unpacking of existing archives
+do_extract() {
+    if [ -z "$1" ]; then
+        printf "${red}error: target missing for extraction.${nc}\n"
+        exit 1
+    fi
+
+    local file="$1"
+    if [ ! -f "$file" ]; then
+        printf "${red}error: file '%s' not found.${nc}\n" "$file"
+        exit 1
+    fi
+
+    printf "${blue}extracting: ${yellow}%s${nc}...\n" "$file"
+
+    case "$file" in
+        *.tar.bz2 | *.tbz2) tar xjf "$file" ;;
+        *.tar.gz | *.tgz) tar xzf "$file" ;;
+        *.tar.xz) tar xJf "$file" ;;
+        *.tar) tar xf "$file" ;;
+        *.lzma) unlzma "$file" ;;
+        *.bz2) bunzip2 "$file" ;;
+        *.rar) unrar x "$file" ;;
+        *.gz) gunzip "$file" ;;
+        *.zip) unzip "$file" ;;
+        *.Z) uncompress "$file" ;;
+        *.7z) 7z x "$file" ;;
+        *.xz) unxz "$file" ;;
+        *.exe) cabextract "$file" ;;
+        *)
+            printf "${red}error: format not recognised.${nc}\n"
+            exit 1
+            ;;
+    esac
+
+    printf "${green}extraction complete.${nc}\n"
+}
+
+# COMMAND ROUTER
+# parses the first argument to determine execution path
+case "$1" in
+    compress)
+        do_compress "$2" "$3"
+        ;;
+    extract)
+        do_extract "$2"
+        ;;
+    *)
+        show_help
+        ;;
+esac

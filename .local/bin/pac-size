@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+pacman -Qi $(pactree -u "$1") | awk '/^Installed Size/ {
+  size=$4
+  if ($5 == "KiB") size /= 1024
+  if ($5 == "GiB") size *= 1024
+  if ($5 == "B") size /= 1048576
+  total += size
+} END {
+  printf "Total ecosystem size: %.2f MiB\n", total
+}'

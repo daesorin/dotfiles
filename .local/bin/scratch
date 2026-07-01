@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# ~/.local/bin/scratchpadctl
+# MANAGE SPATIAL SCRATCHPAD STATE
+
+APP_ID="$1"
+SPAWN_CMD="$2"
+HIDDEN_WORKSPACE="scratchpad_vault"
+
+WINDOW_JSON=$(niri msg -j windows | jq -c ".[] | select(.app_id == \"$APP_ID\")" | head -n 1)
+
+if [ -z "$WINDOW_JSON" ]; then
+    eval "$SPAWN_CMD" &
+    exit 0
+fi
+
+# extract geometric identifiers
+WINDOW_ID=$(echo "$WINDOW_JSON" | jq -r '.id')
+WINDOW_WS=$(echo "$WINDOW_JSON" | jq -r '.workspace_id')
+
+# query active operational space
+CURRENT_WS=$(niri msg -j workspaces | jq -r '.[] | select(.is_focused) | .id')
+
+if [ "$WINDOW_WS" == "$CURRENT_WS" ]; then
+    niri msg action focus-window --id "$WINDOW_ID"
+    niri msg action move-window-to-workspace "$HIDDEN_WORKSPACE"
+else
+    niri msg action focus-window --id "$WINDOW_ID"
+    niri msg action move-window-to-workspace "$CURRENT_WS"
+    niri msg action focus-window --id "$WINDOW_ID"
+fi
