@@ -4,6 +4,8 @@
 # UN-IGNORE TRACKED CONFIGURATION
 !.gitignore
 !.gitconfig
+!.local/bin/
+!bin/
 !.config/git/base.gitconfig
 !.config/
 !.config/bash/

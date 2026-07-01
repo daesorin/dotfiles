@@ -1,6 +1,6 @@
 // STARTUP DAEMONS
 spawn-at-startup "/usr/lib/polkit-kde-authentication-agent-1"
-spawn-at-startup "swaybg" "-i" "/home/dil/Pictures/turtle.jpg" "-m" "fill"
+spawn-at-startup "swaybg" "-i" "/home/dsrn/Pictures/turtle.jpg" "-m" "fill"
 spawn-at-startup "waybar"
 spawn-at-startup "mako"
 spawn-at-startup "nm-applet"
