@@ -24,8 +24,5 @@ bash ~/.dotfiles-meta/bootstrap.sh
 ## Notes
 
 - Arch Linux only. No guarantees on other distros.
-- Neovim config is LazyVim-based.
-- tmux plugins managed by TPM. Run `prefix + I` after first launch to install.
-- gitmux is installed via `go install` -- see `bootstrap.sh`.
-
+- ...
  
