@@ -8,22 +8,6 @@ most scripts rely on the following packages available in the arch repositories o
 
 `bash`, `python3`, `jq`, `curl`, `bc`, `awk`, `bind`, `whois`, `openssl`, `aria2`, `yt-dlp`, `ffmpeg`, `fzf`, `lm_sensors`, `pacman-contrib`, `rsync`, `python-watchdog`, `waybar`
 
-## INSTALLATION
-
-1. clone the repository to your local machine:
-    ```bash
-    git clone https://code.sgbvmr.xyz/daesorin/dotfiles/src/branch/main/.local/bin
-    ```
-2. navigate into the cloned directory and copy the binaries to your path:
-    ```bash
-    cd utils
-    cp * ~/.local/bin/
-    ````
-3. grant execution permissions:
-    ```bash
-    chmod u+x ~/.local/bin/*
-    ```
-    
 ## UTILITIES ARCHITECTURE
 
 the repository is structured around singular, verb-oriented tools designed for autonomous infrastructure management:
