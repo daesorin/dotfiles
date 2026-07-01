@@ -57,7 +57,6 @@
 !/.config/zsh/
 
 # NESTED IGNORES
-# prevents system state and cache files inside whitelisted directories from polluting the index
 .bash_history
 .DS_Store
 __pycache__/
@@ -73,6 +72,5 @@ __pycache__/
 .zsh/.zcompdump
 
 # RESOLVED CONTRADICTIONS
-# items previously set to both track and ignore
 .config/mimeapps.list
 .config/systemd/
