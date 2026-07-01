@@ -12,7 +12,7 @@ most scripts rely on the following packages available in the arch repositories o
 
 1. clone the repository to your local machine:
     ```bash
-    git clone https://git.daesorin.xyz/daesorin/utils.git
+    git clone https://code.sgbvmr.xyz/daesorin/dotfiles/src/branch/main/.local/bin
     ```
 2. navigate into the cloned directory and copy the binaries to your path:
     ```bash
