@@ -1,7 +1,6 @@
 # ROOT IGNORE
 /*
 
-# ROOT EXCLUSIONS
 !.gitignore
 !.gitconfig
 !.zshrc
@@ -11,16 +10,13 @@
 !/bin/
 !/.dotfiles-meta/
 
-# LOCAL EXCLUSIONS
 !/.local/
 /.local/*
 !/.local/bin/
 
-# ZSH EXCLUSIONS
 !/.zsh/
 !/.zsh/README.md
 
-# CONFIG EXCLUSIONS
 !/.config/
 /.config/*
 !/.config/alacritty/
@@ -30,8 +26,10 @@
 !/.config/fastfetch/
 !/.config/foot/
 !/.config/fuzzel/
+
 !/.config/git/
 .config/git/local.gitconfig
+
 !/.config/gtk-3.0/
 !/.config/gtk-4.0/
 !/.config/hypr/
@@ -58,7 +56,6 @@
 !/.config/zsh/
 !/.config/README.md
 
-# NESTED IGNORES
 .bash_history
 .DS_Store
 __pycache__/
@@ -72,7 +69,6 @@ __pycache__/
 .config/zsh/.zcompdump*
 .zsh/.history
 .zsh/.zcompdump
-
-# RESOLVED CONTRADICTIONS
 .config/mimeapps.list
 .config/systemd/
+.config/gtk-3.0/bookmarks
