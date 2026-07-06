@@ -1,7 +1,0 @@
-# CONFIGURATION
-include variables
-include startup
-include appearance
-include devices
-include binds
-include rules

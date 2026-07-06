@@ -2,19 +2,14 @@
 alias pm='sudo pacman'
 alias pr='paru'
 
-# FASTFETCH
-alias ff='fastfetch'
-alias ffm='fastfetch --config ~/.config/fastfetch/minimal.jsonc'
-alias ffl='fastfetch --config ~/.config/fastfetch/laptop.jsonc'
-alias ffs='fastfetch --config ~/.config/fastfetch/server.jsonc'
-
 # EZA
 alias ls='ls --color=always'
 alias lz='eza --group-directories-first'
-alias l='eza -lh --group-directories-first --git'
-alias la='eza -lah --group-directories-first --git'
-alias lt='eza -lh --tree --group-directories-first --git'
-alias lta='eza -lah --tree --group-directories-first --git'
+alias l='eza -l --group-directories-first --git'
+alias li='eza -laai --group-directories-first --git'
+alias la='eza -la --group-directories-first --git'
+alias lt='eza -l --tree --group-directories-first --git'
+alias lta='eza -la --tree --group-directories-first --git'
 alias lt2='eza --tree --level=2'
 alias lt3='eza --tree --level=3'
 
@@ -43,6 +38,8 @@ alias ip='ip --color=auto'
 alias df='df -h'
 alias du='du -h'
 alias free='free -h'
+alias chmod='chmod -v'
+alias suchmod='sudo chmod -v'
 
 alias cls='clear'
 alias path='echo $PATH | tr ":" "\n"'
@@ -103,13 +100,10 @@ alias btlist='bluetoothctl devices'
 alias btscan='bluetoothctl scan on'
 alias btconnect='bluetoothctl connect'
 alias btdisconnect='bluetoothctl disconnect'
-alias bltmouse='echo "connect 30:24:78:A0:00:BD" | bluetoothctl'
-alias bltspeak='echo "connect 41:42:9E:F5:1C:C9" | bluetoothctl'
 
 #  VPN & PRIVACY
 alias vpnup='sudo wg-quick up proton'
 alias vpndown='sudo wg-quick down proton'
-
 alias torup='sudo systemctl start tor && echo "Tor Service Started [O n]"'
 alias tordown='sudo systemctl stop tor && echo "Tor Service Stopped [ Off]"'
 alias torstat='systemctl status tor'
@@ -126,3 +120,19 @@ alias git.today="git log --since='24 hours ago' --oneline --graph --all"
 # PYTHON
 alias py='python3'
 alias ipy='ipython'
+
+# ZATHURA PDF Reader
+alias zt='zathura'
+
+# SYSTEMD
+alias sys='systemctl'
+alias susys='sudo systemctl'
+
+# TMUX
+alias tx='tmux'
+alias txn='tmux new -s'
+alias txnmain='tmux new -s main'
+alias txa='tmux attach -t'
+alias txkw='tmux kill-window -t'
+alias txks='tmux kill-session -t'
+alias txkp='tmux kill-pane -t'

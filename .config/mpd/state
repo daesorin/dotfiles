@@ -1,7 +1,9 @@
 sw_volume: 100
 audio_device_state:1:pulse audio
 audio_device_state:1:visualiser
-state: stop
+state: pause
+current: 0
+time: 1.4040000000000001
 random: 0
 repeat: 0
 single: 0
@@ -15,4 +17,5 @@ playlist_begin
 1:Amigo the Devil - Iâ€™m Going to Heaven.{ext}.opus
 2:Passenger - David.{ext}.opus
 3:Elliott Smith - Everything Means Nothing To Me.{ext}.opus
+4:Passenger - I Hate (Live from the Borderline, London).{ext}.opus
 playlist_end
