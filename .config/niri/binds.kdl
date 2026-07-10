@@ -11,7 +11,7 @@ binds {
     Mod+O cooldown-ms=500 { spawn "obsidian"; }
     Mod+A cooldown-ms=500 { spawn "enteauth"; }
     Mod+Shift+A cooldown-ms=500 { spawn "bitwarden-desktop"; }
-    Mod+E cooldown-ms=500 { spawn "alacritty" "-e" "yazi"; }
+    Mod+E cooldown-ms=500 { spawn "kitty" "-e" "yazi"; }
     Mod+Shift+E cooldown-ms=500 { spawn "ente-desktop"; }
     Mod+G cooldown-ms=500 { spawn "dolphin-emu"; }
     Mod+Shift+G cooldown-ms=500 { spawn "azahar"; }

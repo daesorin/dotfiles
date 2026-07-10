@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 set -o pipefail
 export LC_ALL=C
 
@@ -37,6 +38,13 @@ shift $((OPTIND - 1))
 domain="$1"
 [[ -z "$domain" ]] && usage
 
+# INPUT VALIDATION
+# rejects malformed hostnames before they reach dig/curl/openssl/whois
+if [[ ! "$domain" =~ ^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$ ]]; then
+    printf "${red}error: '%s' is not a valid domain${nc}\n" "$domain"
+    exit 1
+fi
+
 # HELPER FUNCTIONS
 # standardises section headers for clean output
 section_header() {
@@ -59,20 +67,24 @@ ipv4=$(dig $resolver +short A "$domain")
 ipv6=$(dig $resolver +short AAAA "$domain")
 cname=$(dig $resolver +short CNAME "$domain")
 mx=$(dig $resolver +short MX "$domain")
+caa=$(dig $resolver +short CAA "$domain")
 txt=$(dig $resolver +short TXT "$domain" | grep -Ei "spf|dmarc" || true)
+dnskey=$(dig $resolver +short DNSKEY "$domain")
 
 printf "  ipv4:\n%s\n" "$([[ -n "$ipv4" ]] && echo "$ipv4" | sed 's/^/    /' || echo "    n/a")"
 printf "  ipv6:\n%s\n" "$([[ -n "$ipv6" ]] && echo "$ipv6" | sed 's/^/    /' || echo "    n/a")"
 printf "  cname:\n    %s\n" "${cname:-none detected}"
 printf "  nameservers:\n%s\n" "$(dig $resolver +short NS "$domain" | sed 's/^/    /')"
 printf "  mail exchangers:\n%s\n" "$([[ -n "$mx" ]] && echo "$mx" | sed 's/^/    /' || echo "    none detected")"
+printf "  caa records:\n%s\n" "$([[ -n "$caa" ]] && echo "$caa" | sed 's/^/    /' || echo "    none detected")"
 printf "  security txt:\n%s\n" "$([[ -n "$txt" ]] && echo "$txt" | sed 's/^/    /' || echo "    none detected")"
+printf "  dnssec:        %s\n" "$([[ -n "$dnskey" ]] && echo "enabled" || echo "not detected")"
 
 # REVERSE LOOKUP
-# checks ptr records for resolved addresses
+# checks ptr records for resolved v4 and v6 addresses
 section_header "REVERSE DNS"
-if [[ -n "$ipv4" ]]; then
-    for ip in $ipv4; do
+if [[ -n "$ipv4" || -n "$ipv6" ]]; then
+    for ip in $ipv4 $ipv6; do
         ptr=$(dig $resolver +short -x "$ip")
         printf "  %s -> %s\n" "$ip" "${ptr:-n/a}"
     done
@@ -114,42 +126,52 @@ for h in "strict-transport-security" "content-security-policy" "x-frame-options"
 done
 
 # INFRASTRUCTURE PROBE
-# checks common critical ports on the primary resolved ip
+# checks common critical ports on the primary resolved ip, results sorted after concurrent scan
 section_header "PORT SCAN"
 ports=(21 22 25 53 80 443 3306 8080 8443)
 target_ip=$(echo "$ipv4" | head -n1)
 
 if [[ -n "$target_ip" ]]; then
+    scan_tmp=$(mktemp)
     exec 3>&2
     exec 2>/dev/null
     for port in "${ports[@]}"; do
-        (timeout 1 bash -c "</dev/tcp/$target_ip/$port" &>/dev/null && printf "  port %-5s ${green}open${nc}\n" "$port") &
+        (timeout 1 bash -c "</dev/tcp/$target_ip/$port" &>/dev/null && echo "$port" >> "$scan_tmp") &
     done
     wait
     exec 2>&3
+    if [[ -s "$scan_tmp" ]]; then
+        sort -n "$scan_tmp" | while read -r port; do
+            printf "  port %-5s ${green}open${nc}\n" "$port"
+        done
+    else
+        printf "  no open ports detected\n"
+    fi
+    rm -f "$scan_tmp"
 else
     printf "  ${red}no ipv4 address for scanning.${nc}\n"
 fi
 
 # ASSET ENUMERATION
-# queries certificate transparency logs for child infrastructure
+# queries certificate transparency logs for child infrastructure via crt.sh json endpoint
 section_header "SUBDOMAINS"
-subdomains=$(timeout 15 curl -s "https://crt.sh/?q=%25.$domain" | grep -oE "[a-zA-Z0-9._-]+\.$domain" | sort -u | head -n 15)
+subdomains=$(timeout 15 curl -s "https://crt.sh/?q=%25.$domain&output=json" | jq -r '.[].name_value' 2>/dev/null | tr ',' '\n' | sed 's/\*\.//' | sort -u | head -n 15)
 [[ -n "$subdomains" ]] && echo "$subdomains" | sed 's/^/  /' || echo "  enumeration failed or none found"
 
 # REGISTRY AUDIT
 # extracts baseline domain registration metadata
 section_header "WHOIS DATA"
-whois_data=$(whois "$domain" 2>/dev/null | grep -Ei "^registrar:|^creation date:|^updated date:" | tr -s ' ' | head -n 5)
+whois_data=$(timeout "$timeout_val" whois "$domain" 2>/dev/null | grep -Ei "^registrar:|^creation date:|^updated date:" | tr -s ' ' | head -n 5)
 [[ -n "$whois_data" ]] && echo "$whois_data" | sed 's/^/  /' || echo "  extraction limited"
 
 # RISK SCORE
 # calculates a basic hazard rating based on missing protections and open ports
 section_header "RISK SUMMARY"
 risk=0
-[[ ! "$https_status" =~ ^2|3 ]] && ((risk += 2))
+[[ ! "$https_status" =~ ^(2|3) ]] && ((risk += 2))
 echo "$headers" | grep -qi "^strict-transport-security:" || ((risk += 1))
 echo "$headers" | grep -qi "^content-security-policy:" || ((risk += 1))
+[[ -z "$dnskey" ]] && ((risk += 1))
 timeout 1 bash -c "</dev/tcp/$target_ip/22" &>/dev/null && ((risk += 1))
 timeout 1 bash -c "</dev/tcp/$target_ip/21" &>/dev/null && ((risk += 2))
 
@@ -163,4 +185,5 @@ fi
 
 printf "  domain:  %s\n" "$domain"
 printf "  ip:      %s\n" "${target_ip:-n/a}"
-printf "  posture: ${posture_color}%s${nc} (score: %d)\n\n" "$posture_text" "$risk"n\n" "$posture_text" "$risk"
+printf "  posture: ${posture_color}%s${nc} (score: %d)\n\n" "$posture_text" "$risk"
+

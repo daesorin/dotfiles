@@ -41,7 +41,7 @@ check_dependencies() {
     fi
 }
 
-# extract link from wayland or x11
+# extract link from clipboard
 get_clipboard_url() {
     local content=""
 

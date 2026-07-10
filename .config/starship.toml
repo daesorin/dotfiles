@@ -1,32 +1,54 @@
-format = "$directory$git_branch$git_status$hostname$character"
+# PROMPT LAYOUT
+# define the left and right structural order
+format = "$python$directory$git_branch$git_status$hostname$character"
 right_format = """$jobs$time"""
 
+# PYTHON ENVIRONMENT
+# display the active virtual environment name without the python version
+[python]
+style = "green"
+format = "[$virtualenv]($style) "
+
+# DIRECTORY PATH
+# display the truncated current working path
 [directory]
 style = "cyan"
 truncate_to_repo = true
 truncation_length = 3
 format = "[$path]($style) "
 
+# GIT BRANCH
+# display the current repository branch
 [git_branch]
 format = "[$branch]($style) "
 style = "yellow"
 
+# GIT STATUS
+# display modification indicators
 [git_status]
 style = "red"
 format = "[$all_status]($style) "
 
+# HOSTNAME
+# display the machine name only during ssh sessions
 [hostname]
 ssh_only = true
 format = "[$hostname](blue) "
 
+# PROMPT CHARACTER
+# display stateful execution symbols
 [character]
 success_symbol = "[>](bold green)"
 error_symbol = "[x](bold red)"
 vicmd_symbol = "[v](bold green)"
 
+# BACKGROUND JOBS
+# indicate processes suspended in the background
 [jobs]
 symbol = "✦ "
 
+# SYSTEM TIME
+# display the current time on the right axis
 [time]
 disabled = false
 time_format = "%T"
