@@ -1,1 +1,47 @@
-cat "$@" | wl-copy
+# PIPED INPUT HANDLING
+# read directly from standard input when no arguments are provided
+if [ ! -t 0 ] && [ $# -eq 0 ]; then
+    wl-copy
+    return 0
+fi
+
+# ARGUMENT VALIDATION
+# ensure at least one file argument is passed when not piping
+if [ $# -eq 0 ]; then
+    echo "usage: copy <file...> or <command> | copy" >&2
+    return 1
+fi
+
+# FILE EXISTENCE CHECK
+# verify the target argument is a readable file
+if [ ! -r "$1" ]; then
+    echo "error: cannot read file '$1'" >&2
+    return 1
+fi
+
+# MIME TYPE DETECTION
+# inspect the file header to determine the correct clipboard target
+local mime_type
+mime_type=$(file --mime-type -b "$1")
+
+# CLIPBOARD DISPATCH
+# route the file to wl-copy with the appropriate target flags
+case "$mime_type" in
+    image/png|image/jpeg|image/webp|image/gif|image/bmp)
+        wl-copy -t "$mime_type" < "$1"
+        echo "copied $1 ($mime_type) to clipboard."
+        ;;
+    image/svg+xml)
+        if command -v rsvg-convert >/dev/null 2>&1; then
+            rsvg-convert "$1" | wl-copy -t image/png
+            echo "rasterised $1 to png and copied to clipboard."
+        else
+            wl-copy -t image/svg+xml < "$1"
+            echo "copied $1 (raw svg) to clipboard. install librsvg for automatic png rasterisation."
+        fi
+        ;;
+    *)
+        cat "$@" | wl-copy
+        echo "copied text content ($# file(s)) to clipboard."
+        ;;
+esac
