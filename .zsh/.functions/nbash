@@ -1,0 +1,46 @@
+    local target="${1:-}"
+    if [[ -z "$target" ]]; then
+        echo "usage: nbash <new_script_name>"
+        return 1
+    fi
+
+    # PREVENT OVERWRITES
+    # exit immediately if the target file already exists
+    if [[ -f "$target" ]]; then
+        echo "error: file '$target' already exists."
+        return 1
+    fi
+
+    # CREATE DIRECTORIES
+    # ensure the parent directory structure exists before creating the file
+    mkdir -p "$(dirname "$target")"
+
+    # TEMPLATE SELECTION
+    # use the external template if available, otherwise generate inline
+    local template="$HOME/.bash_templates/script.sh"
+    if [[ -f "$template" ]]; then
+        cp "$template" "$target"
+    else
+        cat > "$target" <<EOF
+#!/usr/bin/env bash
+# AUTHOR: Daesorin
+# CREATED: $(date +"%F %R %z")
+
+set -euo pipefail
+
+main() {
+    # main execution block
+    echo "Hello, world!"
+}
+
+main "\$@"
+EOF
+    fi
+
+    # FILE PERMISSIONS
+    # grant read, write, and execute to the owner, and read to others
+    chmod u=rwx,go=r "$target"
+
+    # LAUNCH EDITOR
+    # open the target in the user environment editor
+    ${EDITOR:-vim} "$target"
