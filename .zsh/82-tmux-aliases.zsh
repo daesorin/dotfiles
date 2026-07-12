@@ -1,0 +1,7 @@
+alias tx='tmux'
+alias txn='tmux new -s'
+alias txnmain='tmux new -s main'
+alias txa='tmux attach -t'
+alias txkw='tmux kill-window -t'
+alias txks='tmux kill-session -t'
+alias txkp='tmux kill-pane -t'

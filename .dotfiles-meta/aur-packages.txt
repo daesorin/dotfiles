@@ -1,3 +1,4 @@
+aic94xx-firmware 30-10
 ansifilter 2.22-1
 azahar-appimage-wayland 1:2124.3-1
 ente-auth-bin 4.4.23-2
@@ -14,6 +15,5 @@ python-questionary 2.1.1-2
 spotdl 4.5.0-3
 telegram-desktop-bin 6.9.3-1
 tut-bin 2.0.1-1
+wd719x-firmware 1-9
 zen-browser-bin 1.21.3b-1
-zennotes-bin 2.5.0-1
-zt 0.8.0-1

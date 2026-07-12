@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+# AUTHOR: Daesorin
+# CREATED: 2026-07-11 11:50 +0100
+
+import sys
+from pathlib import Path
+from decimal import Decimal, InvalidOperation
+
+# CONFIGURATION
+# set accounting buckets, currency symbol, and hardcoded vault path
+DEFAULT_EXPENSE_ACCOUNT = "Expenses:Uncategorised"
+DEFAULT_INCOME_ACCOUNT = "Income:Uncategorised"
+DEFAULT_PAYMENT_ACCOUNT = "Assets:Checking"
+CURRENCY = "NGN "
+NOTES_DIR = Path("~/obsidian/Finances/daesorin").expanduser()
+
+# FRONTMATTER PARSER
+# extract yaml between the opening and closing dashes without external libraries
+def parse_frontmatter(file_path):
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+    except OSError as e:
+        print(f"warning: unable to read {file_path} ({e})", file=sys.stderr)
+        return None
+
+    if not content.startswith("---"):
+        return None
+
+    parts = content.split("---", 2)
+    if len(parts) < 3:
+        return None
+
+    yaml_text = parts[1]
+    data = {}
+    for line in yaml_text.strip().split("\n"):
+        # ignore empty lines and full-line comments
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+            
+        if ":" in line:
+            key, val = line.split(":", 1)
+            # strip inline yaml comments and surrounding quotation marks
+            clean_val = val.split("#", 1)[0].strip().strip('\'"')
+            data[key.strip().lower()] = clean_val
+            
+    return data
+
+# JOURNAL GENERATOR
+# convert parsed dictionary into an hledger double entry transaction string
+def generate_entry(data, file_path):
+    try:
+        date = data["date"]
+        name = data.get("name", "untitled transaction")
+        tx_type = data.get("type", "expense").lower()
+        
+        # use decimal for precise financial arithmetic
+        unit = Decimal(data.get("unit", "1"))
+        amount = Decimal(data["amount"])
+        total = unit * amount
+
+        if tx_type == "income":
+            target_account = data.get("account", DEFAULT_INCOME_ACCOUNT)
+            entry = (
+                f"{date} * {name}\n"
+                f"    {DEFAULT_PAYMENT_ACCOUNT}    {CURRENCY}{total:.2f}\n"
+                f"    {target_account}    -{CURRENCY}{total:.2f}\n\n"
+            )
+        else:
+            target_account = data.get("account", DEFAULT_EXPENSE_ACCOUNT)
+            entry = (
+                f"{date} * {name}\n"
+                f"    {target_account}    {CURRENCY}{total:.2f}\n"
+                f"    {DEFAULT_PAYMENT_ACCOUNT}    -{CURRENCY}{total:.2f}\n\n"
+            )
+
+        return entry
+    except (KeyError, InvalidOperation, TypeError) as e:
+        # log malformed notes to standard error to prevent silent data loss
+        print(f"warning: skipping malformed note '{file_path}' ({type(e).__name__})", file=sys.stderr)
+        return ""
+
+# MAIN EXECUTION
+# scan the hardcoded directory recursively and print compiled journal entries
+if __name__ == "__main__":
+    if not NOTES_DIR.is_dir():
+        print(f"error: directory '{NOTES_DIR}' does not exist", file=sys.stderr)
+        sys.exit(1)
+
+    entries = []
+    # rglob enables recursive scanning through nested folder structures
+    for file_path in sorted(NOTES_DIR.rglob("*.md")):
+        data = parse_frontmatter(file_path)
+        if data and "date" in data and "amount" in data:
+            entry = generate_entry(data, file_path)
+            if entry:
+                entries.append(entry)
+
+    print("".join(entries), end="")

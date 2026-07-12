@@ -1,0 +1,7 @@
+alias hl='hledger'
+alias hlb='hledger bal'
+alias hlbe='hledger bal Expenses'
+alias hlbi='hledger bal Income'
+alias hlr='hledger reg'
+alias hlis='hledger incomestatement'
+alias hlw='hledger-web'

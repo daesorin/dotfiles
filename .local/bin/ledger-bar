@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+# AUTHOR: Daesorin
+# CREATED: 2026-07-11 13:28 +0100
+
+import sys
+import csv
+
+# DATA INGESTION
+# read comma separated values from standard input
+reader = csv.reader(sys.stdin)
+rows = list(reader)
+
+if not rows or len(rows) < 2:
+    print("error: insufficient data provided to generate histogram", file=sys.stderr)
+    sys.exit(1)
+
+# PARSE ACCOUNT BALANCES
+# extract account labels and numerical values while skipping headers and total lines
+data = []
+total = 0.0
+
+for row in rows:
+    if len(row) >= 2:
+        account = row[0].strip()
+        # skip table headers and running totals
+        if account.lower() in ["account", "total", ""]:
+            continue
+        try:
+            # remove currency symbols and formatting commas before type conversion
+            val_str = row[1].replace("NGN", "").replace(",", "").strip()
+            amount = abs(float(val_str))
+            data.append((account, amount))
+            total += amount
+        except ValueError:
+            continue
+
+if total == 0:
+    print("error: net balance is zero, cannot calculate distribution percentage", file=sys.stderr)
+    sys.exit(1)
+
+# RENDER HISTOGRAM
+# sort accounts by expenditure volume and print ascii progress bars
+data.sort(key=lambda x: x[1], reverse=True)
+max_label = max(len(item[0]) for item in data)
+bar_width = 35
+
+print(f"\n{'ACCOUNT':<{max_label}} | {'AMOUNT (NGN)':>14} | {'%':>5} | HISTOGRAM")
+print("-" * (max_label + 62))
+
+for account, amount in data:
+    percentage = (amount / total) * 100
+    filled = int((percentage / 100) * bar_width)
+    bar = "█" * filled
+    print(f"{account:<{max_label}} | {amount:>14.2f} | {percentage:>4.1f}% | {bar}")
+
+print("-" * (max_label + 62))
+print(f"{'TOTAL':<{max_label}} | {total:>14.2f} | 100.0% |\n")

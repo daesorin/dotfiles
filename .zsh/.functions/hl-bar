@@ -1,0 +1,11 @@
+# TERMINAL HISTOGRAM
+# pipe csv balances into python ascii graphing script with native percentage fallback
+local target="${1:-Expenses}"
+local bar_script="$HOME/.local/bin/ledger-bar"
+
+if [[ -x "$bar_script" ]]; then
+    hledger bal "$target" -O csv --flat | "$bar_script"
+else
+    echo "warning: ledger-bar not found, defaulting to percentage breakdown" >&2
+    hledger bal "$target" --percent
+fi
