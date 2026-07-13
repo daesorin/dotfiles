@@ -1,7 +1,7 @@
 # VAULT COMPILATION
 # execute python parser to convert markdown notes into double entry transactions
 local generator="$HOME/.local/bin/md-to-hledger"
-local journal="$HOME/.journal/2026.journal"
+local journal="${HLEDGER_JOURNAL:-$HOME/.journal/2026.journal}"
 
 if [[ ! -x "$generator" ]]; then
     echo "error: generator script missing or not executable at $generator" >&2

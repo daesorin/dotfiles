@@ -12,7 +12,7 @@ DEFAULT_EXPENSE_ACCOUNT = "Expenses:Uncategorised"
 DEFAULT_INCOME_ACCOUNT = "Income:Uncategorised"
 DEFAULT_PAYMENT_ACCOUNT = "Assets:Checking"
 CURRENCY = "NGN "
-NOTES_DIR = Path("~/obsidian/Finances/daesorin").expanduser()
+NOTES_DIR = Path("~/obsidian/Finances").expanduser()
 
 # FRONTMATTER PARSER
 # extract yaml between the opening and closing dashes without external libraries
@@ -60,7 +60,11 @@ def generate_entry(data, file_path):
         amount = Decimal(data["amount"])
         total = unit * amount
 
-        if tx_type == "income":
+        # CASH FLOW ROUTING
+        # route transactions based on whether money enters or leaves checking
+        inflow_types = {"income", "liability", "borrowing", "inflow"}
+
+        if tx_type in inflow_types:
             target_account = data.get("account", DEFAULT_INCOME_ACCOUNT)
             entry = (
                 f"{date} * {name}\n"
