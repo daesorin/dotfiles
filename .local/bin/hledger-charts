@@ -1,0 +1,625 @@
+#!/usr/bin/env python3
+# AUTHOR: Daesorin
+# CREATED: 2026-07-12 09:40 +0100
+"""
+hledger-charts
+
+terminal and image charts for hledger csv output. reads csv from standard
+input, piped directly from hledger, and renders an ascii chart to the
+terminal, a matplotlib png, or both.
+
+ARCH DIFFERENCE
+matplotlib is only required for --png output, ascii charts use the standard
+library alone. install matplotlib via pacman rather than pip where possible:
+
+    pacman -S python-matplotlib
+
+pip installs into an externally managed environment fail under PEP 668
+unless a virtualenv is used or --break-system-packages is passed.
+
+INPUT
+pipe hledger csv output in directly, or pass --journal so the script
+calls hledger itself. pass the -O csv flag when piping directly from
+hledger. the --format flag specifies a custom line format string and
+produces incompatible text:
+
+    hledger balance -O csv | hledger-charts pie --png pie.png
+    hledger-charts pie --journal .journal/2026.journal --png pie.png
+
+histogram and pie read a single period balance report. trend, stacked, and
+grouped read a multi period balance report (hledger balance -M), which the
+script requests automatically when --journal is given. pass an account pattern
+or date range as trailing query arguments to focus the chart. all trailing
+arguments and flags after the chart options are passed straight through to
+hledger balance:
+
+    hledger-charts stacked --journal .journal/2026.journal expenses
+    hledger-charts trend --journal .journal/2026.journal expenses -b 2026-01 -e 2026-04
+"""
+
+import argparse
+import csv
+import io
+import os
+import re
+import subprocess
+import sys
+
+SPARK_CHARS = "▁▂▃▄▅▆▇█"
+ANSI_COLOURS = [31, 33, 32, 36, 34, 35, 91, 93, 92, 96, 94, 95]
+
+
+# AMOUNT PARSING
+# shared by both single period and multi period csv shapes
+
+def clean_amount(raw, invert=False):
+    """EXTRACT THE FIRST NUMERIC VALUE FROM CURRENCY AND FORMATTED STRINGS
+    accepts formats such as "1,200.00 NGN", "NGN -1,200.00", "- 450.00"
+    """
+    cleaned = raw.replace(",", "")
+    cleaned = re.sub(r"([-+])\s+", r"\1", cleaned)
+    match = re.search(r"[-+]?\d+(?:\.\d+)?", cleaned)
+    if not match:
+        return 0.0
+    val = float(match.group(0))
+    return -val if invert else val
+
+
+# ACCOUNT HIERARCHY
+
+def rollup_account(account, depth):
+    """TRUNCATE ACCOUNT NAME TO A SPECIFIED HIERARCHY DEPTH"""
+    if not depth or depth <= 0:
+        return account
+    parts = account.split(":")
+    return ":".join(parts[:depth])
+
+
+def aggregate_single_period(accounts, amounts, depth):
+    """GROUP SINGLE PERIOD AMOUNTS BY TRUNCATED ACCOUNT NAME"""
+    if not depth or depth <= 0:
+        return accounts, amounts
+    grouped = {}
+    for acc, amt in zip(accounts, amounts):
+        parent = rollup_account(acc, depth)
+        grouped[parent] = grouped.get(parent, 0.0) + amt
+    return list(grouped.keys()), list(grouped.values())
+
+
+def aggregate_multi_period(accounts, periods, matrix, depth):
+    """GROUP MULTI PERIOD MATRICES BY TRUNCATED ACCOUNT NAME"""
+    if not depth or depth <= 0:
+        return accounts, periods, matrix
+    grouped = {}
+    n_periods = len(periods)
+    for i, acc in enumerate(accounts):
+        parent = rollup_account(acc, depth)
+        if parent not in grouped:
+            grouped[parent] = [0.0] * n_periods
+        for j in range(n_periods):
+            grouped[parent][j] += matrix[i][j]
+    return list(grouped.keys()), periods, list(grouped.values())
+
+
+# CSV PARSING
+
+def parse_balance_csv(rows, invert=False):
+    """PARSE A SINGLE PERIOD BALANCE REPORT
+    expects rows shaped like [account, amount], skips headers and totals
+    """
+    accounts = []
+    amounts = []
+    for row in rows:
+        if len(row) < 2:
+            continue
+        account = row[0].strip()
+        if account.lower().rstrip(" :") in ("account", "total", ""):
+            continue
+        try:
+            amount = clean_amount(row[1], invert=invert)
+        except ValueError:
+            continue
+        accounts.append(account)
+        amounts.append(amount)
+    return accounts, amounts
+
+
+def parse_period_csv(rows, invert=False):
+    """PARSE A MULTI PERIOD BALANCE REPORT
+    expects a header of account,period1,... and drops any trailing total column
+    """
+    if not rows:
+        return [], [], []
+    header = [c.strip() for c in rows[0]]
+    if len(header) < 2:
+        raise ValueError(
+            "period csv needs an account column and at least one value column"
+        )
+    periods = header[1:]
+    if len(periods) > 1 and periods[-1].lower().rstrip(" :") == "total":
+        periods = periods[:-1]
+    accounts = []
+    matrix = []
+    for row in rows[1:]:
+        if len(row) < 2:
+            continue
+        account = row[0].strip()
+        if account.lower().rstrip(" :") in ("account", "total", ""):
+            continue
+        values = row[1:1 + len(periods)]
+        try:
+            parsed = [clean_amount(v, invert=invert) for v in values]
+        except ValueError:
+            continue
+        accounts.append(account)
+        matrix.append(parsed)
+    return accounts, periods, matrix
+
+
+# DATA LOADING
+
+def load_csv_rows(args, period):
+    """LOAD BALANCE REPORT ROWS WITH TTY AND PIPELINE VALIDATION
+    calls hledger directly when --journal is given, otherwise reads csv from stdin
+    """
+    if not args.journal:
+        if sys.stdin.isatty():
+            print("error: no input piped to stdin and --journal not specified", file=sys.stderr)
+            sys.exit(1)
+        if args.query:
+            print("warning: query arguments are ignored when reading pre-computed csv from stdin", file=sys.stderr)
+        return list(csv.reader(sys.stdin))
+    cmd = ["hledger", "-f", args.journal, "balance", "-O", "csv"]
+    if period:
+        cmd.append("-M")
+    cmd.extend(args.query)
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True)
+    except FileNotFoundError:
+        print("error: hledger not found on PATH", file=sys.stderr)
+        sys.exit(1)
+    if result.returncode != 0:
+        print(f"error: hledger exited with status {result.returncode}", file=sys.stderr)
+        if result.stderr:
+            print(result.stderr.strip(), file=sys.stderr)
+        sys.exit(1)
+    return list(csv.reader(io.StringIO(result.stdout)))
+
+
+# RANKING HELPERS
+# keep charts readable when the account list is long
+
+def top_n_with_other(labels, values, n):
+    """COLLAPSE LOW RANKED ENTRIES INTO A SINGLE OTHER CATEGORY"""
+    paired = sorted(zip(labels, values), key=lambda p: abs(p[1]), reverse=True)
+    if n <= 0 or len(paired) <= n:
+        return [p[0] for p in paired], [p[1] for p in paired]
+    top = paired[:n]
+    rest = paired[n:]
+    other_total = sum(v for _, v in rest)
+    out_labels = [p[0] for p in top]
+    out_values = [p[1] for p in top]
+    if other_total != 0:
+        out_labels.append("other")
+        out_values.append(other_total)
+    return out_labels, out_values
+
+
+def top_n_matrix_with_other(accounts, matrix, n):
+    """COLLAPSE LOW RANKED ACCOUNTS INTO AN OTHER ROW ACROSS ALL PERIODS"""
+    totals = [sum(abs(v) for v in row) for row in matrix]
+    order = sorted(range(len(accounts)), key=lambda i: totals[i], reverse=True)
+    if n <= 0 or len(order) <= n:
+        idx = order
+        return [accounts[i] for i in idx], [matrix[i] for i in idx]
+    top_idx = order[:n]
+    rest_idx = order[n:]
+    top_accounts = [accounts[i] for i in top_idx]
+    top_matrix = [matrix[i] for i in top_idx]
+    n_periods = len(matrix[0]) if matrix else 0
+    other_row = [sum(matrix[i][j] for i in rest_idx) for j in range(n_periods)]
+    if any(other_row):
+        top_accounts.append("other")
+        top_matrix.append(other_row)
+    return top_accounts, top_matrix
+
+
+# ASCII RENDERING PRIMITIVES
+
+def use_colour(args):
+    if args.no_colour:
+        return False
+    if os.environ.get("NO_COLOR"):
+        return False
+    return sys.stdout.isatty()
+
+
+def sparkline(values):
+    """RENDER A COMPACT UNICODE SPARKLINE FOR ONE SERIES"""
+    if not values:
+        return ""
+    lo = min(values)
+    hi = max(values)
+    span = hi - lo
+    if span == 0:
+        return SPARK_CHARS[0] * len(values)
+    out = []
+    for v in values:
+        idx = int(((v - lo) / span) * (len(SPARK_CHARS) - 1))
+        out.append(SPARK_CHARS[idx])
+    return "".join(out)
+
+
+def multiline_sparkline(values, rows=2):
+    """RENDER A MULTI-LINE ASCII SPARKLINE CANVAS"""
+    if not values or rows <= 1:
+        return [sparkline(values)]
+    lo = min(values)
+    hi = max(values)
+    span = hi - lo if hi != lo else 1.0
+    canvas = [[" " for _ in values] for _ in range(rows)]
+    for col, v in enumerate(values):
+        norm = (v - lo) / span
+        scaled = norm * rows
+        full_blocks = int(scaled)
+        remainder = scaled - full_blocks
+        for r in range(full_blocks):
+            if r < rows:
+                canvas[rows - 1 - r][col] = "█"
+        if full_blocks < rows:
+            idx = int(remainder * len(SPARK_CHARS))
+            if idx > 0 or full_blocks == 0:
+                canvas[rows - 1 - full_blocks][col] = SPARK_CHARS[min(idx, len(SPARK_CHARS) - 1)]
+    return ["".join(row) for row in canvas]
+
+
+def segment_glyph(i, colour):
+    """PICK A GLYPH FOR SEGMENT I
+    coloured terminals reuse a plain block since colour carries the
+    distinction, plain terminals fall back to a letter per segment so
+    adjacent segments of the same rendered width stay distinguishable
+    """
+    if colour:
+        return "█"
+    return chr(ord("A") + (i % 26))
+
+
+def render_stacked_bar(labels, values, width, colour):
+    """RENDER ONE PROPORTIONAL STACKED BAR ACROSS THE GIVEN WIDTH"""
+    abs_values = [abs(v) for v in values]
+    total = sum(abs_values)
+    if total <= 0:
+        return " " * width
+    segments = []
+    allocated = 0
+    for i, v in enumerate(abs_values):
+        seg_width = int(round((v / total) * width))
+        if i == len(abs_values) - 1:
+            seg_width = max(width - allocated, 0)
+        allocated += seg_width
+        glyph = segment_glyph(i, colour)
+        char = glyph * seg_width
+        if colour:
+            code = ANSI_COLOURS[i % len(ANSI_COLOURS)]
+            char = f"\033[{code}m{char}\033[0m"
+        segments.append(char)
+    return "".join(segments)
+
+
+def render_legend(labels, values, colour):
+    """RENDER A LABEL AND PERCENTAGE LEGEND"""
+    abs_values = [abs(v) for v in values]
+    total = sum(abs_values)
+    max_label = max((len(l) for l in labels), default=0)
+    lines = []
+    for i, (label, value) in enumerate(zip(labels, values)):
+        pct = (abs(value) / total * 100) if total else 0.0
+        glyph = segment_glyph(i, colour)
+        swatch = glyph
+        if colour:
+            code = ANSI_COLOURS[i % len(ANSI_COLOURS)]
+            swatch = f"\033[{code}m{glyph}\033[0m"
+        lines.append(f"{swatch} {label:<{max_label}} {value:>14.2f} {pct:>5.1f}%")
+    return "\n".join(lines)
+
+
+# MATPLOTLIB HELPERS
+# imported lazily, ascii output never needs this dependency
+
+def _matplotlib_pyplot(theme="default"):
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        if theme and theme != "default":
+            try:
+                plt.style.use(theme)
+            except OSError:
+                print(f"warning: matplotlib theme '{theme}' not found, falling back to default", file=sys.stderr)
+        return plt
+    except ImportError:
+        print(
+            "error: matplotlib not installed, install with "
+            "'pacman -S python-matplotlib' or "
+            "'pip install matplotlib --break-system-packages'",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+
+def render_histogram_png(accounts, amounts, path, currency, theme):
+    plt = _matplotlib_pyplot(theme)
+    data = sorted(zip(accounts, amounts), key=lambda p: abs(p[1]), reverse=True)
+    labels = [d[0] for d in data]
+    values = [d[1] for d in data]
+    fig, ax = plt.subplots(figsize=(10, max(4, len(labels) * 0.4)))
+    ax.barh(labels, values, color="#4C72B0")
+    ax.invert_yaxis()
+    ax.set_xlabel(f"amount ({currency})" if currency else "amount")
+    ax.set_title("account balances")
+    fig.tight_layout()
+    fig.savefig(path, dpi=150)
+    fig.clf()
+    plt.close(fig)
+    print(f"saved histogram to {path}", file=sys.stderr)
+
+
+def render_pie_png(labels, values, path, currency, theme):
+    plt = _matplotlib_pyplot(theme)
+    fig, ax = plt.subplots(figsize=(8, 8))
+    abs_values = [abs(v) for v in values]
+    ax.pie(abs_values, labels=labels, autopct="%1.1f%%", startangle=90)
+    ax.set_title(f"account distribution ({currency})" if currency else "account distribution")
+    ax.axis("equal")
+    fig.tight_layout()
+    fig.savefig(path, dpi=150)
+    fig.clf()
+    plt.close(fig)
+    print(f"saved pie chart to {path}", file=sys.stderr)
+
+
+def render_trend_png(accounts, periods, matrix, path, currency, theme):
+    plt = _matplotlib_pyplot(theme)
+    fig, ax = plt.subplots(figsize=(10, 6))
+    for i, account in enumerate(accounts):
+        ax.plot(periods, matrix[i], marker="o", label=account)
+    ax.set_xlabel("period")
+    ax.set_ylabel(f"amount ({currency})" if currency else "amount")
+    ax.set_title("balance trend")
+    ax.legend()
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
+    fig.tight_layout()
+    fig.savefig(path, dpi=150)
+    fig.clf()
+    plt.close(fig)
+    print(f"saved trend chart to {path}", file=sys.stderr)
+
+
+def render_stacked_png(accounts, periods, matrix, path, currency, theme):
+    plt = _matplotlib_pyplot(theme)
+    fig, ax = plt.subplots(figsize=(10, 6))
+    bottom = [0.0] * len(periods)
+    for i, account in enumerate(accounts):
+        values = [abs(v) for v in matrix[i]]
+        ax.bar(periods, values, bottom=bottom, label=account)
+        bottom = [b + v for b, v in zip(bottom, values)]
+    ax.set_xlabel("period")
+    ax.set_ylabel(f"amount ({currency})" if currency else "amount")
+    ax.set_title("spending by category per period")
+    ax.legend()
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
+    fig.tight_layout()
+    fig.savefig(path, dpi=150)
+    fig.clf()
+    plt.close(fig)
+    print(f"saved stacked chart to {path}", file=sys.stderr)
+
+
+def render_grouped_png(accounts, periods, matrix, path, currency, theme):
+    plt = _matplotlib_pyplot(theme)
+    x = list(range(len(periods)))
+    n = len(accounts)
+    width = 0.8 / max(n, 1)
+    fig, ax = plt.subplots(figsize=(10, 6))
+    for i, account in enumerate(accounts):
+        values = [abs(v) for v in matrix[i]]
+        offset = (i - (n - 1) / 2) * width
+        positions = [xi + offset for xi in x]
+        ax.bar(positions, values, width=width, label=account)
+    ax.set_xticks(x)
+    ax.set_xticklabels(periods, rotation=45, ha="right")
+    ax.set_xlabel("period")
+    ax.set_ylabel(f"amount ({currency})" if currency else "amount")
+    ax.set_title("monthly comparison by account")
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(path, dpi=150)
+    fig.clf()
+    plt.close(fig)
+    print(f"saved grouped chart to {path}", file=sys.stderr)
+
+
+# SUBCOMMANDS
+
+def cmd_histogram(args):
+    rows = load_csv_rows(args, period=False)
+    accounts, amounts = parse_balance_csv(rows, invert=args.invert)
+    if not accounts:
+        print("error: no account data found in input", file=sys.stderr)
+        sys.exit(1)
+    accounts, amounts = aggregate_single_period(accounts, amounts, args.depth)
+    total = sum(amounts)
+    abs_total = sum(abs(a) for a in amounts)
+    data = sorted(zip(accounts, amounts), key=lambda p: abs(p[1]), reverse=True)
+    max_label = max(len(a) for a, _ in data)
+    bar_width = 35
+    print(f"\n{'ACCOUNT':<{max_label}} | {'AMOUNT':>14} | {'%':>5} | HISTOGRAM")
+    print("-" * (max_label + 62))
+    for account, amount in data:
+        pct = (abs(amount) / abs_total * 100) if abs_total else 0.0
+        filled = int((pct / 100) * bar_width)
+        print(f"{account:<{max_label}} | {amount:>14.2f} | {pct:>4.1f}% | {'█' * filled}")
+    print("-" * (max_label + 62))
+    print(f"{'TOTAL':<{max_label}} | {total:>14.2f} | 100.0% |\n")
+    if args.png:
+        render_histogram_png(accounts, amounts, args.png, args.currency, args.theme)
+
+
+def cmd_pie(args):
+    rows = load_csv_rows(args, period=False)
+    accounts, amounts = parse_balance_csv(rows, invert=args.invert)
+    if not accounts:
+        print("error: no account data found in input", file=sys.stderr)
+        sys.exit(1)
+    accounts, amounts = aggregate_single_period(accounts, amounts, args.depth)
+    labels, values = top_n_with_other(accounts, amounts, args.top)
+    colour = use_colour(args)
+    print()
+    print(render_stacked_bar(labels, values, args.width, colour))
+    print()
+    print(render_legend(labels, values, colour))
+    print()
+    if args.png:
+        render_pie_png(labels, values, args.png, args.currency, args.theme)
+
+
+def cmd_trend(args):
+    rows = load_csv_rows(args, period=True)
+    accounts, periods, matrix = parse_period_csv(rows, invert=args.invert)
+    if not accounts:
+        print("error: no account data found in input", file=sys.stderr)
+        sys.exit(1)
+    accounts, periods, matrix = aggregate_multi_period(accounts, periods, matrix, args.depth)
+    if args.top > 0:
+        accounts, matrix = top_n_matrix_with_other(accounts, matrix, args.top)
+    else:
+        # DEFAULT TO A SINGLE AGGREGATE SERIES
+        # sums every account per period unless --top requests individual lines
+        agg = [sum(row[j] for row in matrix) for j in range(len(periods))]
+        accounts, matrix = ["total"], [agg]
+    colour = use_colour(args)
+    max_label = max(len(a) for a in accounts)
+    print()
+    for i, account in enumerate(accounts):
+        series = matrix[i]
+        spark_lines = multiline_sparkline(series, rows=args.rows)
+        if colour:
+            code = ANSI_COLOURS[i % len(ANSI_COLOURS)]
+            spark_lines = [f"\033[{code}m{sl}\033[0m" for sl in spark_lines]
+        if args.rows > 1:
+            print(f"{account}: {series[0]:>12.2f} -> {series[-1]:>12.2f}")
+            for sl in spark_lines:
+                print(f"  {sl}")
+            print()
+        else:
+            print(f"{account:<{max_label}} {spark_lines[0]}  {series[0]:>12.2f} -> {series[-1]:>12.2f}")
+    if args.rows <= 1:
+        print()
+    print("periods: " + ", ".join(periods))
+    print()
+    if args.png:
+        render_trend_png(accounts, periods, matrix, args.png, args.currency, args.theme)
+
+
+def cmd_stacked(args):
+    rows = load_csv_rows(args, period=True)
+    accounts, periods, matrix = parse_period_csv(rows, invert=args.invert)
+    if not accounts:
+        print("error: no account data found in input", file=sys.stderr)
+        sys.exit(1)
+    accounts, periods, matrix = aggregate_multi_period(accounts, periods, matrix, args.depth)
+    accounts, matrix = top_n_matrix_with_other(accounts, matrix, args.top)
+    colour = use_colour(args)
+    max_period = max(len(p) for p in periods)
+    print()
+    for j, period in enumerate(periods):
+        values = [abs(matrix[i][j]) for i in range(len(accounts))]
+        bar = render_stacked_bar(accounts, values, args.width, colour)
+        print(f"{period:<{max_period}} {bar}")
+    print()
+    totals = [sum(abs(matrix[i][j]) for j in range(len(periods))) for i in range(len(accounts))]
+    print(render_legend(accounts, totals, colour))
+    print()
+    if args.png:
+        render_stacked_png(accounts, periods, matrix, args.png, args.currency, args.theme)
+
+
+def cmd_grouped(args):
+    rows = load_csv_rows(args, period=True)
+    accounts, periods, matrix = parse_period_csv(rows, invert=args.invert)
+    if not accounts:
+        print("error: no account data found in input", file=sys.stderr)
+        sys.exit(1)
+    accounts, periods, matrix = aggregate_multi_period(accounts, periods, matrix, args.depth)
+    accounts, matrix = top_n_matrix_with_other(accounts, matrix, args.top)
+    colour = use_colour(args)
+    bar_width = 20
+    print()
+    for i, account in enumerate(accounts):
+        row = [abs(v) for v in matrix[i]]
+        row_max = max(row) if row else 0
+        print(account)
+        for j, period in enumerate(periods):
+            filled = int((row[j] / row_max) * bar_width) if row_max else 0
+            char = "█" * filled
+            if colour:
+                code = ANSI_COLOURS[i % len(ANSI_COLOURS)]
+                char = f"\033[{code}m{char}\033[0m"
+            padded = char + " " * (bar_width - filled)
+            print(f"  {period:<10} {padded} {row[j]:>12.2f}")
+        print()
+    if args.png:
+        render_grouped_png(accounts, periods, matrix, args.png, args.currency, args.theme)
+
+
+# ARGUMENT PARSING
+
+def build_parser():
+    parser = argparse.ArgumentParser(
+        description="terminal and image charts for hledger csv output, reads csv from standard input"
+    )
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("--png", metavar="PATH", help="also render a matplotlib png to this path")
+    common.add_argument("-t", "--theme", default="default", help="matplotlib stylesheet theme (e.g., dark_background, ggplot)")
+    common.add_argument("--currency", default="", help="currency label for chart titles")
+    common.add_argument("--no-colour", action="store_true", help="disable ansi colour output")
+    common.add_argument("-i", "--invert", action="store_true", help="invert mathematical signs (multiply all amounts by -1)")
+    common.add_argument("-d", "--depth", type=int, default=0, help="summarise accounts to this hierarchy depth (0 for full names)")
+    common.add_argument("--journal", metavar="PATH", help="hledger journal file, calls hledger directly instead of reading csv from stdin")
+    common.add_argument("query", nargs=argparse.REMAINDER, help="optional hledger query passed through to hledger balance, e.g. an account pattern or -b/-e dates, only used with --journal")
+
+    p_hist = sub.add_parser("histogram", parents=[common], help="horizontal bar histogram of account balances")
+    p_hist.set_defaults(func=cmd_histogram)
+
+    p_pie = sub.add_parser("pie", parents=[common], help="proportional bar and pie chart of account distribution")
+    p_pie.add_argument("--top", type=int, default=8, help="accounts to show before collapsing into other, 0 for no limit")
+    p_pie.add_argument("--width", type=int, default=60, help="width of the ascii bar in characters")
+    p_pie.set_defaults(func=cmd_pie)
+
+    p_trend = sub.add_parser("trend", parents=[common], help="balance trend over time as sparklines and a line chart")
+    p_trend.add_argument("--top", type=int, default=0, help="individual account lines to show, 0 shows only the total")
+    p_trend.add_argument("-r", "--rows", type=int, default=1, help="height of the ascii sparkline canvas in rows (default 1)")
+    p_trend.set_defaults(func=cmd_trend)
+
+    p_stack = sub.add_parser("stacked", parents=[common], help="stacked bar of spending by category per period")
+    p_stack.add_argument("--top", type=int, default=8, help="accounts to show before collapsing into other, 0 for no limit")
+    p_stack.add_argument("--width", type=int, default=50, help="width of each ascii bar in characters")
+    p_stack.set_defaults(func=cmd_stacked)
+
+    p_group = sub.add_parser("grouped", parents=[common], help="grouped bar comparison of accounts across periods")
+    p_group.add_argument("--top", type=int, default=6, help="accounts to show before collapsing into other, 0 for no limit")
+    p_group.set_defaults(func=cmd_grouped)
+
+    return parser
+
+
+def main():
+    parser = build_parser()
+    args = parser.parse_args()
+    args.func(args)
+
+
+if __name__ == "__main__":
+    main()

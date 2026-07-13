@@ -1,0 +1,6 @@
+# COMPILATION AND VERIFICATION
+# compile markdown notes to journal and display top-level balance summary
+if hl-compile; then
+    echo ""
+    hledger -f "${HLEDGER_JOURNAL:-$HOME/.journal/2026.journal}" balance --depth 1
+fi

@@ -1,0 +1,11 @@
+# STACKED BAR RENDERING
+# render stacked proportional bars across time periods
+local chart_script="$HOME/.local/bin/hledger-charts"
+local journal="${HLEDGER_JOURNAL:-$HOME/.journal/2026.journal}"
+
+if [[ -x "$chart_script" ]]; then
+    "$chart_script" stacked --journal "$journal" "${@:-expenses}"
+else
+    echo "warning: hledger-charts not found, defaulting to monthly tabular matrix" >&2
+    hledger -f "$journal" balance -M "${@:-expenses}"
+fi

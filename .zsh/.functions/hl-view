@@ -1,0 +1,14 @@
+# GRAPHICAL IMAGE RENDERING
+# generate matplotlib png image and open immediately with imv
+local subcommand="${1:-pie}"
+shift 2>/dev/null || true
+local chart_script="$HOME/.local/bin/hledger-charts"
+local journal="${HLEDGER_JOURNAL:-$HOME/.journal/2026.journal}"
+local tmp_image="/tmp/hledger_chart.png"
+
+if [[ -x "$chart_script" ]]; then
+    "$chart_script" "$subcommand" --journal "$journal" --png "$tmp_image" --theme "${HL_THEME:-dark_background}" "${@:-expenses}" && imv "$tmp_image"
+else
+    echo "error: hledger-charts binary not executable at $chart_script" >&2
+    return 1
+fi

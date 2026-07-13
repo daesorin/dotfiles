@@ -1,0 +1,10 @@
+# INCOME DISTRIBUTION
+# view earnings breakdown with inverted mathematical signs for positive display
+local chart_script="$HOME/.local/bin/hledger-charts"
+local journal="${HLEDGER_JOURNAL:-$HOME/.journal/2026.journal}"
+
+if [[ -x "$chart_script" ]]; then
+    "$chart_script" pie --journal "$journal" -i "${@:-income}"
+else
+    hledger -f "$journal" balance "${@:-income}" --invert
+fi

@@ -1,0 +1,10 @@
+# DEBT AND LIABILITY TRACKING
+# view loan balances over time using inverted multi-line sparklines
+local chart_script="$HOME/.local/bin/hledger-charts"
+local journal="${HLEDGER_JOURNAL:-$HOME/.journal/2026.journal}"
+
+if [[ -x "$chart_script" ]]; then
+    "$chart_script" trend --journal "$journal" -i -r 2 "${@:-liabilities}"
+else
+    hledger -f "$journal" balance -M "${@:-liabilities}" --invert
+fi
