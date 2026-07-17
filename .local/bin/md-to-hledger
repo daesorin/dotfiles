@@ -12,7 +12,7 @@ DEFAULT_EXPENSE_ACCOUNT = "Expenses:Uncategorised"
 DEFAULT_INCOME_ACCOUNT = "Income:Uncategorised"
 DEFAULT_PAYMENT_ACCOUNT = "Assets:Checking"
 CURRENCY = "NGN "
-NOTES_DIR = Path("~/obsidian/Finances").expanduser()
+NOTES_DIR = Path("~/obsidian/finances").expanduser()
 
 # FRONTMATTER PARSER
 # extract yaml between the opening and closing dashes without external libraries

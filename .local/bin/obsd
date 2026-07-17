@@ -1,53 +1,269 @@
 #!/usr/bin/env python3
 
+# MODULE IMPORTS
+# import required standard library and external modules
 import argparse
-import time
+import json
 import subprocess
-from threading import Timer
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+import time
 from pathlib import Path
+from threading import Timer
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 
-# PRODUCTION CONFIGURATION
+# SYSTEM CONFIGURATION
+# define local disk paths and remote ssh endpoints
 local_dir = "/home/dsrn/obsidian/"
 remote_dest = "ish:/root/obsidian/"
 debounce_seconds = 2.0
+ledger_file = Path.home() / ".cache" / "obsd" / "ledger.json"
 
-# ignore workspace ui states to prevent infinite sync loops
+# EXCLUSION RULES
+# ignore workspace ui states and version control directories to prevent sync loops
 excludes = [
     "--exclude=.obsidian/workspace*",
     "--exclude=.trash/",
-    "--exclude=.git/"
+    "--exclude=.git/",
 ]
 
+# RSYNC PARAMETERS
+# use checksum verification and ignore ios metadata incompatibilities
+rsync_base_flags = [
+    "-rlcz",
+    "--delete",
+    "--no-perms",
+    "--no-owner",
+    "--no-group",
+    "--omit-dir-times",
+]
+
+
+# PATH EVALUATION
+# check if relative path matches any rsync ignore rules
+def is_excluded(rel_path):
+    parts = Path(rel_path).parts
+    if ".git" in parts or ".trash" in parts:
+        return True
+    if rel_path.startswith(".obsidian/workspace"):
+        return True
+    return False
+
+
+# STATE LEDGER MANAGEMENT
+# handle local state tracking to distinguish deletions from remote additions
+def load_ledger():
+    if not ledger_file.exists():
+        return {}
+    with open(ledger_file, "r") as f:
+        return json.load(f)
+
+
+def save_ledger(state):
+    ledger_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(ledger_file, "w") as f:
+        json.dump(state, f, indent=2)
+
+
+# DISK INSPECTION
+# scan vault directory and record file modification timestamps
+def scan_local_vault():
+    state = {}
+    root = Path(local_dir)
+    if not root.exists():
+        return state
+    for path in root.rglob("*"):
+        if path.is_file():
+            rel = str(path.relative_to(root))
+            if not is_excluded(rel):
+                state[rel] = path.stat().st_mtime
+    return state
+
+
+# STATE COMPARISON
+# evaluate local disk modifications against the saved baseline
+def get_local_changes(current, ledger):
+    added = []
+    modified = []
+    deleted = []
+
+    for path, mtime in current.items():
+        if path not in ledger:
+            added.append(path)
+        elif mtime - ledger[path] > 1.0:
+            modified.append(path)
+
+    for path in ledger:
+        if path not in current:
+            deleted.append(path)
+
+    return added, modified, deleted
+
+
+# SYNC STATUS EVALUATION
+# compare local disk state against ledger and remote endpoint using checksums
+def get_sync_status():
+    ledger = load_ledger()
+    current_local = scan_local_vault()
+
+    local_added, local_modified, local_deleted = get_local_changes(current_local, ledger)
+    local_changes = local_added + local_modified + local_deleted
+
+    cmd = ["rsync", "-rlni", "--checksum", "--delete", "--no-perms", "--no-owner", "--no-group", "--omit-dir-times"] + excludes + [remote_dest, local_dir]
+    res = subprocess.run(cmd, capture_output=True, text=True)
+
+    remote_added = []
+    remote_modified = []
+    remote_deleted = []
+
+    if res.returncode != 0:
+        print(f"error: remote inspection failed ({res.stderr.strip()})")
+        return "error", [], []
+
+    for line in res.stdout.splitlines():
+        if not line.strip():
+            continue
+        parts = line.split(maxsplit=1)
+        if len(parts) != 2:
+            continue
+        code, filepath = parts
+        if filepath.endswith("/"):
+            continue
+
+        if code.startswith("*deleting"):
+            if filepath not in local_added:
+                remote_deleted.append(filepath)
+        elif code.startswith(">f+++++++++"):
+            if filepath not in local_deleted:
+                remote_added.append(filepath)
+        elif code.startswith(">f") or code.startswith("c"):
+            if filepath not in local_modified:
+                remote_modified.append(filepath)
+
+    remote_changes = remote_added + remote_modified + remote_deleted
+
+    if not local_changes and not remote_changes:
+        state = "clean"
+    elif local_changes and not remote_changes:
+        state = "local_ahead"
+    elif remote_changes and not local_changes:
+        state = "remote_ahead"
+    else:
+        state = "diverged"
+
+    return state, local_changes, remote_changes
+
+
+# COMMAND ASSEMBLE
+# construct rsync arguments based on operational flags and checksum parameters
 def build_rsync_cmd(src, dest):
-    return ["rsync", "-avz", "--delete"] + excludes + [src, dest]
+    return ["rsync"] + rsync_base_flags + excludes + [src, dest]
 
-def pull_sync():
-    print(f"pulling changes from ish to arch...")
-    subprocess.run(build_rsync_cmd(remote_dest, local_dir))
-    print("pull complete.")
 
-def push_sync():
-    print(f"pushing changes from arch to ish...")
-    subprocess.run(build_rsync_cmd(local_dir, remote_dest))
-    print("push complete.")
+# EXECUTION COMMANDS
+# define pull and push operations with safety guards
+def pull_sync(force=False):
+    state, local_ch, remote_ch = get_sync_status()
+    if state == "error":
+        return
+    if not force and state in ["local_ahead", "diverged"]:
+        print(f"pull aborted: vault state is {state}. local changes would be overwritten.")
+        print(f"run 'obsd status' to inspect or use '--force' to override.")
+        return
 
+    print("pulling changes from ish to arch using checksum verification...")
+    res = subprocess.run(build_rsync_cmd(remote_dest, local_dir))
+    if res.returncode == 0:
+        save_ledger(scan_local_vault())
+        print("pull complete. ledger updated.")
+
+
+def push_sync(force=False):
+    state, local_ch, remote_ch = get_sync_status()
+    if state == "error":
+        return
+    if not force and state in ["remote_ahead", "diverged"]:
+        print(f"push aborted: vault state is {state}. mobile changes would be overwritten.")
+        print(f"run 'obsd pull' first or use '--force' to override.")
+        return
+
+    print("pushing changes from arch to ish using checksum verification...")
+    res = subprocess.run(build_rsync_cmd(local_dir, remote_dest))
+    if res.returncode == 0:
+        save_ledger(scan_local_vault())
+        print("push complete. ledger updated.")
+
+
+def bidirectional_sync(force=False):
+    state, local_ch, remote_ch = get_sync_status()
+    if state == "clean":
+        print("vaults are synchronised. no action required.")
+    elif state == "local_ahead":
+        push_sync(force=True)
+    elif state == "remote_ahead":
+        pull_sync(force=True)
+    elif state == "diverged":
+        if force:
+            print("force flag detected. pushing local changes over remote...")
+            push_sync(force=True)
+        else:
+            print("sync aborted: vaults have diverged. inspect status and resolve manually.")
+    elif state == "error":
+        print("sync failed due to unreachable remote.")
+
+
+def print_status():
+    print("inspecting vault states across arch and ish...")
+    state, local_ch, remote_ch = get_sync_status()
+    if state == "error":
+        return
+
+    print(f"\ncurrent status: {state.upper()}")
+    if local_ch:
+        print(f"\nlocal changes ({len(local_ch)}):")
+        for f in local_ch:
+            print(f"  + {f}")
+    if remote_ch:
+        print(f"\nremote changes ({len(remote_ch)}):")
+        for f in remote_ch:
+            print(f"  + {f}")
+    if state == "clean":
+        print("\ndirectories match ledger baseline exactly.")
+
+
+def init_ledger():
+    print("initialising synchronisation ledger from current local vault state...")
+    save_ledger(scan_local_vault())
+    print(f"ledger written to {ledger_file}.")
+
+
+# WATCHDOG EVENT HANDLING
+# monitor local filesystem for modifications and trigger debounced syncs
 class watchdog_push_handler(FileSystemEventHandler):
     def __init__(self):
         self.sync_timer = None
 
     def on_any_event(self, event):
-        # ignore directory changes and workspace/hidden cache updates
-        if event.is_directory or any(x in event.src_path for x in [".obsidian", ".trash"]):
+        if event.is_directory or any(x in event.src_path for x in [".obsidian", ".trash", ".git"]):
             return
-            
-        print(f"local change detected: {event.event_type}")
+
+        print(f"local change detected: {event.event_type} on {Path(event.src_path).name}")
         if self.sync_timer:
             self.sync_timer.cancel()
-            
-        self.sync_timer = Timer(debounce_seconds, push_sync)
+
+        self.sync_timer = Timer(debounce_seconds, self.safe_watchdog_push)
         self.sync_timer.start()
+
+    def safe_watchdog_push(self):
+        state, local_ch, remote_ch = get_sync_status()
+        if state in ["clean", "local_ahead"]:
+            push_sync(force=True)
+        elif state == "remote_ahead":
+            print("watchdog paused: remote vault is ahead. run 'obsd pull' to update arch.")
+        elif state == "diverged":
+            print("watchdog paused: vaults have diverged. run 'obsd status' to inspect.")
+        elif state == "error":
+            print("watchdog paused: could not connect to ish node.")
+
 
 def watch_mode():
     print(f"arch watchdog listening on {local_dir}")
@@ -64,14 +280,31 @@ def watch_mode():
         observer.stop()
     observer.join()
 
+
+# ARGUMENT PARSING
+# parse command line interface flags and execute requested mode
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="arch sync node")
-    parser.add_argument("mode", nargs="?", default="watch", choices=["watch", "push", "pull"])
+    parser = argparse.ArgumentParser(description="arch synchronisation node with safety locks")
+    parser.add_argument(
+        "mode",
+        nargs="?",
+        default="watch",
+        choices=["watch", "push", "pull", "status", "sync", "init"],
+    )
+    parser.add_argument(
+        "-f", "--force", action="store_true", help="override safety locks and force transfer"
+    )
     args = parser.parse_args()
 
-    if args.mode == "pull":
-        pull_sync()
+    if args.mode == "init":
+        init_ledger()
+    elif args.mode == "status":
+        print_status()
+    elif args.mode == "pull":
+        pull_sync(force=args.force)
     elif args.mode == "push":
-        push_sync()
+        push_sync(force=args.force)
+    elif args.mode == "sync":
+        bidirectional_sync(force=args.force)
     else:
         watch_mode()

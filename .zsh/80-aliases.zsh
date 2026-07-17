@@ -42,6 +42,7 @@ alias -g WC='| wc -l'
 alias -g NUL='>/dev/null 2>&1'
 alias -g E='2>&1'
 alias -g COPY='| wl-copy'
+alias -g ANSICOPY='| ansifilter | wl-copy'
 
 alias fullcharge='sudo tlp fullcharge'
 alias paste='wl-paste'

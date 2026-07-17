@@ -3,3 +3,5 @@
 
 [include]
     path = ~/.config/git/local.gitconfig
+[url "git@code.sgbvmr.xyz:"]
+	insteadOf = https://code.sgbvmr.xyz/
