@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# AUTHOR: Daesorin
+# CREATED: 2026-07-18 11:26 +0100
+
+set -euo pipefail
+
+# DEFINE API ENDPOINT
+# store the target url and authentication parameter in a shell variable
+readonly API_URL="http://api.weatherapi.com/v1/current.json?key=d06994d0d97744ae89d172923261707&q=Idogbo&aqi=no"
+
+# FETCH AND PARSE WEATHER PAYLOAD
+# curl fetches the data silently and pipes the stream directly into jq for extraction
+curl -s "$API_URL" | jq -r '
+  "Location: \(.location.name), \(.location.region), \(.location.country)",
+  "Local Time: \(.location.localtime)",
+  "Temperature: \(.current.temp_c)°C",
+  "Condition: \(.current.condition.text) (Code: \(.current.condition.code))",
+  "Icon URL: https:\(.current.condition.icon)"
+'
