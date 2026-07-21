@@ -26,7 +26,7 @@ binds {
     Mod+Shift+T cooldown-ms=500 { spawn "alacritty" "-e" "tut"; }
 
     // HARDWARE AND OVERLAYS
-    Mod+Shift+C { spawn "/home/dil/.local/bin/picker"; }
+    Mod+Shift+C { spawn "/home/dsrn/.local/bin/pick"; }
     Mod+W { spawn-sh "killall -SIGUSR1 waybar"; }
 
     // WINDOW MECHANICS
@@ -69,6 +69,8 @@ binds {
     Mod+R { open-overview; }
 
     // HARDWARE MEDIA ROUTING
+    Mod+Alt+K { spawn "pamixer" "-i" "10"; }
+    Mod+Alt+J { spawn "pamixer" "-d" "10"; }
     XF86AudioRaiseVolume { spawn "pamixer" "-i" "5"; }
     XF86AudioLowerVolume { spawn "pamixer" "-d" "5"; }
     XF86AudioMute { spawn "pamixer" "-t"; }
@@ -80,7 +82,7 @@ binds {
     Mod+Alt+Space { spawn "mpc" "toggle"; }
     Mod+Alt+L { spawn "mpc" "next"; }
     Mod+Alt+H { spawn "mpc" "prev"; }
-    Mod+Alt+K { spawn "mpc" "stop"; }
+    Mod+Alt+S { spawn "mpc" "stop"; }
     // SHELL AUTOMATIONS
     Mod+Print { spawn "bash" "-c" "grim -g \"$(slurp)\" - | wl-copy"; }
     Print { spawn "bash" "-c" "grim - | wl-copy"; }

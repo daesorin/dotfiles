@@ -72,3 +72,4 @@ __pycache__/
 .config/mimeapps.list
 .config/systemd/
 .config/gtk-3.0/bookmarks
+.local/bin/roulette
