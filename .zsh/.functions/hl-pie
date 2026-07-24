@@ -1,7 +1,7 @@
 # PIE AND PROPORTIONAL RENDERING
 # render proportional ascii bar and distribution chart
 local chart_script="$HOME/.local/bin/hledger-charts"
-local journal="${HLEDGER_JOURNAL:-$HOME/.journal/2026.journal}"
+local journal="${HLEDGER_JOURNAL:-$HOME/obsidian/finances/journals/2026.journal}"
 
 if [[ -x "$chart_script" ]]; then
     "$chart_script" pie --journal "$journal" "${@:-expenses}"

@@ -7,6 +7,10 @@ export MANPAGER="nvim +Man!"
 export BAT_THEME="base16"
 export NODE_OPTIONS=--no-deprecation
 
+# HLEDGER CONFIGURATION
+# point system commands to the primary journal file
+export LEDGER_FILE="$HOME/obsidian/finances/journals/2026.journal"
+
 # PAGER COLOURS
 # define terminal capability codes for less
 export LESS_TERMCAP_mb=$'\E[1;31m'

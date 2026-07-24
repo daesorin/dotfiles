@@ -3,7 +3,7 @@
 local subcommand="${1:-pie}"
 shift 2>/dev/null || true
 local chart_script="$HOME/.local/bin/hledger-charts"
-local journal="${HLEDGER_JOURNAL:-$HOME/.journal/2026.journal}"
+local journal="${HLEDGER_JOURNAL:-$HOME/obsidian/finances/journals/2026.journal}"
 local tmp_image="/tmp/hledger_chart.png"
 
 if [[ -x "$chart_script" ]]; then

@@ -1,7 +1,7 @@
 # HISTOGRAM RENDERING
 # render horizontal bar chart of account balances
 local chart_script="$HOME/.local/bin/hledger-charts"
-local journal="${HLEDGER_JOURNAL:-$HOME/.journal/2026.journal}"
+local journal="${HLEDGER_JOURNAL:-$HOME/obsidian/finances/journals/2026.journal}"
 
 if [[ -x "$chart_script" ]]; then
     "$chart_script" histogram --journal "$journal" "${@:-expenses}"
