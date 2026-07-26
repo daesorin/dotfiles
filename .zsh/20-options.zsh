@@ -1,5 +1,6 @@
-# NAVIGATION OPTIONS
-# set directory behaviour
+# LINTING DIRECTIVES
+# ignore file during static analysis due to lack of zsh support
+# shellcheck disable=all
 setopt AUTO_CD # enter dir without prepending `cd`
 setopt AUTO_PUSHD
 setopt PUSHD_IGNORE_DUPS
@@ -10,6 +11,7 @@ setopt COMPLETE_IN_WORD
 setopt ALWAYS_TO_END
 setopt AUTO_LIST
 setopt GLOB_DOTS
+setopt hist_ignore_space
 
 # GLOBBING OPTIONS
 # set expansion rules

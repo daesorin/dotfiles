@@ -82,7 +82,7 @@ binds {
     Mod+Alt+Space { spawn "mpc" "toggle"; }
     Mod+Alt+L { spawn "mpc" "next"; }
     Mod+Alt+H { spawn "mpc" "prev"; }
-    Mod+Alt+S { spawn "mpc" "stop"; }
+    Mod+Alt+Shift+K { spawn "mpc" "stop"; }
     // SHELL AUTOMATIONS
     Mod+Print { spawn "bash" "-c" "grim -g \"$(slurp)\" - | wl-copy"; }
     Print { spawn "bash" "-c" "grim - | wl-copy"; }

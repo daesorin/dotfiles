@@ -1,9 +1,9 @@
 sw_volume: 100
 audio_device_state:1:pulse audio
 audio_device_state:1:visualiser
-state: play
-current: 0
-time: 114.19500000000001
+state: pause
+current: 49
+time: 38.396
 random: 0
 repeat: 0
 single: 0
@@ -13,5 +13,59 @@ mixrampdb: 0
 mixrampdelay: -1
 lastloadedplaylist: 
 playlist_begin
-0:Six_figures_of_a_shattered_psyche.m4a
+0:The Dead Brothers - I Am All I Got.{ext}.opus
+1:Jason Webley - Dance While the Sky Crashes Down.{ext}.opus
+2:Jason Webley - Last Song.{ext}.opus
+3:Passenger - Things That Stop You Dreaming.{ext}.opus
+4:Passenger - Let Her Go.{ext}.opus
+5:Passenger - Staring at the Stars.{ext}.opus
+6:Passenger - All the Little Lights.{ext}.opus
+7:Passenger - The Wrong Direction.{ext}.opus
+8:Passenger - Circles.{ext}.opus
+9:Passenger - Keep on Walking.{ext}.opus
+10:Passenger - Patient Love.{ext}.opus
+11:Passenger - Life's for the Living.{ext}.opus
+12:Passenger - Holes.{ext}.opus
+13:Passenger - Feather on the Clyde.{ext}.opus
+14:Passenger - I Hate (Live from the Borderline, London).{ext}.opus
+15:Passenger - Let Her Go (Acoustic Version).{ext}.opus
+16:Passenger - Staring at the Stars (Acoustic Version).{ext}.opus
+17:Passenger - All the Little Lights (Acoustic Version).{ext}.opus
+18:Passenger - Circles (Acoustic Version).{ext}.opus
+19:Johnny Cash - The Man Comes Around.{ext}.opus
+20:Those Poor Bastards - God's Dark Heaven.{ext}.opus
+21:Amigo the Devil - Cocaine and Abel.{ext}.opus
+22:Amigo the Devil - Hell and You.{ext}.opus
+23:02 - The Accidents of Gesture [bgz15dwPhRE].opus
+24:09 - We Who Fell in Love with the Sea [OHrLr_s3K9w].opus
+25:10 - Swords to Rust - Hearts to Dust [blW1HCQntME].opus
+26:Giles Corey - No One Is Ever Going to Want Me.{ext}.opus
+27:Danny Schmidt - Firestorm.{ext}.opus
+28:Danny Schmidt - Serpentine Cycle Of Money.{ext}.opus
+29:08 - Michael Jackson - Thriller [cgE8HEflQPg].opus
+30:12 - Michael Jackson - Workin' Day and Night [jyRJyftxfWo].opus
+31:Danny Schmidt - This Too Shall Pass.{ext}.opus
+32:Danny Schmidt - Dark-Eyed Prince.{ext}.opus
+33:Danny Schmidt - Happy All the Time.{ext}.opus
+34:Danny Schmidt - Stained Glass.{ext}.opus
+35:Danny Schmidt - Ghosts.{ext}.opus
+36:nothing,nowhere. - Pieces of You.{ext}.opus
+37:Nick Cave & The Bad Seeds - Into My Arms.{ext}.opus
+38:Nick Cave & The Bad Seeds - People Ain't No Good.{ext}.opus
+39:Jason Webley - Ways to Love.{ext}.opus
+40:Jason Webley - Almost Time to Go.{ext}.opus
+41:Leonard Cohen - Famous Blue Raincoat.{ext}.opus
+42:Barton Carroll - Those Days Are Gone, and My Heart Is Breaking.{ext}.opus
+43:grandson - thoughts & prayers.{ext}.opus
+44:01 - Tunng - Eating the Dead [V8irBermE8Y].opus
+45:02 - Tunng - Death is the New Sex [JmN_OW8VMYU].opus
+46:09 - Tunng - Man [Pwj6F9YuZT4].opus
+47:12 - Tunng - Woman [sQfKnqWFRGA].opus
+48:Passenger - Coins in a Fountain.{ext}.opus
+49:Passenger - Whispers.{ext}.opus
+50:Passenger - Riding to New York.{ext}.opus
+51:Passenger - Scare Away the Dark.{ext}.opus
+52:Passenger - David.{ext}.opus
+53:Passenger - Words.{ext}.opus
+54:Passenger - Strangers.{ext}.opus
 playlist_end
